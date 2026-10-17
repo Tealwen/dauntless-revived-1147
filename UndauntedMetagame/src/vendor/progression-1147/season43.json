@@ -1,0 +1,1509 @@
+{
+  "progression_id": "season43",
+  "premium_gating_entitlement": "season43_premium",
+  "progression_multiplier": 1,
+  "progression_multiplier_start_date": "2019-01-01T00:00:00+00:00",
+  "progression_multiplier_end_date": "2019-01-01T00:00:00+00:00",
+  "requirements": [
+    {
+      "rank_id": 0,
+      "xp_required": 0
+    },
+    {
+      "rank_id": 1,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 2,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 3,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 4,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 5,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 6,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 7,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 8,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 9,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 10,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 11,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 12,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 13,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 14,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 15,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 16,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 17,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 18,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 19,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 20,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 21,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 22,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 23,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 24,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 25,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 26,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 27,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 28,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 29,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 30,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 31,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 32,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 33,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 34,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 35,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 36,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 37,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 38,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 39,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 40,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 41,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 42,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 43,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 44,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 45,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 46,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 47,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 48,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 49,
+      "xp_required": 100
+    },
+    {
+      "rank_id": 50,
+      "xp_required": 100
+    }
+  ],
+  "free_rewards": [
+    {
+      "rank_id": 0,
+      "entitlements": [],
+      "stacked_items": [],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 1,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "TITLE_HP09B_COMMANDO_00",
+          "hidden": false,
+          "priority": 1,
+          "quantity": 1
+        },
+        {
+          "catalog_id": "EJ_HP09B_COMMANDO_02",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 2,
+      "entitlements": [],
+      "stacked_items": [],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 3,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_TOKEN_EXCHANGE_SPEED_UP",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 25
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 4,
+      "entitlements": [],
+      "stacked_items": [],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 5,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "Container_Core_Slayer_Silver",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 6,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "TOKEN_BOUNTY_DRAFT",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 2
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 7,
+      "entitlements": [],
+      "stacked_items": [],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 8,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "QI_DAMAGE_BLOCK_POTION",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 15
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 9,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "TOKEN_EVENT_S09B_QUEST_COUNTER",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 10,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_PLATINUM_UNIV",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 50
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 11,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "TOKEN_BOUNTY_DRAFT",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 2
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 12,
+      "entitlements": [],
+      "stacked_items": [],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 13,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "QI_STAMINA_POTION_00",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 25
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 14,
+      "entitlements": [],
+      "stacked_items": [],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 15,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "EJ_HP09B_COMMANDO_00",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 16,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "TOKEN_BOUNTY_DRAFT",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 2
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 17,
+      "entitlements": [],
+      "stacked_items": [],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 18,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "QI_HEALING_PYLON_BIG",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 10
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 19,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "TOKEN_EVENT_S09B_QUEST_COUNTER",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 20,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_TOKEN_EXCHANGE_SPEED_UP",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 25
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 21,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "TOKEN_BOUNTY_DRAFT",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 2
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 22,
+      "entitlements": [],
+      "stacked_items": [],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 23,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "QI_STAMINA_POTION_00",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 25
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 24,
+      "entitlements": [],
+      "stacked_items": [],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 25,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_PLATINUM_UNIV",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 50
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 26,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "TOKEN_BOUNTY_DRAFT",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 2
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 27,
+      "entitlements": [],
+      "stacked_items": [],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 28,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "DYE_HP09B_COMMANDO_00_DURABLE",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 29,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "TOKEN_EVENT_S09B_QUEST_COUNTER",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 30,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "QI_FLARE_HP09B_COMMANDO_00",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 31,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "TOKEN_BOUNTY_DRAFT",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 2
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 32,
+      "entitlements": [],
+      "stacked_items": [],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 33,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "EJ_HP09B_COMMANDO_01",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 34,
+      "entitlements": [],
+      "stacked_items": [],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 35,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_PLATINUM_UNIV",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 50
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 36,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "TOKEN_BOUNTY_DRAFT",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 2
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 37,
+      "entitlements": [],
+      "stacked_items": [],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 38,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "QI_DAMAGE_PYLON",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 10
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 39,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "TOKEN_EVENT_S09B_QUEST_COUNTER",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 2
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 40,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "BNC_SIGIL_HP09B_COMMANDO_00",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 41,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "TOKEN_BOUNTY_DRAFT",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 2
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 42,
+      "entitlements": [],
+      "stacked_items": [],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 43,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "EM_PLAYER_HP09B_COMMANDO_00",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 44,
+      "entitlements": [],
+      "stacked_items": [],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 45,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_PLATINUM_UNIV",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 50
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 46,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "TOKEN_BOUNTY_DRAFT",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 2
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 47,
+      "entitlements": [],
+      "stacked_items": [],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 48,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_TOKEN_TRANSMOG",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 49,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "TOKEN_EVENT_S09B_QUEST_COUNTER",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 3
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 50,
+      "entitlements": [
+        {
+          "duration": 0,
+          "entitlement": "ent_hp09b_elite_50"
+        }
+      ],
+      "stacked_items": [
+        {
+          "catalog_id": "AR_HP09B_COMMANDO_HELM_00",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        },
+        {
+          "catalog_id": "AR_HP09B_COMMANDO_LEGS_00",
+          "hidden": false,
+          "priority": 1,
+          "quantity": 1
+        },
+        {
+          "catalog_id": "AR_HP09B_COMMANDO_ARMS_00",
+          "hidden": false,
+          "priority": 2,
+          "quantity": 1
+        },
+        {
+          "catalog_id": "AR_HP09B_COMMANDO_CHEST_00",
+          "hidden": false,
+          "priority": 3,
+          "quantity": 1
+        },
+        {
+          "catalog_id": "TITLE_HP09B_COMMANDO_01",
+          "hidden": false,
+          "priority": 4,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    }
+  ],
+  "premium_rewards": [
+    {
+      "rank_id": 0,
+      "entitlements": [],
+      "stacked_items": [],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 1,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "AR_HP09B_COMMANDO_HELM_00",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        },
+        {
+          "catalog_id": "AR_HP09B_COMMANDO_LEGS_00",
+          "hidden": false,
+          "priority": 1,
+          "quantity": 1
+        },
+        {
+          "catalog_id": "AR_HP09B_COMMANDO_ARMS_00",
+          "hidden": false,
+          "priority": 2,
+          "quantity": 1
+        },
+        {
+          "catalog_id": "AR_HP09B_COMMANDO_CHEST_00",
+          "hidden": false,
+          "priority": 3,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 2,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "DYE_HP09B_COMMANDO_01_DURABLE",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 3,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_TOKEN_TRANSMOG",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 4,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "WP_EB_HP09B_COMMANDO_00",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 5,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "EM_INTRO_HP09B_COMMANDO_00_F",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 6,
+      "entitlements": [
+        {
+          "duration": 0,
+          "entitlement": "ent_cchd_hp09b_commando_00"
+        }
+      ],
+      "stacked_items": [],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 7,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "TOKEN_DAILY_PATROL_BONUS_PURCHASED",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 5
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 8,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_PLATINUM_UNIV",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 50
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 9,
+      "entitlements": [
+        {
+          "duration": 0,
+          "entitlement": "ent_ccfp_hp09b_commando_00"
+        }
+      ],
+      "stacked_items": [],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 10,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "LT_HP09B_COMMANDO_00",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 11,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "DYE_HP09B_COMMANDO_02_DURABLE",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 12,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_PLATINUM_UNIV",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 50
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 13,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "BNC_FABRIC_EVENT_HP09B_COMMANDO_00",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 14,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_TOKEN_TRANSMOG",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 15,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "WP_CB_HP09B_COMMANDO_00",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 16,
+      "entitlements": [
+        {
+          "duration": 24,
+          "entitlement": "escalation_xp_boost_entitlement"
+        }
+      ],
+      "stacked_items": [],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 17,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_MARKS_STEEL",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 100
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 18,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_PLATINUM_UNIV",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 50
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 19,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "TOKEN_DAILY_PATROL_BONUS_PURCHASED",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 5
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 20,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "WP_IH_HP09B_COMMANDO_00",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 21,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "EM_PLAYER_HP09B_COMMANDO_01",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 22,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_TOKEN_TRANSMOG",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 23,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_PLATINUM_UNIV",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 50
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 24,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "TOKEN_DAILY_PATROL_BONUS_PURCHASED",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 5
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 25,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "WP_MS_HP09B_COMMANDO_00",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 26,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_TOKEN_TRANSMOG",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 27,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_MARKS_STEEL",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 100
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 28,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_PLATINUM_UNIV",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 50
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 29,
+      "entitlements": [
+        {
+          "duration": 0,
+          "entitlement": "ent_ccfp_hp09b_commando_01"
+        }
+      ],
+      "stacked_items": [],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 30,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "WP_GA_HP09B_COMMANDO_00",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 31,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "EM_PLAYER_HP09B_COMMANDO_02",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 32,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_MARKS_STEEL",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 100
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 33,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_PLATINUM_UNIV",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 50
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 34,
+      "entitlements": [
+        {
+          "duration": 2,
+          "entitlement": "escalation_xp_boost_entitlement"
+        }
+      ],
+      "stacked_items": [],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 35,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "WP_DP_HP09B_COMMANDO_00",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 36,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "BNC_STANDARD_HP09B_COMMANDO_00",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 37,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_PRESTIGE",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 50
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 38,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_PLATINUM_UNIV",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 50
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 39,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_MARKS_STEEL",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 100
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 40,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "WP_AC_HP09B_COMMANDO_00",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 41,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "TOKEN_BOUNTY_DRAFT",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 5
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 42,
+      "entitlements": [
+        {
+          "duration": 2,
+          "entitlement": "escalation_xp_boost_entitlement"
+        }
+      ],
+      "stacked_items": [],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 43,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_PLATINUM_UNIV",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 50
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 44,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_MARKS_STEEL",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 100
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 45,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "EM_INTRO_HP09B_COMMANDO_00",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 46,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "TOKEN_BOUNTY_DRAFT",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 5
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 47,
+      "entitlements": [
+        {
+          "duration": 2,
+          "entitlement": "escalation_xp_boost_entitlement"
+        }
+      ],
+      "stacked_items": [],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 48,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_MARKS_STEEL",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 100
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 49,
+      "entitlements": [],
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_PRESTIGE",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 50
+        }
+      ],
+      "instanced_items": []
+    },
+    {
+      "rank_id": 50,
+      "entitlements": [
+        {
+          "duration": 0,
+          "entitlement": "ent_hp09b_elite_50"
+        }
+      ],
+      "stacked_items": [
+        {
+          "catalog_id": "AR_HP09B_COMMANDO_HELM_00_ULTRA",
+          "hidden": false,
+          "priority": 0,
+          "quantity": 1
+        },
+        {
+          "catalog_id": "AR_HP09B_COMMANDO_CHEST_00_ULTRA",
+          "hidden": false,
+          "priority": 1,
+          "quantity": 1
+        },
+        {
+          "catalog_id": "AR_HP09B_COMMANDO_ARMS_00_ULTRA",
+          "hidden": false,
+          "priority": 2,
+          "quantity": 1
+        },
+        {
+          "catalog_id": "AR_HP09B_COMMANDO_LEGS_00_ULTRA",
+          "hidden": false,
+          "priority": 3,
+          "quantity": 1
+        }
+      ],
+      "instanced_items": []
+    }
+  ],
+  "start_date": "2019-01-01T00:00:00+00:00",
+  "end_date": "2099-01-01T00:00:00+00:00",
+  "prestige": {
+    "free_rewards": {
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_PRESTIGE",
+          "hidden": false,
+          "quantity": 1
+        }
+      ]
+    },
+    "premium_rewards": {
+      "stacked_items": [
+        {
+          "catalog_id": "CURRENCY_PRESTIGE",
+          "hidden": false,
+          "quantity": 5
+        }
+      ]
+    },
+    "xp_per_level": 100
+  }
+}

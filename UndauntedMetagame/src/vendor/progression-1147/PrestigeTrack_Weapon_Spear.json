@@ -1,0 +1,24 @@
+{
+  "progression_id": "PrestigeTrack_Weapon_Spear",
+  "premium_gating_entitlement": "",
+  "progression_multiplier": 1,
+  "progression_multiplier_start_date": "2019-01-01T00:00:00+00:00",
+  "progression_multiplier_end_date": "2019-01-01T00:00:00+00:00",
+  "requirements": [
+    {
+      "rank_id": 0,
+      "xp_required": 0
+    },
+    {
+      "rank_id": 1,
+      "xp_required": 10000
+    }
+  ],
+  "free_rewards": [],
+  "premium_rewards": [],
+  "start_date": "2019-01-01T00:00:00+00:00",
+  "end_date": "2099-01-01T00:00:00+00:00",
+  "prestige": {
+    "xp_per_level": 10000
+  }
+}

@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { chmodSync, mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { buildWineLaunch, decodeWorkerPayload, terminateProcessTree } from "../../unix-common/game-runner.mjs";
+import { buildWineLaunch, decodeWorkerPayload, dllOverrides, terminateProcessTree } from "../../unix-common/game-runner.mjs";
 import { buildSshLaunch } from "../../openbsd-server/launch-gameserver.mjs";
 
 function exe(file) {
@@ -118,4 +118,10 @@ test("OpenBSD launcher sends one encoded payload over batch SSH", () => {
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
+});
+
+test("1.14.7 servers force the native winmm loader instead of dxgi", () => {
+  assert.equal(dllOverrides("foo=n;winmm=b", "1.14.7"), "foo=n;winmm=n,b");
+  assert.equal(dllOverrides("", "1.14.7"), "winmm=n,b");
+  assert.equal(dllOverrides("dxgi=b", undefined), "dxgi=n,b");
 });

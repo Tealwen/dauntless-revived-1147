@@ -77,6 +77,8 @@ const args = parseArgs(process.argv.slice(2));
 const platform = required(args, "platform");
 if (platform !== "linux" && platform !== "openbsd") throw new Error("--platform must be linux or openbsd");
 const mode = args.mode || "private";
+const gameVersion = args["game-version"] || "1.4.4";
+if (gameVersion !== "1.4.4" && gameVersion !== "1.14.7") throw new Error("--game-version must be 1.4.4 or 1.14.7");
 if (mode !== "private" && mode !== "public") throw new Error("--mode must be private or public");
 const root = path.resolve(required(args, "root"));
 const data = path.resolve(required(args, "data"));
@@ -119,7 +121,7 @@ const metagame = {
   MATCHMAKING_MODE: "DEPLOYSERVER",
   DEPLOYSERVER_URL: "127.0.0.1:61001",
   QOS_TARGET_URL: mode === "public" ? "http://127.0.0.1:61000/QoS" : "http://" + myIp + ":61000/QoS",
-  TARGET_CHANGELIST: 239827,
+  TARGET_CHANGELIST: gameVersion === "1.14.7" ? 647472 : 239827,
   SERVER_NAME: serverName,
   SOURCE_URL: "https://github.com/mixutin/dauntless-revived",
   GIT_COMMIT: commit,
@@ -130,6 +132,17 @@ const metagame = {
   CHAT_PORT: 61099,
   CHAT_BIND_HOST: mode === "public" ? "127.0.0.1" : myIp,
   ...(mode === "public" ? { GATEWAY_SECRET: gatewaySecret } : {}),
+  // 1.14.7 client (routes/compat1147.ts): its progression tracks, the season43 Hunt Pass and its Elite
+  // entitlement, and the main store sold for Platinum. An owner's own value in the old file is kept.
+  ...(gameVersion === "1.14.7" ? {
+    TARGET_GAME_VERSION: "1.14.7",
+    PROGRESSION_CONFIG_DIR: path.join(root, "UndauntedMetagame", "src", "vendor", "progression-1147"),
+    ACTIVE_HUNT_PASS: oldMeta.ACTIVE_HUNT_PASS || "season43",
+    ENTITLEMENTS_DEFAULT: oldMeta.ENTITLEMENTS_DEFAULT || "season43_premium,season09b_premium,season_premium_any,season_free_any",
+    STORE: oldMeta.STORE || "free",
+    STORE_PRICING: oldMeta.STORE_PRICING || "platinum",
+    ...(oldMeta.CHALLENGE_SEASON_START ? { CHALLENGE_SEASON_START: oldMeta.CHALLENGE_SEASON_START } : {}),
+  } : {}),
 };
 writeEnv(metaFile, metagame);
 
@@ -147,6 +160,7 @@ const deploy = {
   RAMSGATE_POOL: args["ramsgate-pool"] ?? readEnv(path.join(config, "deployserver.env")).RAMSGATE_POOL ?? 1,
   ENABLE_DOJO: args["enable-dojo"] || 0,
   NODE_ENV: "production",
+  DR_GAME_VERSION: gameVersion,
 };
 if (platform === "linux") {
   deploy.DR_GAME_EXE = path.join(game, "Archon", "Binaries", "Win64", "Dauntless-Win64-Shipping.exe");
@@ -216,6 +230,7 @@ fs.writeFileSync(path.join(config, "server.conf"), [
   "DR_DATA=" + data,
   "DR_CONFIG=" + config,
   "DR_GAME_DIR=" + game,
+  "DR_GAME_VERSION=" + gameVersion,
   "DR_MY_IP=" + myIp,
   "DR_GATEWAY_EXTERNAL_PORT=" + externalGatewayPort,
   "DR_UDP_BEGIN=" + udpBegin,

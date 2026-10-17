@@ -1,0 +1,97 @@
+{
+  "progression_id": "ExperienceTrack_PlayerLevel",
+  "premium_gating_entitlement": "",
+  "progression_multiplier": 1,
+  "progression_multiplier_start_date": "2019-01-01T00:00:00+00:00",
+  "progression_multiplier_end_date": "2019-01-01T00:00:00+00:00",
+  "requirements": [
+    {
+      "rank_id": 0,
+      "xp_required": 0
+    },
+    {
+      "rank_id": 1,
+      "xp_required": 671
+    },
+    {
+      "rank_id": 2,
+      "xp_required": 1343
+    },
+    {
+      "rank_id": 3,
+      "xp_required": 2014
+    },
+    {
+      "rank_id": 4,
+      "xp_required": 2686
+    },
+    {
+      "rank_id": 5,
+      "xp_required": 3357
+    },
+    {
+      "rank_id": 6,
+      "xp_required": 4029
+    },
+    {
+      "rank_id": 7,
+      "xp_required": 4700
+    },
+    {
+      "rank_id": 8,
+      "xp_required": 5372
+    },
+    {
+      "rank_id": 9,
+      "xp_required": 6043
+    },
+    {
+      "rank_id": 10,
+      "xp_required": 6715
+    },
+    {
+      "rank_id": 11,
+      "xp_required": 7386
+    },
+    {
+      "rank_id": 12,
+      "xp_required": 8058
+    },
+    {
+      "rank_id": 13,
+      "xp_required": 8729
+    },
+    {
+      "rank_id": 14,
+      "xp_required": 9401
+    },
+    {
+      "rank_id": 15,
+      "xp_required": 10072
+    },
+    {
+      "rank_id": 16,
+      "xp_required": 10744
+    },
+    {
+      "rank_id": 17,
+      "xp_required": 11415
+    },
+    {
+      "rank_id": 18,
+      "xp_required": 12087
+    },
+    {
+      "rank_id": 19,
+      "xp_required": 12758
+    },
+    {
+      "rank_id": 20,
+      "xp_required": 13440
+    }
+  ],
+  "free_rewards": [],
+  "premium_rewards": [],
+  "start_date": "2019-01-01T00:00:00+00:00",
+  "end_date": "2099-01-01T00:00:00+00:00"
+}

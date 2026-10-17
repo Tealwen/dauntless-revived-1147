@@ -2,6 +2,7 @@ import type { IncomingMessage, Server } from "http";
 import type { Duplex } from "stream";
 import WebSocket, { RawData, WebSocketServer } from "ws";
 import { logger } from "../logger";
+import { ClientAddressOf } from "../middleware/RequestOrigin";
 import { OnClose, OnConnect, OnSubscribe, OnUnsubscribe, StompPeer } from "./stompbus1147";
 
 // Minimal STOMP-over-WebSocket endpoint for the 1.14.7 client's StompClientMcp (Epic's notification
@@ -58,7 +59,8 @@ export function AttachStomp(Http: Server): void {
             return;
         }
         socket.on("error", () => undefined);
-        const Address = req.socket.remoteAddress ?? "?";
+        // Behind the gateway every socket comes from loopback: count the player's own address
+        const Address = ClientAddressOf(req as any) ?? req.socket.remoteAddress ?? "?";
         if (Total >= MAX_TOTAL || (PerAddress.get(Address) ?? 0) >= MAX_PER_ADDRESS) {
             logger.warn(`stomp: refused a connection from ${Address} (limit)`);
             socket.destroy();

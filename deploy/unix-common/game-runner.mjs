@@ -65,13 +65,16 @@ function steamRootFor(proton) {
   return null;
 }
 
-function dllOverrides(existing) {
+// The loader DLL next to the exe must win over Wine's builtin: dxgi.dll for 1.4.4, winmm.dll for 1.14.7
+// (DR_GAME_VERSION; the 1.14.7 exe crashes with a dxgi proxy).
+export function dllOverrides(existing, version) {
+  const loader = version === "1.14.7" ? "winmm" : "dxgi";
   const parts = (existing ?? "")
     .split(";")
     .map((part) => part.trim())
     .filter(Boolean)
-    .filter((part) => !/^dxgi=/i.test(part));
-  parts.push("dxgi=n,b");
+    .filter((part) => !new RegExp("^" + loader + "=", "i").test(part));
+  parts.push(loader + "=n,b");
   return parts.join(";");
 }
 
@@ -101,7 +104,7 @@ export function buildWineLaunch(args, env = process.env) {
       ...(steamRoot ? { STEAM_COMPAT_CLIENT_INSTALL_PATH: steamRoot } : {}),
       STEAM_COMPAT_APP_ID: "0",
       PROTON_LOG: "0",
-      WINEDLLOVERRIDES: dllOverrides(env.WINEDLLOVERRIDES),
+      WINEDLLOVERRIDES: dllOverrides(env.WINEDLLOVERRIDES, env.DR_GAME_VERSION),
     };
     runtime = "Proton (" + path.basename(path.dirname(proton)) + ")";
   } else {
@@ -115,7 +118,7 @@ export function buildWineLaunch(args, env = process.env) {
       ...env,
       WINEPREFIX: prefix,
       WINEDEBUG: env.WINEDEBUG ?? "-all",
-      WINEDLLOVERRIDES: dllOverrides(env.WINEDLLOVERRIDES),
+      WINEDLLOVERRIDES: dllOverrides(env.WINEDLLOVERRIDES, env.DR_GAME_VERSION),
     };
     runtime = "Wine";
   }

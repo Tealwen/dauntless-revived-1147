@@ -98,6 +98,15 @@ describe("Classify", () => {
         assert.equal(Upgrade.action === "reject" && Upgrade.status, 403);
     });
 
+    it("sends STOMP upgrades (the 1.14.7 notification service) to the metagame and the others to chat", () => {
+        const Stomp = Classify("GET", "/", { upgrade: "websocket", "sec-websocket-protocol": "v10.stomp, v11.stomp, v12.stomp" }, true);
+        assert.equal(Stomp.action === "proxy" && Stomp.upstream, "metagame");
+        const Chat = Classify("GET", "/", { upgrade: "websocket", "sec-websocket-protocol": "xmpp" }, true);
+        assert.equal(Chat.action === "proxy" && Chat.upstream, "ws");
+        const Lookalike = Classify("GET", "/", { upgrade: "websocket", "sec-websocket-protocol": "v12.stompx" }, true);
+        assert.equal(Lookalike.action === "proxy" && Lookalike.upstream, "ws");
+    });
+
     it("refuses targets that are not a plain path, odd methods and non-websocket upgrades", () => {
         assert.equal((Classify("GET", "http://evil.example/undaunted/api/CreateInvite", {}, false) as any).status, 400);
         assert.equal((Classify("OPTIONS", "*", {}, false) as any).status, 400);

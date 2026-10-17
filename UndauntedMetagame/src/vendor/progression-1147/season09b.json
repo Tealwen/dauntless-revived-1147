@@ -1,0 +1,217 @@
+{
+  "progression_id": "season09b",
+  "premium_gating_entitlement": "season09b_premium",
+  "progression_multiplier": 1,
+  "progression_multiplier_start_date": "2019-01-01T00:00:00+00:00",
+  "progression_multiplier_end_date": "2019-01-01T00:00:00+00:00",
+  "requirements": [
+    {
+      "rank_id": 0,
+      "xp_required": 0
+    },
+    {
+      "rank_id": 1,
+      "xp_required": 196
+    },
+    {
+      "rank_id": 2,
+      "xp_required": 392
+    },
+    {
+      "rank_id": 3,
+      "xp_required": 588
+    },
+    {
+      "rank_id": 4,
+      "xp_required": 784
+    },
+    {
+      "rank_id": 5,
+      "xp_required": 980
+    },
+    {
+      "rank_id": 6,
+      "xp_required": 1176
+    },
+    {
+      "rank_id": 7,
+      "xp_required": 1372
+    },
+    {
+      "rank_id": 8,
+      "xp_required": 1568
+    },
+    {
+      "rank_id": 9,
+      "xp_required": 1764
+    },
+    {
+      "rank_id": 10,
+      "xp_required": 1960
+    },
+    {
+      "rank_id": 11,
+      "xp_required": 2156
+    },
+    {
+      "rank_id": 12,
+      "xp_required": 2352
+    },
+    {
+      "rank_id": 13,
+      "xp_required": 2549
+    },
+    {
+      "rank_id": 14,
+      "xp_required": 2745
+    },
+    {
+      "rank_id": 15,
+      "xp_required": 2941
+    },
+    {
+      "rank_id": 16,
+      "xp_required": 3137
+    },
+    {
+      "rank_id": 17,
+      "xp_required": 3333
+    },
+    {
+      "rank_id": 18,
+      "xp_required": 3529
+    },
+    {
+      "rank_id": 19,
+      "xp_required": 3725
+    },
+    {
+      "rank_id": 20,
+      "xp_required": 3921
+    },
+    {
+      "rank_id": 21,
+      "xp_required": 4117
+    },
+    {
+      "rank_id": 22,
+      "xp_required": 4313
+    },
+    {
+      "rank_id": 23,
+      "xp_required": 4509
+    },
+    {
+      "rank_id": 24,
+      "xp_required": 4705
+    },
+    {
+      "rank_id": 25,
+      "xp_required": 4901
+    },
+    {
+      "rank_id": 26,
+      "xp_required": 5098
+    },
+    {
+      "rank_id": 27,
+      "xp_required": 5294
+    },
+    {
+      "rank_id": 28,
+      "xp_required": 5490
+    },
+    {
+      "rank_id": 29,
+      "xp_required": 5686
+    },
+    {
+      "rank_id": 30,
+      "xp_required": 5882
+    },
+    {
+      "rank_id": 31,
+      "xp_required": 6078
+    },
+    {
+      "rank_id": 32,
+      "xp_required": 6274
+    },
+    {
+      "rank_id": 33,
+      "xp_required": 6470
+    },
+    {
+      "rank_id": 34,
+      "xp_required": 6666
+    },
+    {
+      "rank_id": 35,
+      "xp_required": 6862
+    },
+    {
+      "rank_id": 36,
+      "xp_required": 7058
+    },
+    {
+      "rank_id": 37,
+      "xp_required": 7254
+    },
+    {
+      "rank_id": 38,
+      "xp_required": 7450
+    },
+    {
+      "rank_id": 39,
+      "xp_required": 7647
+    },
+    {
+      "rank_id": 40,
+      "xp_required": 7843
+    },
+    {
+      "rank_id": 41,
+      "xp_required": 8039
+    },
+    {
+      "rank_id": 42,
+      "xp_required": 8235
+    },
+    {
+      "rank_id": 43,
+      "xp_required": 8431
+    },
+    {
+      "rank_id": 44,
+      "xp_required": 8627
+    },
+    {
+      "rank_id": 45,
+      "xp_required": 8823
+    },
+    {
+      "rank_id": 46,
+      "xp_required": 9019
+    },
+    {
+      "rank_id": 47,
+      "xp_required": 9215
+    },
+    {
+      "rank_id": 48,
+      "xp_required": 9411
+    },
+    {
+      "rank_id": 49,
+      "xp_required": 9607
+    },
+    {
+      "rank_id": 50,
+      "xp_required": 9828
+    }
+  ],
+  "free_rewards": [],
+  "premium_rewards": [],
+  "start_date": "2019-01-01T00:00:00+00:00",
+  "end_date": "2019-01-02T00:00:00+00:00"
+}

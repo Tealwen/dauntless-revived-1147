@@ -128,6 +128,49 @@ The installer creates the fixed `dr-game-worker` command. For an SSH worker key,
 `authorized_keys` to the printed `restrict,command=".../ssh-worker-command.sh"` prefix. The forced
 command accepts only one bounded base64url JSON argv payload and never evaluates it as shell syntax.
 
+## Dauntless 1.14.7
+
+`--game-version 1.14.7` runs the servers on the Dauntless 1.14.7 build (CL 647472) instead of 1.4.4:
+
+```sh
+sudo ./deploy/linux-server/install.sh \
+  --game-dir /srv/dauntless/Game1147/Dauntless \
+  --my-ip 203.0.113.10 \
+  --mode public \
+  --firewall-interface eth0 \
+  --game-version 1.14.7
+```
+
+- `prepare-game.sh` checks the 1.14.7 exe (`f3f95fbf…b66b`) and installs `winmm.dll` (the loader,
+  `UndauntedProxy/`) and the 1.14.7 `UndauntedInternalServer.dll` from `deploy/game-1147/`, checked
+  against `deploy/game-1147/SHA256SUMS`. A 1.4.4 `dxgi.dll` in the folder is moved aside: it crashes
+  1.14.7 at start-up.
+- The game runner forces `winmm=n,b` instead of `dxgi=n,b` (`DR_GAME_VERSION` in `deployserver.env`).
+- `metagame.env` gets `TARGET_GAME_VERSION=1.14.7`, `TARGET_CHANGELIST=647472`, the 1.14.7 progression
+  tracks (`UndauntedMetagame/src/vendor/progression-1147`, from `PORT-1.14.7/tools/gen-progression-1147.js`),
+  `ACTIVE_HUNT_PASS=season43`, the Elite entitlement in `ENTITLEMENTS_DEFAULT`, and the main store sold
+  for Platinum (`STORE=free`, `STORE_PRICING=platinum`). Values already in the file for these keys are kept.
+- The gateway sends WebSocket upgrades offering a `v10/v11/v12.stomp` subprotocol (the 1.14.7
+  notification service) to the metagame, and every other upgrade to chat, as before.
+
+One metagame serves one game version: 1.4.4 players cannot connect to a 1.14.7 server. Players need
+the 1.14.7 client with `winmm.dll` and the 1.14.7 `UndauntedInternalServer.dll` next to its exe, and a
+launcher that starts it (the 1.4.4 launcher pins the 1.4.4 build).
+
+When the DLL is rebuilt, copy `UndauntedInternalServer1147/x64/Release/UndauntedInternalServer.dll`
+(and `UndauntedProxy/winmm.dll` if it changed) into `deploy/game-1147/` and regenerate the sums:
+
+```sh
+cd deploy/game-1147 && sha256sum winmm.dll UndauntedInternalServer.dll > SHA256SUMS
+```
+
+Replacing a running 1.4.4 server: back up `/var/lib/dauntless-revived/undaunted.db` first, install
+the 1.14.7 game tree in its own folder, then run the install again with `--game-version 1.14.7`. The
+database is reused; new tables are added by the migrations at start-up.
+
+Not validated yet: the 1.14.7 exe under Wine/Proton (only tested on Windows), and a 1.4.4 production
+database opened by 1.14.7 clients (characters, loadouts and inventories made by 1.4.4).
+
 ## Validation status
 
 On 1 October 2026 this port was tested against the local pinned

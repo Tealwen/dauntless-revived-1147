@@ -18,6 +18,7 @@ usage: $0 --game-dir <Dauntless folder> --my-ip <advertised IP> [options]
   --proton-data <dir>            Proton compat-data dir; default <data-dir>/proton
   --wine <path>                  explicit wine/wine64
   --xvfb 0|1                    use xvfb-run when no DISPLAY; default 1
+  --game-version 1.4.4|1.14.7    game build the servers run; default 1.4.4
   --firewall-interface <name>    nftables input interface; optional
   --no-services                  build/configure only; no root/systemd changes
   --skip-build                   do not run npm ci/build (for tests only)
@@ -42,6 +43,7 @@ proton=
 proton_data=
 wine=
 xvfb=1
+game_version=1.4.4
 firewall_interface=
 no_services=0
 skip_build=0
@@ -64,6 +66,7 @@ while [ "$#" -gt 0 ]; do
     --proton-data) proton_data=$2; shift 2 ;;
     --wine) wine=$2; shift 2 ;;
     --xvfb) xvfb=$2; shift 2 ;;
+    --game-version) game_version=$2; shift 2 ;;
     --firewall-interface) firewall_interface=$2; shift 2 ;;
     --no-services) no_services=1; shift ;;
     --skip-build) skip_build=1; shift ;;
@@ -74,6 +77,7 @@ done
 [ -n "$game_dir" ] && [ -n "$my_ip" ] || usage
 case "$mode" in private|public) ;; *) usage ;; esac
 case "$xvfb" in 0|1) ;; *) usage ;; esac
+case "$game_version" in 1.4.4|1.14.7) ;; *) usage ;; esac
 for p in "$source_root" "$game_dir"; do [ -d "$p" ] || { echo "not a directory: $p" >&2; exit 1; }; done
 for c in node npm tar sha256sum; do command -v "$c" >/dev/null 2>&1 || { echo "missing command: $c" >&2; exit 1; }; done
 node -e "const [a,b]=process.versions.node.split(\".\").map(Number); if(a<20 || (a===20 && b<19)) process.exit(1)" || { echo "Node.js 20.19+ is required" >&2; exit 1; }
@@ -97,7 +101,7 @@ fi
 
 chmod +x "$install_root/deploy/linux-server/launch-gameserver.mjs" "$install_root/deploy/linux-server/worker-launch.mjs" "$install_root/deploy/linux-server/prepare-game.sh" "$install_root/deploy/linux-server/allowlist.mjs" "$install_root/deploy/linux-server/stack.sh"
 
-"$install_root/deploy/linux-server/prepare-game.sh" --game-dir "$game_dir" --repo "$install_root"
+"$install_root/deploy/linux-server/prepare-game.sh" --game-dir "$game_dir" --repo "$install_root" --game-version "$game_version"
 
 if [ "$skip_build" -eq 0 ]; then
   for pkg in UndauntedMetagame UndauntedGateway UndauntedContent UndauntedDeployServer; do
@@ -110,7 +114,7 @@ set -- --platform linux --root "$install_root" --data "$data_dir" --config "$con
 [ -n "$proton" ] && set -- "$@" --proton "$proton"
 [ -n "$proton_data" ] && set -- "$@" --proton-data "$proton_data"
 [ -n "$wine" ] && set -- "$@" --wine "$wine"
-set -- "$@" --xvfb "$xvfb"
+set -- "$@" --xvfb "$xvfb" --game-version "$game_version"
 [ -n "$firewall_interface" ] && set -- "$@" --firewall-interface "$firewall_interface"
 node "$install_root/deploy/unix-common/generate-config.mjs" "$@"
 
