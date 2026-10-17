@@ -425,12 +425,32 @@ static void EngineTickHook(UGameEngine* Engine, float DeltaTime, bool bIdleMode)
 
     if (Globals::Listening && Networking::NetDriver) {
         bool HasConnection = false;
+        int ActiveConnections = 0;
         for (UNetConnection* Connection : Networking::NetDriver->ClientConnections) {
             const auto State = Connection ? Networking::ConnectionState(Connection) : 0;
-            HasConnection |= State == 2 || State == 3; // pending or open
+            if (State == 2 || State == 3) { // pending or open
+                HasConnection = true;
+                ++ActiveConnections;
+            }
         }
         static auto PreviousIdleCheck = std::chrono::steady_clock::now();
         const auto Now = std::chrono::steady_clock::now();
+        // Ramsgate: the player count, once a second, for the deploy server's city pool (as the 1.4.4 DLL).
+        // Without it a city older than 3 minutes counts as full and every arrival gets a new Ramsgate.
+        if (IsCity) {
+            static auto NextOccupancyWrite = Now;
+            if (Now >= NextOccupancyWrite) {
+                NextOccupancyWrite = Now + std::chrono::seconds(1);
+                wchar_t Directory[32768] = {};
+                const auto Length = GetEnvironmentVariableW(L"GAMESERVER_READY_DIR", Directory, 32768);
+                if (Length > 0 && Length < 32768) {
+                    const auto File = std::filesystem::path(Directory) / (L"city-occupancy-" + std::to_wstring(GetCurrentProcessId()) + L".txt");
+                    const auto Temporary = std::filesystem::path(File.wstring() + L".tmp");
+                    { std::ofstream Output(Temporary); Output << GetCurrentProcessId() << " " << ActiveConnections << "\n"; }
+                    MoveFileExW(Temporary.c_str(), File.c_str(), MOVEFILE_REPLACE_EXISTING);
+                }
+            }
+        }
         const double Elapsed = std::chrono::duration<double>(Now - PreviousIdleCheck).count();
         PreviousIdleCheck = Now;
         const bool IdleExpired = IsCity ? CityIdle.Advance(Elapsed, HasConnection) : HuntIdle.Advance(Elapsed, HasConnection);
