@@ -95,13 +95,19 @@ export function buildWineLaunch(args, env = process.env) {
   if (proton) {
     const compatData = path.resolve(env.DR_PROTON_COMPAT_DATA ?? path.join(home, ".local", "share", "dauntless-revived", "proton"));
     mkdirSync(compatData, { recursive: true });
-    const steamRoot = steamRootFor(proton);
+    // Proton's setup_prefix requires STEAM_COMPAT_CLIENT_INSTALL_PATH. A standalone Proton (e.g. GE-Proton in /opt)
+    // has no Steam root, so give it an empty "steam" dir next to the compat data.
+    let steamRoot = env.STEAM_COMPAT_CLIENT_INSTALL_PATH || steamRootFor(proton);
+    if (!steamRoot) {
+      steamRoot = path.join(path.dirname(compatData), "steam");
+      mkdirSync(steamRoot, { recursive: true });
+    }
     command = proton;
     gameArgs = ["run", gameExe, ...args];
     launchEnv = {
       ...env,
       STEAM_COMPAT_DATA_PATH: compatData,
-      ...(steamRoot ? { STEAM_COMPAT_CLIENT_INSTALL_PATH: steamRoot } : {}),
+      STEAM_COMPAT_CLIENT_INSTALL_PATH: steamRoot,
       STEAM_COMPAT_APP_ID: "0",
       PROTON_LOG: "0",
       WINEDLLOVERRIDES: dllOverrides(env.WINEDLLOVERRIDES, env.DR_GAME_VERSION),
