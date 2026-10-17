@@ -7,6 +7,7 @@
 #include <shellapi.h>
 #include <io.h>
 #include <share.h>
+#include <algorithm>
 #include <chrono>
 #include <filesystem>
 #include <fstream>
@@ -148,8 +149,15 @@ static FString* GetDefaultMapHook(FString* Out) {
         Url += L"?MonsterClass=" + std::wstring(Globals::BehemothPath);
     if (!std::wstring(Globals::MatchmakerHuntId).contains(L"NO_MM_HUNTID"))
         Url += L"?HuntId=" + std::wstring(Globals::MatchmakerHuntId);
-    if (!std::wstring(Globals::ExpectedPlayerString).contains(L"NO_EXPECTED_PLAYERS"))
-        Url += L"?PlayerHuntIds=" + std::wstring(Globals::ExpectedPlayerString);
+    if (!std::wstring(Globals::ExpectedPlayerString).contains(L"NO_EXPECTED_PLAYERS")) {
+        const std::wstring Players(Globals::ExpectedPlayerString);
+        Url += L"?PlayerHuntIds=" + Players;
+        // 1.14.7 has no PlayerHuntIds: AArchonGameMode::InitGame (0x1906EB0) reads ExpectedPlayerCount, and the
+        // pre-match airship waits for that many players before the arrival sequence. Without it a party's
+        // hunt started with the first player in. The list is "uid:huntId,uid:huntId,...".
+        const auto Count = std::count(Players.begin(), Players.end(), L',') + 1;
+        Url += L"?ExpectedPlayerCount=" + std::to_wstring(Count);
+    }
 
     EngineString::Assign(Ret, Url.c_str());
     return Ret;
