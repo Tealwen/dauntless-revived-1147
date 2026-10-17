@@ -57,10 +57,10 @@ async function connect(): Promise<WebSocket> {
     return socket;
 }
 
-async function login(id: string): Promise<WebSocket> {
+async function login(id: string, domain = "prod.ol.epicgames.com"): Promise<WebSocket> {
     const socket = await connect();
     const opened = frame(socket);
-    socket.send('<open xmlns="urn:ietf:params:xml:ns:xmpp-framing" to="prod.ol.epicgames.com" version="1.0"/>');
+    socket.send(`<open xmlns="urn:ietf:params:xml:ns:xmpp-framing" to="${domain}" version="1.0"/>`);
     assert.match(await opened, /<open /);
     assert.match(await frame(socket), /PLAIN/);
     const success = frame(socket);
@@ -73,7 +73,7 @@ async function login(id: string): Promise<WebSocket> {
     assert.match(await frame(socket), /bind/);
     const bound = frame(socket);
     socket.send('<iq type="set" id="bind1"><bind xmlns="urn:ietf:params:xml:ns:xmpp-bind"><resource>game</resource></bind></iq>');
-    assert.match(await bound, new RegExp(`${id}@prod.ol.epicgames.com/game`));
+    assert.ok((await bound).includes(`${id}@${domain}/game`));
     return socket;
 }
 
@@ -133,6 +133,34 @@ describe("experimental chat", () => {
         assert.ok(delivered.includes(`from="${city}/${alpha}"`));
         assert.doesNotMatch(delivered, /<nick /, "no XEP-0172 nickname: the client never reads it");
         assert.match(await frame(a), /Ready\?/);
+    });
+
+    it("shares a room between players whose clients were given different metagame addresses", async () => {
+        // 1.14.7 behind the PhynariaMC launcher: each player's domain is its local relay, with its own port
+        const a = await login(A, "127.0.0.1:58281");
+        const b = await login(B, "127.0.0.1:57329");
+        const local = "City-94366405-9d6e-4ec6-841c-a1a27c338bb3";
+        const cityA = `${local}@muc.127.0.0.1:58281`;
+        const cityB = `${local}@muc.127.0.0.1:57329`;
+        const alpha = `Alpha:${A}:game`;
+        const bravo = `Bravo:${B}:game`;
+
+        const joinedA = frame(a);
+        a.send(`<presence to="${cityA}/${alpha}"><x xmlns="http://jabber.org/protocol/muc"/></presence>`);
+        assert.match(await joinedA, /status code="110"/);
+
+        const seenByB = frame(b);
+        b.send(`<presence to="${cityB}/${bravo}"><x xmlns="http://jabber.org/protocol/muc"/></presence>`);
+        assert.ok((await seenByB).includes(`from="${cityB}/${alpha}"`), "B hears of A, under B's own room address");
+        assert.match(await frame(b), /status code="110"/);
+        assert.ok((await frame(a)).includes(`from="${cityA}/${bravo}"`), "A hears of B, under A's own room address");
+
+        const toB = frame(b, "room message");
+        a.send(`<message to="${cityA}" type="groupchat" id="m3"><body>Salut</body></message>`);
+        const delivered = await toB;
+        assert.match(delivered, /Salut/);
+        assert.ok(delivered.includes(`from="${cityB}/${alpha}"`));
+        assert.match(await frame(a), /Salut/);
     });
 });
 

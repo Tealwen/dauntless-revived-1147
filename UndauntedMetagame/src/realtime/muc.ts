@@ -98,8 +98,11 @@ export type MucHost = {
 };
 
 type Room = {
-    Jid: string,     // <local>@muc.<domain>, the local part as the client sent it
-    Local: string,
+    Jid: string,     // <local>@muc.<domain> of the first joiner, the local part as the client sent it
+    Local: string,   // the key: every occupant's <local>@muc.<their own domain> is the same room
+    // The room as each occupant addresses it. A player's domain is the metagame address its client was
+    // given; behind the 1.14.7 launchers' local relays it carries the relay's port, which differs per player.
+    Addressed: Map<MucSession, string>,
     Class: RoomClass,
     ClassId: string, // the party or guild id
     // Join order
@@ -145,10 +148,14 @@ export class MucService {
 
     // ---- Stanzas ----
 
+    private jidFor(Room: Room, Session: MucSession): string {
+        return Room.Addressed.get(Session) ?? `${Room.Local}@muc.${Session.Domain}`;
+    }
+
     private occupantPresence(Room: Room, Nick: string, Occupant: MucSession, To: MucSession, Options: { Self?: boolean, Unavailable?: boolean, Evicted?: boolean } = {}): string {
         const Statuses = `${Options.Self ? `<status code="110"/>` : ""}${Options.Evicted ? `<status code="307"/>` : ""}`;
 
-        return `<presence xmlns="${NS.CLIENT}"${Options.Unavailable ? ` type="unavailable"` : ""} from="${EscapeXml(`${Room.Jid}/${Nick}`)}" to="${EscapeXml(FullJid(To))}">`
+        return `<presence xmlns="${NS.CLIENT}"${Options.Unavailable ? ` type="unavailable"` : ""} from="${EscapeXml(`${this.jidFor(Room, To)}/${Nick}`)}" to="${EscapeXml(FullJid(To))}">`
             + `<x xmlns="${NS.MUC_USER}"><item affiliation="none" role="${Options.Unavailable ? "none" : "participant"}" jid="${EscapeXml(FullJid(Occupant))}"/>${Statuses}</x></presence>`;
     }
 
@@ -202,8 +209,8 @@ export class MucService {
             return;
         }
 
-        const Existing = this.rooms.get(RoomJid);
-        const Held = Session.Rooms.get(RoomJid);
+        const Existing = this.rooms.get(To.Local);
+        const Held = Session.Rooms.get(To.Local);
 
         // Party and guild rooms: members only (someone who left is also removed from the room)
         if(!this.mayUse(Uid, Kind.Class, Kind.Id)){
@@ -217,6 +224,7 @@ export class MucService {
 
         // Rejoin with the same nickname: this session alone gets the room again, nobody else hears of it
         if(Existing !== undefined && Held === Nick){
+            Existing.Addressed.set(Session, RoomJid);
             this.welcome(Session, Existing, Nick);
             logger.info(`chat: join room=${To.Local} uid=${Uid} name=${NamePartOf(Nick) ?? "?"} occupants=${this.others(Existing, Session).length} rejoin`);
             return;
@@ -247,7 +255,7 @@ export class MucService {
             this.remove(Session, Existing, "left");
         }
 
-        const Room = this.rooms.get(RoomJid);
+        const Room = this.rooms.get(To.Local);
         // The occupants of other accounts. An older session of this account is replaced below, so it
         // neither conflicts nor counts toward the room's limit.
         const OtherAccounts = [...(Room?.Occupants ?? [])].filter(([Other]) => Other !== Session && Other.Uid !== Uid);
@@ -262,7 +270,7 @@ export class MucService {
             return;
         }
 
-        const Joined = Room ?? { Jid: RoomJid, Local: To.Local, Class: Kind.Class, ClassId: Kind.Id, Occupants: new Map<MucSession, string>() };
+        const Joined = Room ?? { Jid: RoomJid, Local: To.Local, Class: Kind.Class, ClassId: Kind.Id, Occupants: new Map<MucSession, string>(), Addressed: new Map<MucSession, string>() };
 
         // 0. This account's older session in the room (normally the ghost of a dropped connection) leaves
         // first, told to the others but not to itself (see the top of this file)
@@ -274,7 +282,8 @@ export class MucService {
 
         const Others = this.others(Joined, Session);
 
-        this.rooms.set(RoomJid, Joined);
+        this.rooms.set(To.Local, Joined);
+        Joined.Addressed.set(Session, RoomJid);
 
         // 1. The joiner hears of everyone already there; 2. they hear of the joiner; 3. the joiner's own
         // presence last, which completes the join on its screen
@@ -287,7 +296,7 @@ export class MucService {
         }
 
         Joined.Occupants.set(Session, Nick);
-        Session.Rooms.set(RoomJid, Nick);
+        Session.Rooms.set(To.Local, Nick);
         this.host.Send(Session, this.occupantPresence(Joined, Nick, Session, Session, { Self: true }));
         logger.info(`chat: join room=${To.Local} uid=${Uid} name=${Check.Ok ? Check.Name : (NamePartOf(Nick) ?? "?")} occupants=${Others.length}`);
     }
@@ -335,7 +344,7 @@ export class MucService {
 
     Leave(Session: MucSession, To: Jid): void {
         const RoomJid = `${To.Local}@${To.Domain}`;
-        const Room = this.rooms.get(RoomJid);
+        const Room = this.rooms.get(To.Local);
 
         if(Room === undefined || !Room.Occupants.has(Session)){
             // Not in it (after a refused join, or a restart of the metagame): confirm the leave anyway, so the
@@ -353,8 +362,8 @@ export class MucService {
 
     // A broadcast unavailable, or the end of the session
     LeaveAll(Session: MucSession, Reason: LeaveReason): void {
-        for(const RoomJid of [...Session.Rooms.keys()]){
-            const Room = this.rooms.get(RoomJid);
+        for(const Local of [...Session.Rooms.keys()]){
+            const Room = this.rooms.get(Local);
 
             if(Room !== undefined){
                 this.remove(Session, Room, Reason);
@@ -378,14 +387,16 @@ export class MucService {
         }
 
         Room.Occupants.delete(Session);
-        Session.Rooms.delete(Room.Jid);
+        Session.Rooms.delete(Room.Local);
 
         if(!Session.Ended && (Reason === "left" || Reason === "evicted")){
             this.host.Send(Session, this.occupantPresence(Room, Nick, Session, Session, { Unavailable: true, Self: true, Evicted }));
         }
 
+        Room.Addressed.delete(Session);
+
         if(Room.Occupants.size === 0){
-            this.rooms.delete(Room.Jid);
+            this.rooms.delete(Room.Local);
         }
 
         logger.info(`chat: leave room=${Room.Local} uid=${Session.Uid} reason=${Reason}`);
@@ -404,7 +415,7 @@ export class MucService {
             return;
         }
 
-        const Room = this.rooms.get(RoomJid);
+        const Room = this.rooms.get(To.Local);
         const Nick = Room?.Occupants.get(Session);
         const Body = TextOf(BodyNode);
         const Length = BodyLength(Body);
@@ -429,7 +440,6 @@ export class MucService {
             return;
         }
 
-        const From = EscapeXml(`${Room.Jid}/${Nick}`);
         const Text = EscapeXml(Body);
         const Recipients = [...Room.Occupants.keys()].filter((Recipient) => Recipient === Session || Recipient.Uid !== Session.Uid);
         const Blockers = this.host.Access.BlockersAmong(Session.Uid!, Recipients.map((Recipient) => Recipient.Uid!));
@@ -448,7 +458,7 @@ export class MucService {
                 continue;
             }
 
-            this.host.Send(Recipient, `<message xmlns="${NS.CLIENT}" type="groupchat"${Id !== undefined ? ` id="${EscapeXml(Id)}"` : ""} from="${From}" to="${EscapeXml(FullJid(Recipient))}"><body>${Text}</body></message>`);
+            this.host.Send(Recipient, `<message xmlns="${NS.CLIENT}" type="groupchat"${Id !== undefined ? ` id="${EscapeXml(Id)}"` : ""} from="${EscapeXml(`${this.jidFor(Room, Recipient)}/${Nick}`)}" to="${EscapeXml(FullJid(Recipient))}"><body>${Text}</body></message>`);
             Delivered++;
         }
 
