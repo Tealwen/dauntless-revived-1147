@@ -161,7 +161,8 @@ function SendStoreError(res: any, error: unknown, What: string){
 // retail served them from Phoenix's CDN. store-images/ holds the items' own 1.4.4 icons, one PNG per
 // catalog id (lower case), extracted from the game's textures. An offer whose first item has one gets
 // its URL on this server, built from the host the client called so it works behind the relay too.
-const STORE_IMAGES_DIR = path.join(process.cwd(), "store-images");
+// 1.14.7: the icons of its own catalogue (store-images-1147, extracted from the 1.14.7 paks, PORT-1.14.7 doc 18)
+const STORE_IMAGES_DIR = path.join(process.cwd(), process.env.TARGET_GAME_VERSION === "1.14.7" ? "store-images-1147" : "store-images");
 let StoreImageFiles: Set<string> | undefined;
 
 function StoreImageFor(Offer: any){

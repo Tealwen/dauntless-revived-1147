@@ -9,6 +9,13 @@ import { MiddlemanStore, StoreMode, StoreRepeatableTokens, TrialsStore } from ".
 import catalog from "../vendor/store_catalog.json";
 import curated30 from "../vendor/store_curated_30.json";
 import itemKinds from "../vendor/store_item_kinds.json";
+import catalog1147 from "../vendor/store_catalog_1147.json";
+import itemKinds1147 from "../vendor/store_item_kinds_1147.json";
+
+// 1.14.7 (TARGET_GAME_VERSION): the main store sells the 1.14.7 catalogue (vendor/store_catalog_1147.json, every
+// cosmetic that had a tile in the client's StoreItemsTable, PORT-1.14.7 doc 18) and grants with its kinds
+// (all cosmetics are stackable in the 1.14.7 catalogs)
+const IS_1147 = process.env.TARGET_GAME_VERSION === "1.14.7";
 import ladyLuck from "../vendor/store_ladyluck.json";
 import middlemanStore from "../vendor/store_middleman.json";
 import middlemanCells from "../vendor/store_middleman_cells.json";
@@ -152,6 +159,8 @@ const PLATINUM_PRICES: [Tag: string, Single: number, Bundle?: number][] = [
     ["social_arrival", 500],
     ["personality_stylekit", 500],
     ["social_emote", 300],
+    ["social_emojis", 150],
+    ["hunting_gliders", 600],
     ["dye_armour", 200],
     ["dye_tint", 150],
     ["personality_fabric", 150],
@@ -179,7 +188,7 @@ function PricedWebstore(Offers: unknown){
 
 const Catalog: Record<string, unknown> = {
     ...(catalog as unknown as Record<string, unknown>),
-    webstore: PricedWebstore((catalog as unknown as Record<string, unknown>).webstore),
+    webstore: PricedWebstore(IS_1147 ? (catalog1147 as unknown as Record<string, unknown>).webstore : (catalog as unknown as Record<string, unknown>).webstore),
     ladyluckstore: LadyLuck.offers,
     exchange_vendor_slot_2: MiddlemanCatalogData.exchange_vendor_slot_2,
     exchange_vendor_slot_3: MiddlemanCatalogData.exchange_vendor_slot_3,
@@ -228,7 +237,9 @@ const CURRENCY_ALIASES: Record<string, string> = {
 
 // Which items the store may hand out at all: cosmetics, and the repeatable consumable. Anything else
 // (currencies, boosts, weapons proper) is refused even if an offer lists it.
-const COSMETIC_PREFIXES = ["AR_", "WP_", "EM_", "DYE_", "QI_FLARE_", "BNC_FABRIC_", "BNC_STANDARD_", "BNC_SIGIL_", "LT_"];
+const COSMETIC_PREFIXES = ["AR_", "WP_", "EM_", "DYE_", "QI_FLARE_", "BNC_FABRIC_", "BNC_STANDARD_", "BNC_SIGIL_", "LT_",
+    // 1.14.7 cosmetics: emojis, gliders, banner animations/meshes/effects, head accessories, titles and the rest of the catalogue
+    ...(IS_1147 ? ["EJ_", "GD_FRAME_", "BNC_ANIMATION_", "BNC_MESH_", "BNC_VFX_", "AC_HEAD_", "TY_", "MP_", "QI_BASIC_"] : [])];
 
 // Consumables that may be bought any number of times: TOKEN_BOUNTY_DRAFT_PREMIUM is the
 // premium_bounty_token_id of /bounty/game-data, the kind that persists into the next season.
@@ -237,7 +248,7 @@ const REPEATABLE_ITEMS = new Set(["TOKEN_BOUNTY_DRAFT_PREMIUM"]);
 // How each item is granted, from the stackable flag of the client's item catalogue (a prefix rule got
 // individual items wrong: most weapon skins and a few arrivals are instanced, a few fabrics and lanterns
 // stacked).
-const ITEM_KINDS = itemKinds as unknown as Record<string, string>;
+const ITEM_KINDS = { ...(itemKinds as unknown as Record<string, string>), ...(IS_1147 ? itemKinds1147 as unknown as Record<string, string> : {}) };
 
 const Hash = (Value: string) => createHash("sha256").update(Value).digest("hex");
 const OfferHash = (Offer: StoreOffer) => Hash(JSON.stringify(Offer));
