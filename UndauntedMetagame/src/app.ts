@@ -20,6 +20,7 @@ import { slayerLinksRouter } from "./routes/slayerlinks.js";
 import { progressionRouter } from "./routes/progression.js";
 import { loadoutRouter } from "./routes/loadout.js";
 import { undauntedApiRouter } from "./routes/undauntedapi.js";
+import { compat1147EarlyRouter, compat1147Router } from "./routes/compat1147.js";
 import { DescribeOrigin, RefuseProxiedInDevAuthMode } from "./middleware/RequestOrigin.js";
 import { BodyLog, Redact } from "./middleware/BodyLog.js";
 import { backupRouter } from './routes/backup';
@@ -59,6 +60,7 @@ if (process.env.LOG_BODIES === "1") {
     app.use(BodyLog(process.env.BODY_LOG_FILE || "bodies.log"));
 }
 
+app.use("/", compat1147EarlyRouter); // 1.14.7 shapes for URLs 1.4.4 also uses (off unless TARGET_GAME_VERSION=1.14.7)
 app.use("/", loginRouter);
 app.use("/", keyRotationRouter);
 app.use("/", backupRouter);
@@ -77,6 +79,7 @@ app.use("/", partyRouter);
 app.use("/", slayerLinksRouter);
 app.use("/", progressionRouter);
 app.use("/", loadoutRouter);
+app.use("/", compat1147Router);
 app.use("/undaunted/api", undauntedApiRouter); // Everything that I/we add to help manage undaunted that doesn't belong to the game proper belongs here
 
 app.use((req, res) => {

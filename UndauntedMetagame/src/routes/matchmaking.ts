@@ -90,6 +90,8 @@ matchmakingRouter.post("/candidate/player/alive", MiscRoutesOn, HasUndauntedMeta
 
 const QOS_TARGET_URL = process.env.QOS_TARGET_URL;
 const TARGET_CHANGELIST = process.env.TARGET_CHANGELIST;
+// The game version in the build id the client compares with its own: 1.4.4 (default) or 1.14.7.
+const TARGET_GAME_VERSION = process.env.TARGET_GAME_VERSION || "1.4.4";
 
 matchmakingRouter.post("/candidate/player/register", HasUndauntedMetagameAuth, (req: any, res) => {
     logger.info(`userId ${req.AuthData.userId} is registering for matchmaking!`);
@@ -168,7 +170,7 @@ matchmakingRouter.get("/candidate/status", HasUndauntedMetagameAuth, async (req:
                 huntId: MatchmakingResult.HuntId,
                 playerStates: PlayerStatesOf(MatchmakingResult),
                 serverInfo: {
-                    buildId: TARGET_CHANGELIST + "_1.4.4_shipping", // TODO: pull the end of the buildstring from somewhere nonstatic
+                    buildId: `${TARGET_CHANGELIST}_${TARGET_GAME_VERSION}_shipping`,
                     gameSessionId: GameSessionForCandidate(MatchmakingResult),
                     host: MatchmakingResult.Host,
                     port: MatchmakingResult.Port

@@ -63,6 +63,13 @@ systemRouter.post("/heartbeat", HasUndauntedMetagameAuth, async (req: any, res) 
 });
 
 systemRouter.post("/event", (req, res) => {
+    // The game's telemetry. playerdata_load_failed lists every player-data loader and whether it
+    // finished, which is the quickest way to see what a loading timeout waited for.
+    const Text = JSON.stringify(req.body ?? "");
+    if (Text.includes("playerdata_load_failed")) {
+        const At = Text.indexOf("playerdata_load_failed");
+        logger.warn(`Player data load failed: ${Text.slice(Math.max(0, At - 200), At + 3000)}`);
+    }
     res.status(200);
     res.json({});
 });
@@ -344,6 +351,32 @@ systemRouter.put("/cooldown/:userId/:cooldownId", RealProgressionOnly, HasUndaun
 	SendRealReply(res, StartCooldown(req.params.userId, req.params.cooldownId, CallerOf(req)));
 });
 
+// The bounty configuration. 1.4.4 reads it from /bounty/game-data; 1.14.7 reads the same data from the
+// game-tuning blobs bounty_game_data, bounty_game_data_daily and bounty_game_data_weekly (compat1147.ts).
+export function BountyGameDataPayload() {
+  return {
+    max_slots: 4,
+    num_draft_options: 3,
+    num_spicy_options: 1,
+    bounty_token_id: "TOKEN_BOUNTY_DRAFT",
+    premium_bounty_token_id: "TOKEN_BOUNTY_DRAFT_PREMIUM",
+    num_tokens_hp_start: BOUNTY_TOKENS_DAILY,
+    num_tokens_per_day: BOUNTY_TOKENS_DAILY,
+    bounty_token_grant_hour: 0,
+    history_length: 10,
+    bronze_count: 9,
+    silver_count: 3,
+    gold_count: 1,
+    new_season_reset_bounties: false,
+    bounty_data: [],
+    item_grant_data: [],
+    token_rollover_warning_days: 1000,
+    automatic_draft: false,
+    automatic_claim: false,
+    delete_claimed_bounties: false,
+  };
+}
+
 systemRouter.get("/bounty/game-data", HasUndauntedMetagameAuth, (req: any, res) => {
 	logger.info("Bounty game data (stubbed)");
 
@@ -351,27 +384,7 @@ systemRouter.get("/bounty/game-data", HasUndauntedMetagameAuth, (req: any, res) 
 	res.json({
     code: null,
     message: "OK",
-    payload: {
-      max_slots: 4,
-      num_draft_options: 3,
-      num_spicy_options: 1,
-      bounty_token_id: "TOKEN_BOUNTY_DRAFT",
-      premium_bounty_token_id: "TOKEN_BOUNTY_DRAFT_PREMIUM",
-      num_tokens_hp_start: BOUNTY_TOKENS_DAILY,
-      num_tokens_per_day: BOUNTY_TOKENS_DAILY,
-      bounty_token_grant_hour: 0,
-      history_length: 10,
-      bronze_count: 9,
-      silver_count: 3,
-      gold_count: 1,
-      new_season_reset_bounties: false,
-      bounty_data: [],
-      item_grant_data: [],
-      token_rollover_warning_days: 1000,
-      automatic_draft: false,
-      automatic_claim: false,
-      delete_claimed_bounties: false,
-    },
+    payload: BountyGameDataPayload(),
   });
 });
 

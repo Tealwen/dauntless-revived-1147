@@ -1,0 +1,4 @@
+*.obj
+*.dll
+*.exp
+*.lib

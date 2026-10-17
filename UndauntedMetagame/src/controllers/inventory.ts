@@ -66,6 +66,8 @@ export class InventoryInsufficientError extends Error {
 
 type LogEntry = Omit<typeof inventorylog.$inferInsert, "time" | "userId" | "characterId" | "transactionId" | "source" | "caller">;
 
+const DAILY_CHALLENGE_DRAFT_TOKEN = "TOKEN_DAILY_CHALLENGE_DRAFT";
+
 function MakeEmptyInventoryRow(CharacterId: string): typeof inventory.$inferInsert {
     return {
         characterId: CharacterId,
@@ -845,12 +847,25 @@ export async function GetInventoryForUserIdAndCharacterId(UserId: string, Charac
             await GetDb().insert(inventory).values(InventoryFromDb);
         }
 
+        const StackedItems = JSON.parse(InventoryFromDb!.stackedItems);
+
+        // 1.14.7: the daily-bounty loader drafts on its own and spends a TOKEN_DAILY_CHALLENGE_DRAFT;
+        // without one it never reports loaded and the player is dropped after 60 s. Keep one in stock.
+        if(process.env.TARGET_GAME_VERSION === "1.14.7" && Array.isArray(StackedItems)
+            && !StackedItems.some((Item: any) => Item?.catalogId === DAILY_CHALLENGE_DRAFT_TOKEN && Item.quantity > 0)){
+            const Stack = StackedItems.find((Item: any) => Item?.catalogId === DAILY_CHALLENGE_DRAFT_TOKEN);
+            if(Stack) Stack.quantity = 1;
+            else StackedItems.push({catalogId: DAILY_CHALLENGE_DRAFT_TOKEN, quantity: 1});
+            await GetDb().update(inventory).set({stackedItems: JSON.stringify(StackedItems)}).where(eq(inventory.characterId, CharacterId));
+            logger.info(`Seeded ${DAILY_CHALLENGE_DRAFT_TOKEN} for characterId ${CharacterId}`);
+        }
+
         return {
             success: true,
             data: {
                 characterId: CharacterId,
                 instancedItems: JSON.parse(InventoryFromDb!.instancedItems),
-                stackedItems: JSON.parse(InventoryFromDb!.stackedItems)
+                stackedItems: StackedItems
             }
         };
     }

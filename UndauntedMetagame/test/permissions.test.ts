@@ -165,6 +165,14 @@ after(async () => {
 // "METHOD path [middleware...]", in registration order. A route added, removed or with
 // different auth middleware fails this test: classify it in route-audit.md, then update this list.
 const EXPECTED_ROUTES = [
+    // 1.14.7 shapes for URLs 1.4.4 also uses (compat1147EarlyRouter; they pass on unless TARGET_GAME_VERSION=1.14.7)
+    "GET /huntpass/:userId [HasUndauntedMetagameAuth]",
+    "GET /bounty/:userId [HasUndauntedMetagameAuth]",
+    "GET /game_tuning/:blobId []",
+    "GET /progression/tracked_objectives/:userId [HasUndauntedMetagameAuth]",
+    "POST /progression/tracked_objectives/:userId [HasUndauntedMetagameAuth]",
+    "GET /^\\/progression\\/level_access(\\/.*)?$/ [HasUndauntedMetagameAuth]",
+    "GET /^\\/progression\\/\\/[^/]+$/ [HasUndauntedMetagameAuth]",
     "GET /features/platform/win []",
     "GET /account/link/epic/:AccId []",
     "POST /login [HasUndauntedMetagameAuth]",
@@ -309,6 +317,18 @@ const EXPECTED_ROUTES = [
     "POST /loadout/:userId/:characterId/active/:index [RealProgressionOnly, HasUndauntedMetagameAuth]",
     "GET /loadout/:userId/:characterId/all [HasUndauntedMetagameAuth]",
     "POST /loadout/:userId/:characterId/:index [HasUndauntedMetagameAuth]",
+    // Routes only 1.14.7 asks for (compat1147Router)
+    "GET /isbanned [HasUndauntedMetagameAuth]",
+    "POST /migration/trigger [HasUndauntedMetagameAuth]",
+    "_ALL /migration/status [HasUndauntedMetagameAuth]",
+    "GET /pjm,/pjm/seasonal/:key,/pjm/:key [HasUndauntedMetagameAuth]",
+    "POST /pjm/:key [HasUndauntedMetagameAuth]",
+    "GET /weapon_tracker/:accountId/:itemId [HasUndauntedMetagameAuth]",
+    "GET /config [HasUndauntedMetagameAuth]",
+    "GET /^\\/rewards\\/personal\\/[^/]*\\/[^/]+$/ [HasUndauntedMetagameAuth]",
+    "GET /^\\/rewards\\/guild\\/[^/]*\\/[^/]+$/ [HasUndauntedMetagameAuth]",
+    "GET /^\\/leaderboard\\/get_leaderboard\\/[^/]*$/ [HasUndauntedMetagameAuth]",
+    "GET /survey/config [HasUndauntedMetagameAuth]",
     "GET /undaunted/api/HuntRegion [HasUndauntedUserApiKey]",
     "POST /undaunted/api/HuntRegion [HasUndauntedUserApiKey]",
     "GET /undaunted/api/DiscordKeyStats [HasUndauntedAdminApiKey]",
