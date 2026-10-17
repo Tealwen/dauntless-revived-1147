@@ -79,6 +79,12 @@ SEASONAL_EVENTS=EVENT_DARKHARVEST,DarkHarvest
 Other events: `EVENT_FROSTFALL,Frostfall`, `EVENT_SPRINGTIDE,SpringEvent`, `EVENT_SAINTSBOND,SaintsBond`,
 `EVENT_RAMSGIVING,Ramsgiving` (ids from the client's seasonal_event_ui_table). A reinstall keeps `SEASONAL_EVENTS`.
 
+The game servers also keep the event's own objects alive (lore objects such as the Halloween pumpkins and the
+Unseen recruits, which otherwise destroy themselves at start-up): `SeasonalSchedule1147.h` forces the ids of
+`DR_SEASONAL_EVENTS` (in `deployserver.env`; `-` turns it off), and with nothing set, the Dark Harvest ids
+whenever `DR_FEATURES` has `city_event_dark_harvest_bpff`. The event store (tag `seasonal_event`, Dark
+Harvest currency) is `UndauntedMetagame/src/routes/darkharvest1147.ts` (`DARK_HARVEST_STORE=0` turns it off).
+
 ## Notes
 
 - One metagame serves one game version: 1.4.4 clients cannot join this server.

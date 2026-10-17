@@ -36,6 +36,7 @@
 #include "NativeDiagnostics.h"
 #include "Networking.h"
 #include "NoPlatinumPrice1147.h"
+#include "SeasonalSchedule1147.h"
 #include "ServerFrameLimit.h"
 #include "Social1147.h"
 #include "UiHitchProfile1147.h"
@@ -514,6 +515,8 @@ static void InstallServerHooks() {
     for (const auto& P : Patches::Server)
         Patch(P.Name, P.Rva, P.Expected, P.Replacement);
     CrashFixes1147::Apply();
+    // Seasonal events (lore objects of Dark Harvest...) kept alive on the server: SEASONAL_EVENTS / DR_FEATURES
+    SeasonalSchedule1147::Install();
 }
 
 static void OpenConsole() {
