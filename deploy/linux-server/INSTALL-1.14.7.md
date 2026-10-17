@@ -53,6 +53,21 @@ file first. Background: `README.md` in this folder (section "Dauntless 1.14.7");
 6. **Invite the owner:** `sudo -u dauntless node /opt/dauntless-revived/deploy/unix-common/new-invite.mjs --config
    /etc/dauntless-revived --name <name>` prints a `dauntless-revived://join?v=2&...` invite to paste into the launcher.
 
+## Seasonal decorations and other game feature flags
+
+The game's feature flags (`*_bpff` assets) are turned on with `DR_FEATURES` in
+`/etc/dauntless-revived/deployserver.env`, comma-separated, by short name; a leading `-` turns one off:
+
+```sh
+DR_FEATURES=city_event_dark_harvest_bpff
+```
+
+Then `sudo systemctl restart dauntless-deploy` (open Ramsgates close and the next ones load the flags). Known
+seasonal ones: `city_event_dark_harvest_bpff` (Halloween), `enable_city_event_frostfall_bpff` (winter),
+`city_event_Springtide_bpff`, `city_event_SaintsBond_bpff`. The full list is in
+`UndauntedInternalServer1147/FeatureFlags1147.h`. The PhynariaMC launcher gives players the same flags from
+`"dauntless": { "features": [...] }` in its config.json. A reinstall keeps `DR_FEATURES` and `DR_LOG_FILE`.
+
 ## Notes
 
 - One metagame serves one game version: 1.4.4 clients cannot join this server.

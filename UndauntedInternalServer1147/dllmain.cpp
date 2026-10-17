@@ -28,6 +28,7 @@
 #include "DeveloperStyle1147.h"
 #include "Endpoints1147.h"
 #include "EngineString.h"
+#include "FeatureFlags1147.h"
 #include "FallRecovery1147.h"
 #include "Hooking.h"
 #include "HuntIdlePolicy.h"
@@ -610,6 +611,8 @@ static void Init() {
         BuildEndpointMap();
 
     Trace("endpoints");
+    // DR_FEATURES: the game's feature flags (FeatureFlags1147.h), written before the engine reads its config
+    FeatureFlags1147::Apply();
     DR_InitDiagnostics();
     MH_Initialize();
     Trace("minhook");

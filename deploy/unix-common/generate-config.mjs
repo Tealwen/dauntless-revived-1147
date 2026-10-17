@@ -162,6 +162,13 @@ const deploy = {
   NODE_ENV: "production",
   DR_GAME_VERSION: gameVersion,
 };
+// Kept from the previous file: the game's feature flags (DR_FEATURES, e.g. city_event_dark_harvest_bpff for
+// Ramsgate's Halloween decoration; UndauntedInternalServer1147/FeatureFlags1147.h) and the game servers'
+// engine log (DR_LOG_FILE, a Wine path such as Z:/var/lib/dauntless-revived/logs/gameserver.log)
+{
+  const oldDeploy = readEnv(path.join(config, "deployserver.env"));
+  for (const key of ["DR_FEATURES", "DR_LOG_FILE"]) if (oldDeploy[key]) deploy[key] = oldDeploy[key];
+}
 if (platform === "linux") {
   deploy.DR_GAME_EXE = path.join(game, "Archon", "Binaries", "Win64", "Dauntless-Win64-Shipping.exe");
   deploy.DR_WINEPREFIX = path.join(data, "wineprefix");

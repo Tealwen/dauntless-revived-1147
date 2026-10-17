@@ -3066,8 +3066,8 @@
     },
     {
       "path": "Archon/Binaries/Win64/UndauntedInternalServer.dll",
-      "size": 274944,
-      "sha256": "a3561d300a5d3a45150afa69ba9cea6be257595b8cc3929b727c0ec4cbe01288"
+      "size": 305664,
+      "sha256": "083eff3e4aa1b9c38e2b698b12886bf79f30791dde8bbf15a734218295ffb3ad"
     }
   ]
 }
