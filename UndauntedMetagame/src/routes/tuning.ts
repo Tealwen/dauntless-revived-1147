@@ -46,13 +46,25 @@ function OneTimeSchedule(Id: string, StartTime: string, EndTime: string): Schedu
     };
 }
 
+// SEASONAL_EVENTS: seasonal events kept running, comma-separated scheduler ids, e.g. EVENT_DARKHARVEST,DarkHarvest
+// (Halloween; the 1.14.7 seasonal_event_ui_table has EventID EVENT_DARKHARVEST on row DarkHarvest). Ramsgate's
+// event decoration is a game feature flag (DR_FEATURES on the game servers and the launcher); the event's
+// gatherables and currency are only live while the event is in this schedule. Each id runs from 2020 to 2099.
+export function SeasonalEventItems(Env: NodeJS.ProcessEnv = process.env): Schedule[] {
+    return (Env.SEASONAL_EVENTS ?? "").split(",").map((Id) => Id.trim())
+        .filter((Id) => /^[A-Za-z0-9_.-]{1,64}$/.test(Id))
+        .map((Id) => OneTimeSchedule(Id, "2020.01.01-00.00.00", "2099.12.31-00.00.00"));
+}
+
 export function GetSeasonalEventSchedule(At: Date = new Date()){
+    const Seasonal = SeasonalEventItems();
+
     if(!TrialsSchedule()){
         return {
             code: null,
             message: "OK",
             payload: {
-                ScheduledItems: []
+                ScheduledItems: Seasonal
             }
         };
     }
@@ -79,13 +91,13 @@ export function GetSeasonalEventSchedule(At: Date = new Date()){
             // FServiceSchedule -> FScheduleData -> FScheduledItem in the 1.4.4 SDK. The captured
             // event_ladyluck_repeatable key is the strongest known scheduler identifier; the player-hunt
             // and matchmaker ids make the experiment tolerant of whichever key the native arena code asks for.
-            ScheduledItems: Ids.map((Id) => OneTimeSchedule(Id, StartTime, EndTime))
+            ScheduledItems: [...Ids.map((Id) => OneTimeSchedule(Id, StartTime, EndTime)), ...Seasonal]
         }
     };
 }
 
 tuningRouter.get("/game_tuning/seasonal_event_schedule", (req: any, res) => {
-    logger.info(`Seasonal Event Schedule (${TrialsSchedule() ? "Trials active" : "stubbed"})`);
+    logger.info(`Seasonal Event Schedule (${TrialsSchedule() ? "Trials active" : "no Trials"}; events: ${process.env.SEASONAL_EVENTS || "none"})`);
 
     res.status(200);
     res.json(GetSeasonalEventSchedule());

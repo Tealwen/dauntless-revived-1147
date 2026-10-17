@@ -68,6 +68,17 @@ seasonal ones: `city_event_dark_harvest_bpff` (Halloween), `enable_city_event_fr
 `UndauntedInternalServer1147/FeatureFlags1147.h`. The PhynariaMC launcher gives players the same flags from
 `"dauntless": { "features": [...] }` in its config.json. A reinstall keeps `DR_FEATURES` and `DR_LOG_FILE`.
 
+The decoration alone does not run the event: its gatherables and currency are live only while the event is in
+the metagame's seasonal schedule. Add to `/etc/dauntless-revived/metagame.env`, then
+`sudo systemctl restart dauntless-metagame`:
+
+```sh
+SEASONAL_EVENTS=EVENT_DARKHARVEST,DarkHarvest
+```
+
+Other events: `EVENT_FROSTFALL,Frostfall`, `EVENT_SPRINGTIDE,SpringEvent`, `EVENT_SAINTSBOND,SaintsBond`,
+`EVENT_RAMSGIVING,Ramsgiving` (ids from the client's seasonal_event_ui_table). A reinstall keeps `SEASONAL_EVENTS`.
+
 ## Notes
 
 - One metagame serves one game version: 1.4.4 clients cannot join this server.
