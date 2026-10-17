@@ -7,8 +7,9 @@ file first. Background: `README.md` in this folder (section "Dauntless 1.14.7");
 
 ## What you have
 
-- This repository, branch `port-1.14.7` (delivered as a git bundle: `git clone dauntless-revived-1147.bundle
-  -b port-1.14.7 <folder>`).
+- This repository, branch `port-1.14.7`, from the owner's private GitHub repository:
+  `git clone https://github.com/Tealwen/dauntless-revived-1147.git` (needs a GitHub login on the server, for
+  example `gh auth login`, or a deploy key). Update later with `git pull`.
 - The 1.14.7 game files on a web folder, laid out as `<base>/dauntless_rel-1.14.7_Shipping_2024-04-01_14-59-21_647472/<path>`
   (the owner gives `<base>`).
 - The server DLLs are already in `deploy/game-1147/` (pinned by `SHA256SUMS`); nothing has to be built on Windows.
