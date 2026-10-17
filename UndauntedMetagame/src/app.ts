@@ -21,6 +21,9 @@ import { progressionRouter } from "./routes/progression.js";
 import { loadoutRouter } from "./routes/loadout.js";
 import { undauntedApiRouter } from "./routes/undauntedapi.js";
 import { compat1147EarlyRouter, compat1147Router } from "./routes/compat1147.js";
+import { hunts1147EarlyRouter, hunts1147Router } from "./routes/hunts1147.js";
+import { progression1147Router } from "./routes/progression1147.js";
+import { stores1147Router } from "./routes/stores1147.js";
 import { DescribeOrigin, RefuseProxiedInDevAuthMode } from "./middleware/RequestOrigin.js";
 import { BodyLog, Redact } from "./middleware/BodyLog.js";
 import { backupRouter } from './routes/backup';
@@ -61,6 +64,7 @@ if (process.env.LOG_BODIES === "1") {
 }
 
 app.use("/", compat1147EarlyRouter); // 1.14.7 shapes for URLs 1.4.4 also uses (off unless TARGET_GAME_VERSION=1.14.7)
+app.use("/", hunts1147EarlyRouter); // 1.14.7 trials leaderboards and escalation stub (routes/hunts1147.ts)
 app.use("/", loginRouter);
 app.use("/", keyRotationRouter);
 app.use("/", backupRouter);
@@ -70,6 +74,8 @@ app.use("/", escalationRouter);
 app.use("/", friendsRouter);
 app.use("/", characterRouter);
 app.use("/", inventoryRouter);
+app.use("/", progression1147Router); // 1.14.7 Elite Hunt Pass offer (routes/progression1147.ts)
+app.use("/", stores1147Router); // 1.14.7 Reward Cache (season_store, routes/stores1147.ts)
 app.use("/", storeRouter);
 app.use("/", guildRouter);
 app.use("/", tuningRouter);
@@ -80,6 +86,7 @@ app.use("/", slayerLinksRouter);
 app.use("/", progressionRouter);
 app.use("/", loadoutRouter);
 app.use("/", compat1147Router);
+app.use("/", hunts1147Router);
 app.use("/undaunted/api", undauntedApiRouter); // Everything that I/we add to help manage undaunted that doesn't belong to the game proper belongs here
 
 app.use((req, res) => {

@@ -264,6 +264,14 @@ export const bounties = sqliteTable("bounties", {
     primaryKey({columns: [table.accountId, table.bountyId]})
 ]);
 
+// 1.14.7 player journey (Slayer's Path, /pjm): one row per journey key (account id, or account-season-faction)
+export const playerjourney = sqliteTable("playerjourney", {
+    journeyKey: text("journeyKey").notNull().primaryKey(),
+    nodes: text("nodes").notNull(),
+    updateVersion: integer("updateVersion").notNull(),
+    updatedDate: text("updatedDate").notNull()
+});
+
 export const bountydraft = sqliteTable("bountydraft", {
     accountId: text("accountId").notNull().primaryKey(),
     data: text("data").notNull(),

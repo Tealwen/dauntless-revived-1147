@@ -41,7 +41,9 @@ export function OverlayHeldCurrencies(Sheet: Record<string, unknown>, Held: Map<
     const Changed: string[] = [];
 
     for(const Key of Object.keys(Sheet)){
-        const CatalogId = Key.startsWith("CURRENCY_") ? Key : Key.startsWith("id_currency_") ? `CURRENCY_${Key.slice("id_currency_".length).toUpperCase()}` : undefined;
+        const Named = Key.startsWith("CURRENCY_") ? Key : Key.startsWith("id_currency_") ? `CURRENCY_${Key.slice("id_currency_".length).toUpperCase()}` : undefined;
+        // Platinum is held as CURRENCY_PLATINUM_UNIV (the stack the store charges, controllers/freestore.ts)
+        const CatalogId = Named === "CURRENCY_PLATINUM" && Held.has("CURRENCY_PLATINUM_UNIV") ? "CURRENCY_PLATINUM_UNIV" : Named;
 
         if(CatalogId !== undefined && Held.has(CatalogId)){
             Sheet[Key] = Held.get(CatalogId);

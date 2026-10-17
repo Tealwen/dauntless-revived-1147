@@ -25,7 +25,7 @@ import { FinalizeCompletedTrialWeeks } from "./trials";
 // - GET /token/<currency>/<sku>: a purchase token for that offer;
 // - POST /notification/<currency>?token=<token>: confirms the purchase, and the grant happens here.
 // Nothing the client sends decides what is granted or what it costs: the offer comes from
-// vendor/store_catalog.json, and only free offers (platinumPrice 0) in platinum are sold.
+// vendor/store_catalog.json; the offers are free unless STORE_PRICING=platinum prices the webstore (below).
 //
 // Differences from Harmonic's freeStore.ts: an account may hold several characters, so a token is bound
 // to the account's active character when it is issued (that fork refused accounts with more than one); items
@@ -140,8 +140,46 @@ const LADY_LUCK_IDS = new Set(LadyLuck.offers.map((Offer) => Offer.id));
 const LADY_LUCK_ITEM_KINDS = LadyLuck.itemKinds;
 const LADY_LUCK_REPEATABLE = new Set(LadyLuck.repeatable);
 
+// STORE_PRICING=platinum: the webstore offers (all free in vendor/store_catalog.json) are sold for Platinum,
+// earned through the Hunt Pass (CURRENCY_PLATINUM_UNIV). The retail prices are not in the catalogue, so each
+// offer gets the price of its category below (estimates close to the live game's), unless the catalogue
+// already gives it a price above 0. The bounty-token bundle (supplies) stays as it is.
+const PLATINUM_PRICES: [Tag: string, Single: number, Bundle?: number][] = [
+    ["skin_armour", 450, 1500],
+    ["skin_weapon_ac", 800], ["skin_weapon_eb", 800], ["skin_weapon_dp", 800], ["skin_weapon_ih", 800],
+    ["skin_weapon_ga", 800], ["skin_weapon_ms", 800], ["skin_weapon_cb", 800],
+    ["skin_lantern", 600],
+    ["social_arrival", 500],
+    ["personality_stylekit", 500],
+    ["social_emote", 300],
+    ["dye_armour", 200],
+    ["dye_tint", 150],
+    ["personality_fabric", 150],
+    ["personality_standard", 150],
+    ["personality_flaresigil", 100],
+    ["personality_character", 200]
+];
+
+export function PlatinumPriceFor(Offer: StoreOffer): number | undefined {
+    if(!Offer.tags.includes("webstore") || Offer.tags.some((Tag) => Tag.startsWith("supplies_"))) return undefined;
+    if(typeof Offer.platinumPrice === "number" && Offer.platinumPrice > 0) return Offer.platinumPrice;
+    const Row = PLATINUM_PRICES.find(([Tag]) => Offer.tags.includes(Tag));
+    if(Row == undefined) return 300;
+    const [, Single, Bundle] = Row;
+    return Bundle !== undefined && (Offer.items ?? []).length > 1 ? Bundle : Single;
+}
+
+function PricedWebstore(Offers: unknown){
+    if(process.env.STORE_PRICING !== "platinum" || !Array.isArray(Offers)) return Offers;
+    return (Offers as StoreOffer[]).map((Offer) => {
+        const Price = PlatinumPriceFor(Offer);
+        return Price === undefined ? Offer : {...Offer, platinumPrice: Price};
+    });
+}
+
 const Catalog: Record<string, unknown> = {
     ...(catalog as unknown as Record<string, unknown>),
+    webstore: PricedWebstore((catalog as unknown as Record<string, unknown>).webstore),
     ladyluckstore: LadyLuck.offers,
     exchange_vendor_slot_2: MiddlemanCatalogData.exchange_vendor_slot_2,
     exchange_vendor_slot_3: MiddlemanCatalogData.exchange_vendor_slot_3,
@@ -171,6 +209,9 @@ const CURRENCY_ALIASES: Record<string, string> = {
     // inventory catalogue id that actually holds the balance. Treat both as the same
     // payment currency so Lady Luck and Middleman purchases do not depend on which name
     // a particular UI path copied into /token/:currency/:sku.
+    // 1.14.7 offers price in id_currency_* (routes/store.ts ToOffer1147)
+    id_currency_platinum: "platinum",
+    id_currency_prestige: "prestige",
     id_currency_celldust: "celldust",
     currency_celldust: "celldust",
     id_currency_marks_steel: "markssteel",

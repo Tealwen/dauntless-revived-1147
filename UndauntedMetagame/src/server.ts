@@ -7,6 +7,7 @@ import { DescribeProgressionMode } from "./controllers/progressionmode";
 import { ProgressionUpgradeNotice } from "./controllers/realprogression";
 import { CheckGatewayConfig } from "./middleware/RequestOrigin";
 import { StartChat } from "./realtime/chat";
+import { AttachStomp } from "./realtime/stomp";
 import { DescribeFeatures } from "./features";
 import { PruneExpiredStorePurchases } from "./controllers/freestore";
 import { CheckProgressionConfig } from "./controllers/progressionconfig";
@@ -88,7 +89,7 @@ DrainAndRegisterAPIKeys().then(async () => {
   // program (ShadowUSB, part of the Shadow client app on the host PC, listens
   // on 127.0.0.1:60000) printed "Clear Skies" and then the process quietly
   // exited, leaving clients connected to the wrong program and hanging forever.
-  app.listen(PORT, BIND_HOST, (err?: Error) => {
+  const Http = app.listen(PORT, BIND_HOST, (err?: Error) => {
     if (err) {
       logger.fatal(`Could not listen on ${BIND_HOST}:${PORT}: ${err.message}`);
       process.exit(1);
@@ -110,4 +111,9 @@ DrainAndRegisterAPIKeys().then(async () => {
     }
     logger.info(`Clear Skies, Slayer.`);
   });
+
+  // The 1.14.7 client's notification (STOMP) connection, on the same port (realtime/stomp.ts)
+  if (process.env.TARGET_GAME_VERSION === "1.14.7") {
+    AttachStomp(Http);
+  }
 });

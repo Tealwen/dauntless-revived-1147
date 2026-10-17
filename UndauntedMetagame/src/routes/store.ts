@@ -192,6 +192,57 @@ storeRouter.get("/store-images/:file", (req, res) => {
     res.sendFile(path.join(STORE_IMAGES_DIR, File));
 });
 
+// 1.14.7 reads an offer's prices from prices: [{currencyId, price, salesPrice}] and skips an offer with none;
+// the 1.4.4 flat price fields are unknown to it (PORT-1.14.7/09-store.md).
+const Is1147 = process.env.TARGET_GAME_VERSION === "1.14.7";
+const PRICE_FIELDS_1147: Record<string, string> = {
+    platinumPrice: "id_currency_platinum",
+    cellDustPrice: "id_currency_celldust",
+    steelMarksPrice: "id_currency_marks_steel",
+    gildedMarksPrice: "id_currency_marks_gilded",
+    prestigePrice: "id_currency_prestige",
+    event01Price: "id_currency_event_01"
+};
+
+function ToInt(Value: unknown, Default: number){
+    return typeof Value === "number" && Number.isFinite(Value) ? Math.trunc(Value) : Default;
+}
+
+function ToOffer1147(Offer: any){
+    if(!Is1147) return Offer;
+
+    const Out: any = {...Offer};
+    const Prices: any[] = [];
+
+    for(const [Field, CurrencyId] of Object.entries(PRICE_FIELDS_1147)){
+        if(typeof Offer[Field] === "number"){
+            const Sale = Field === "platinumPrice" ? Offer.platinumSalePrice : undefined;
+            Prices.push({currencyId: CurrencyId, price: ToInt(Offer[Field], 0), salesPrice: ToInt(Sale, 0)});
+        }
+        delete Out[Field];
+    }
+    delete Out.platinumSalePrice;
+
+    return {
+        ...Out,
+        displayName: Out.displayName ?? "",
+        displayDescription: Out.displayDescription ?? "",
+        displayPriority: ToInt(Out.displayPriority, 0),
+        maxAllowed: ToInt(Out.maxAllowed, 0),
+        remaining: ToInt(Out.remaining, 0),
+        prices: Array.isArray(Out.prices) && Out.prices.length > 0 ? Out.prices : Prices,
+        items: Out.items ?? [],
+        entitlements: Out.entitlements ?? [],
+        skuProgression: null,
+        loadoutSlots: ToInt(Out.loadoutSlots, 0),
+        tags: Out.tags ?? [],
+        timeAvailabilityReason: Out.timeAvailabilityReason ?? "",
+        platformOfferId: Out.platformOfferId ?? "",
+        images: Out.images ?? {},
+        missingEntitlementNames: Out.missingEntitlementNames ?? []
+    };
+}
+
 // StoreGetItemByTagEndpoint: a bare array of offers
 storeRouter.get("/product/skus/public", StoreListOn, HasUndauntedMetagameAuth, PlayerTokenOnly, (req: any, res) => {
     const RequiredTags = req.query.requiredTags;
@@ -214,7 +265,7 @@ storeRouter.get("/product/skus/public", StoreListOn, HasUndauntedMetagameAuth, P
         }
 
         res.status(200);
-        res.json(Offers.map((Offer: any) => WithStoreImage(req, Offer)));
+        res.json(Offers.map((Offer: any) => ToOffer1147(WithStoreImage(req, Offer))));
     }
     catch(error){
         SendStoreError(res, error, `list ${RequiredTags}`);
@@ -225,7 +276,7 @@ storeRouter.get("/product/skus/public", StoreListOn, HasUndauntedMetagameAuth, P
 storeRouter.get("/product/sku/:skuId", StoreSkuOn, HasUndauntedMetagameAuth, PlayerTokenOnly, (req: any, res) => {
     try{
         res.status(200);
-        res.json(WithStoreImage(req, GetStoreOffer(req.AuthData.userId, req.params.skuId)));
+        res.json(ToOffer1147(WithStoreImage(req, GetStoreOffer(req.AuthData.userId, req.params.skuId))));
     }
     catch(error){
         SendStoreError(res, error, `offer ${req.params.skuId}`);
@@ -257,7 +308,16 @@ storeRouter.post("/notification/:currency", StoreAnyOn, HasUndauntedMetagameAuth
 
 // STORE=off: the answer the store screen always got
 storeRouter.get("/product/skus/public", HasUndauntedMetagameAuth, async (req: any, res) => {
-    logger.info("Store SKUs (stubbed)");
+    logger.info(`Store SKUs (stubbed) for tag ${req.query.requiredTags}`);
+
+    // 1.14.7 takes a 400 as a broken store ("Unable to open the store") on every vendor screen; an empty list is fine
+    // there. The main store (webstore) is the exception: with an empty list it spins forever, so it keeps the
+    // 1.4.4 answer below and says the store is unavailable.
+    if(Is1147 && req.query.requiredTags !== "webstore"){
+        res.status(200);
+        res.json([]);
+        return;
+    }
 
     // TODO: No clue if this is microtransactions or game transactions yet
     // If game transactions, I'll support it as it was on live

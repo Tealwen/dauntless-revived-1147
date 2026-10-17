@@ -42,7 +42,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4309;4369</DisableSpecificWarnings>
-      <PreprocessorDefinitions>NOMINMAX;UNDAUNTEDINTERNALSERVER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;UNDAUNTEDINTERNALSERVER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

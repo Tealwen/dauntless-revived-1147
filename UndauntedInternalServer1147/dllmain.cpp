@@ -19,14 +19,25 @@
 #include "SDK.hpp"
 #include "SDK/GameplayAbilities_parameters.hpp"
 #include "Addresses1147.h"
+#include "AutoPressStart1147.h"
+#include "CellFusionTime1147.h"
 #include "CityIdlePolicy.h"
+#include "ConnectedPlayers1147.h"
+#include "CrashFixes1147.h"
+#include "DeveloperStyle1147.h"
 #include "Endpoints1147.h"
 #include "EngineString.h"
+#include "FallRecovery1147.h"
 #include "Hooking.h"
 #include "HuntIdlePolicy.h"
+#include "HuntUnlock1147.h"
 #include "NativeDiagnostics.h"
 #include "Networking.h"
+#include "NoPlatinumPrice1147.h"
 #include "ServerFrameLimit.h"
+#include "Social1147.h"
+#include "UiHitchProfile1147.h"
+#include "VendorTabs1147.h"
 #include "constants.h"
 
 using namespace SDK;
@@ -63,6 +74,11 @@ static void* OrigHasFinishedLoading = nullptr;
 static bool HasFinishedLoadingHook(UObject* Object) {
     if (Original<bool(*)(UObject*)>(OrigHasFinishedLoading)(Object))
         return true;
+    // Client: the inventory finishes on its own once its own inventory query completes. Forcing it ready
+    // let the loadout resolve its items against an empty inventory 20 ms early, and it never retries
+    // ("ResolveItemInstanceId: No InventoryItem"): empty loadout menus and an unequipped character.
+    if (!Globals::AmServer && Object->Class && Object->Class->GetName().contains("inventory"))
+        return false;
     std::cout << "[FORCEREADY] " << Object->GetFullName() << std::endl;
     return true;
 }
@@ -86,12 +102,10 @@ static bool ConfigGetStringHook(void* Config, const wchar_t* Section, const wcha
     // Servers only override Phoenix endpoints; clients also point Epic's MCP services home.
     if (!Globals::AmServer && Section && Key && std::wstring(Section).contains(L"Mcp")) {
         const std::wstring K(Key);
-        // Chat/presence ships pointed at Epic's live XMPP server; keep the login token on this PC.
-        if (std::wstring(Section).contains(L"XMPP") && K == L"ServerAddr") {
-            const std::wstring Host = Globals::MetagameAddress.substr(0, Globals::MetagameAddress.find(L':'));
-            EngineString::Assign(Value, (L"ws://" + Host).c_str());
-            return true;
-        }
+        // Chat (XMPP over WebSocket): address, port, SSL and domain of the metagame's chat server
+        if (Social1147::XmppConfig(Section, Key, Value)) return true;
+        // The notification service is STOMP over a WebSocket (metagame realtime/stomp.ts)
+        if (std::wstring(Section).contains(L"Stomp") && K == L"Protocol") { EngineString::Assign(Value, L"ws"); return true; }
         if (K.contains(L"protocol") || K.contains(L"Protocol")) { EngineString::Assign(Value, L"http"); return true; }
         if (K.contains(L"Domain") || K.contains(L"RedirectUrl")) { EngineString::Assign(Value, Globals::MetagameAddress.c_str()); return true; }
     }
@@ -169,6 +183,7 @@ static bool ProcessRequestHook(void* Request) {
     FString Header(L"x-undaunted-gameserver-apikey");
     FString Key(Globals::ServerAPIKey);
     SetHeader(Request, &Header, &Key);
+    ConnectedPlayers1147::AddHeaders(Request);
     return Original<bool(*)(void*)>(OrigProcessRequest)(Request);
 }
 
@@ -199,12 +214,15 @@ static AArchonPlayerStart* PickPlayerStartFallback(AArchonPlayerState* PlayerSta
 // Phoenix's GetPlayerStartForPlayer filters by group and slot; fall back to any start in the same world.
 static void* OrigGetStartSpot = nullptr;
 static AArchonPlayerStart* GetStartSpotHook(AArchonPlayerState* PlayerState, FName StartGroup) {
-    if (auto* Start = Original<AArchonPlayerStart*(*)(AArchonPlayerState*, FName)>(OrigGetStartSpot)(PlayerState, StartGroup))
+    if (auto* Start = Original<AArchonPlayerStart*(*)(AArchonPlayerState*, FName)>(OrigGetStartSpot)(PlayerState, StartGroup)) {
+        FallRecovery::RememberStart(PlayerState, Start);
         return Start;
+    }
     auto* Start = PickPlayerStartFallback(PlayerState, StartGroup, true);
     if (!Start) Start = PickPlayerStartFallback(PlayerState, StartGroup, false);
     std::cout << "Player start fallback for group=" << StartGroup.ToString() << " -> "
               << (Start ? Start->GetFullName() : std::string("none")) << std::endl;
+    FallRecovery::RememberStart(PlayerState, Start);
     return Start;
 }
 
@@ -284,7 +302,16 @@ static void ProcessEventHook(UObject* Object, UFunction* Function, void* Parms) 
         TryActivateAbility(static_cast<UAbilitySystemComponent*>(Object), P->AbilityToActivate, P->InputPressed, P->PredictionKey, nullptr);
         return;
     }
+    const bool Profiled = UiHitchProfile::Begin(Object, Function);
     Original<void(*)(UObject*, UFunction*, void*)>(OrigProcessEvent)(Object, Function, Parms);
+    if (Profiled) UiHitchProfile::End();
+    if (!Globals::AmServer) {
+        AutoPressStart1147::OnProcessEvent(Object, Function);
+        DeveloperStyle::OnProcessEvent(Object, Function);
+        CellFusionTime::Tick();
+        VendorTabs::OnProcessEvent(Object);
+        NoPlatinumPrice::OnProcessEvent(Object);
+    }
 }
 
 static HuntIdlePolicy HuntIdle;
@@ -374,6 +401,8 @@ static void EngineTickHook(UGameEngine* Engine, float DeltaTime, bool bIdleMode)
     ++DR_ServerTickCount;
     const auto EngineStart = std::chrono::steady_clock::now();
     Original<void(*)(UGameEngine*, float, bool)>(OrigEngineTick)(Engine, DeltaTime, bIdleMode);
+    HuntUnlock1147::Tick();
+    CellFusionTime::Tick();
     const auto EngineMicros = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - EngineStart).count();
     ++Perf.Frames;
     Perf.EngineMicros += EngineMicros;
@@ -383,6 +412,11 @@ static void EngineTickHook(UGameEngine* Engine, float DeltaTime, bool bIdleMode)
 
     ResolveAbilityFunctions();
     KickProgressionConfiguration();
+    {
+        UNetDriver* const ListeningDriver = Globals::Listening ? Networking::NetDriver : nullptr;
+        FallRecovery::Tick(ListeningDriver, DeltaTime);
+        ConnectedPlayers1147::Update(ListeningDriver);
+    }
 
     if (Globals::DoListen) {
         Globals::DoListen = false;
@@ -426,6 +460,7 @@ static void InstallSharedHooks() {
     Hook("EAC client init", Addr::EACClientInit, Prologue::EACClientInit, EACInitHook, &OrigEACInit);
     Hook("HasFinishedLoading", Addr::HasFinishedLoading, Prologue::HasFinishedLoading, HasFinishedLoadingHook, &OrigHasFinishedLoading);
     Hook("FConfigCacheIni::GetString", Addr::ConfigGetString, Prologue::ConfigGetString, ConfigGetStringHook, &OrigConfigGetString);
+    HuntUnlock1147::Install();
 }
 
 static void InstallServerHooks() {
@@ -449,6 +484,7 @@ static void InstallServerHooks() {
 
     for (const auto& P : Patches::Server)
         Patch(P.Name, P.Rva, P.Expected, P.Replacement);
+    CrashFixes1147::Apply();
 }
 
 static void OpenConsole() {
@@ -535,6 +571,7 @@ static void Init() {
         *reinterpret_cast<uint8_t*>(Hooking::Base + Addr::GIsClient) = 0;
     } else {
         if (NumArgs > 2) Globals::MetagameAddress = Args[1];
+        Social1147::Init(Globals::MetagameAddress);
         Trace("client args");
         OpenConsole();
         Trace("console");
@@ -554,9 +591,13 @@ static void Init() {
         InstallServerHooks();
     else {
         Hooking::Hook("FCommandLine::Get", Addr::CommandLineGet, Prologue::CommandLineGet, ClientCommandLineHook, &OrigCommandLine);
-        // Client: only for the DR_TRACE_EVENTS diagnostic (the ability RPCs stay unresolved here).
-        if (!TraceWords.empty())
-            Hooking::Hook("UObject::ProcessEvent", Addr::ProcessEvent, Prologue::ProcessEvent, ProcessEventHook, &OrigProcessEvent);
+        // Client: press start, the F2 console, developer style, and the DR_TRACE_EVENTS diagnostic
+        // (the ability RPCs stay unresolved here).
+        Hooking::Hook("UObject::ProcessEvent", Addr::ProcessEvent, Prologue::ProcessEvent, ProcessEventHook, &OrigProcessEvent);
+        // DR_PROFILE_UI=1: [ui-hitch] lines for frames of 500 ms or more (UiHitchProfile1147.h)
+        if (UiHitchProfile::Enabled())
+            Hooking::Hook("UGameEngine::Tick (ui profile)", Addr::GameEngineTick, Prologue::GameEngineTick,
+                UiHitchProfile::EngineTickHook, &UiHitchProfile::OrigEngineTick);
     }
 
     if (Hooking::Failures)

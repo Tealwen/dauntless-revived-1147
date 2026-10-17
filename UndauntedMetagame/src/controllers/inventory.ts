@@ -67,6 +67,7 @@ export class InventoryInsufficientError extends Error {
 type LogEntry = Omit<typeof inventorylog.$inferInsert, "time" | "userId" | "characterId" | "transactionId" | "source" | "caller">;
 
 const DAILY_CHALLENGE_DRAFT_TOKEN = "TOKEN_DAILY_CHALLENGE_DRAFT";
+const BOUNTY_DRAFT_TOKEN = "TOKEN_BOUNTY_DRAFT";
 
 function MakeEmptyInventoryRow(CharacterId: string): typeof inventory.$inferInsert {
     return {
@@ -849,15 +850,35 @@ export async function GetInventoryForUserIdAndCharacterId(UserId: string, Charac
 
         const StackedItems = JSON.parse(InventoryFromDb!.stackedItems);
 
-        // 1.14.7: the daily-bounty loader drafts on its own and spends a TOKEN_DAILY_CHALLENGE_DRAFT;
-        // without one it never reports loaded and the player is dropped after 60 s. Keep one in stock.
-        if(process.env.TARGET_GAME_VERSION === "1.14.7" && Array.isArray(StackedItems)
-            && !StackedItems.some((Item: any) => Item?.catalogId === DAILY_CHALLENGE_DRAFT_TOKEN && Item.quantity > 0)){
-            const Stack = StackedItems.find((Item: any) => Item?.catalogId === DAILY_CHALLENGE_DRAFT_TOKEN);
-            if(Stack) Stack.quantity = 1;
-            else StackedItems.push({catalogId: DAILY_CHALLENGE_DRAFT_TOKEN, quantity: 1});
-            await GetDb().update(inventory).set({stackedItems: JSON.stringify(StackedItems)}).where(eq(inventory.characterId, CharacterId));
-            logger.info(`Seeded ${DAILY_CHALLENGE_DRAFT_TOKEN} for characterId ${CharacterId}`);
+        if(process.env.TARGET_GAME_VERSION === "1.14.7" && Array.isArray(StackedItems)){
+            let Touched = false;
+
+            // The daily-bounty loader drafts on its own and spends a TOKEN_DAILY_CHALLENGE_DRAFT;
+            // without one it never reports loaded and the player is dropped after 60 s. Keep one in stock.
+            if(!StackedItems.some((Item: any) => Item?.catalogId === DAILY_CHALLENGE_DRAFT_TOKEN && Item.quantity > 0)){
+                const Stack = StackedItems.find((Item: any) => Item?.catalogId === DAILY_CHALLENGE_DRAFT_TOKEN);
+                if(Stack) Stack.quantity = 1;
+                else StackedItems.push({catalogId: DAILY_CHALLENGE_DRAFT_TOKEN, quantity: 1});
+                Touched = true;
+                logger.info(`Seeded ${DAILY_CHALLENGE_DRAFT_TOKEN} for characterId ${CharacterId}`);
+            }
+
+            // Bounty board tokens: 1.14.7 never grants TOKEN_BOUNTY_DRAFT (retail got them from the Hunt Pass),
+            // so the board could never draft. Refill to the daily amount once per daily reset (17:00 UTC).
+            const ResetDay = new Date(Date.now() - 17 * 3600 * 1000).toISOString().slice(0, 10);
+            const JobId = `bounty_tokens_${CharacterId}_${ResetDay}`;
+            if(await GetDb().query.onetimejobs.findFirst({where: eq(onetimejobs.jobId, JobId)}) == undefined){
+                const Stack = StackedItems.find((Item: any) => Item?.catalogId === BOUNTY_DRAFT_TOKEN);
+                if(Stack == undefined) StackedItems.push({catalogId: BOUNTY_DRAFT_TOKEN, quantity: BOUNTY_TOKENS_DAILY});
+                else Stack.quantity = Math.max(Stack.quantity ?? 0, BOUNTY_TOKENS_DAILY);
+                await GetDb().insert(onetimejobs).values({jobId: JobId, doneDate: new Date().toISOString()}).onConflictDoNothing();
+                Touched = true;
+                logger.info(`Refilled ${BOUNTY_DRAFT_TOKEN} to ${BOUNTY_TOKENS_DAILY} for characterId ${CharacterId} (reset day ${ResetDay})`);
+            }
+
+            if(Touched){
+                await GetDb().update(inventory).set({stackedItems: JSON.stringify(StackedItems)}).where(eq(inventory.characterId, CharacterId));
+            }
         }
 
         return {

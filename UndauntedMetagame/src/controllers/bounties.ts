@@ -1,4 +1,4 @@
-import { and, asc, eq, ne } from "drizzle-orm";
+import { and, asc, eq, ne, notLike } from "drizzle-orm";
 import { GetDb } from "../db";
 import { bounties, bountydraft } from "../db/schema";
 import { logger } from "../logger";
@@ -18,6 +18,12 @@ const DEFAULT_DRAFT_DATA = {
     gold_count: 0
 };
 
+// 1.14.7 has three bounty components posting to the same route: the board (Bounty_*), daily challenges
+// (Challenge_Daily_*, draft_data_daily) and weekly season challenges (*_Challenge_Season_*, draft_data_weekly).
+// Their slot indexes are per component, and the weekly one posts a whole season whose slots repeat each week.
+const Is1147 = process.env.TARGET_GAME_VERSION === "1.14.7";
+const EXTRA_DRAFT_KEYS = ["draft_data_daily", "draft_data_weekly"] as const;
+
 function Board(tx: Tx, AccountId: string){
     const Bounties = tx.select().from(bounties).where(eq(bounties.accountId, AccountId)).orderBy(asc(bounties.slotIndex), asc(bounties.bountyId)).all().map((Row) => {
         const Element = JSON.parse(Row.data);
@@ -31,11 +37,19 @@ function Board(tx: Tx, AccountId: string){
     });
 
     const Draft = tx.select().from(bountydraft).where(eq(bountydraft.accountId, AccountId)).get();
-
-    return {
+    const Reply: {bounties: any[], draft_data: any, [Key: string]: unknown} = {
         bounties: Bounties,
         draft_data: Draft != undefined ? JSON.parse(Draft.data) : DEFAULT_DRAFT_DATA
     };
+
+    if(Is1147){
+        for(const Key of EXTRA_DRAFT_KEYS){
+            const Extra = tx.select().from(bountydraft).where(eq(bountydraft.accountId, `${AccountId}#${Key}`)).get();
+            Reply[Key] = Extra != undefined ? JSON.parse(Extra.data) : DEFAULT_DRAFT_DATA;
+        }
+    }
+
+    return Reply;
 }
 
 // GET /bounty/:uid
@@ -81,8 +95,10 @@ export function SetBounties(AccountId: string, Body: unknown, Who: Caller): Real
                 continue;
             }
 
-            if(SlotIndex !== null){
-                const Replaced = tx.delete(bounties).where(and(eq(bounties.accountId, AccountId), eq(bounties.slotIndex, SlotIndex), ne(bounties.bountyId, BountyId))).returning().all();
+            // 1.14.7: only board bounties take each other's slot; challenges are removed through /bounty/delete
+            if(SlotIndex !== null && !(Is1147 && BountyId.includes("Challenge_"))){
+                const Replaced = tx.delete(bounties).where(and(eq(bounties.accountId, AccountId), eq(bounties.slotIndex, SlotIndex), ne(bounties.bountyId, BountyId),
+                    ...(Is1147 ? [notLike(bounties.bountyId, "%Challenge%")] : []))).returning().all();
 
                 for(const Row of Replaced){
                     Notes.push(`${BountyId} took slot ${SlotIndex} from ${Row.bountyId}`);
@@ -102,6 +118,18 @@ export function SetBounties(AccountId: string, Body: unknown, Who: Caller): Real
             }
             else{
                 Notes.push("draft_data is not an object, ignored");
+            }
+        }
+
+        if(Is1147 && IsPlainObject(Body)){
+            for(const Key of EXTRA_DRAFT_KEYS){
+                const Data = Body[Key];
+                if(IsPlainObject(Data)){
+                    const Id = `${AccountId}#${Key}`;
+                    tx.insert(bountydraft).values({accountId: Id, data: JSON.stringify(Data), updatedDate: Now})
+                        .onConflictDoUpdate({target: bountydraft.accountId, set: {data: JSON.stringify(Data), updatedDate: Now}}).run();
+                    Saved.push(Key);
+                }
             }
         }
 

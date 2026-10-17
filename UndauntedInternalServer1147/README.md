@@ -35,7 +35,16 @@ The DLL refuses to start on any other build.
 | Damage, damage numbers, hit reactions and deaths on monsters | works |
 | Chain blades right click (thrown chain) | **freezes**: the beginner chain blades have no secondary (chain) mesh, on the client too, so it is the weapon's item data, not networking |
 | Animations not always smooth, some missing | **open**; the server holds 29 fps at about 2 ms per frame |
-| Ramsgate with a client | not tried yet (a new account starts on the tutorial island) |
+| Ramsgate with a client | works (one player; two or more not tried yet) |
+| Inventory and loadout menus | work: the client inventory is no longer forced ready before its own query completes |
+| Bounties, Hunt Pass (Commando rewards), Slayer's Path, quest menu | work (metagame side; quest menu freeze fixed by the 14-week season window) |
+| Chat (XMPP port and SSL from `Social1147.h`), Stomp notifications | connect |
+| Stores: main store (Platinum), Reward Cache, Lady Luck, Research Lab | metagame side; main store tested in game, the others not yet |
+| Ported 1.4.4 helpers: hunt unlocks and trials (`HuntUnlock1147.h`), fall recovery, developer style, press start, F2 console, connected-player headers, cell fusion time, vendor tabs, no platinum price, Ramsgate input-setup crash fix | built, partly checked in game (press start, console, cell fusion, trials table patch, chat) |
+
+`DR_PROFILE_UI=1` on a client logs `[ui-hitch]` lines (per-event ProcessEvent times, object count) for frames of 500 ms
+or more (`UiHitchProfile1147.h`). The project defines `_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR`: the game loads an older
+MSVCP140.dll, and a `std::mutex` built with the constexpr constructor crashes it on the first lock.
 
 What made combat work, in order (details in the code comments):
 1. The server issues the progression configuration query itself (`KickProgressionConfiguration`). Otherwise only the
