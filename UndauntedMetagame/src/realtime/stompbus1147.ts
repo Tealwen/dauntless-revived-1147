@@ -139,7 +139,3 @@ export function PublishToPlayer(AccountId: string, Body: unknown): number {
 export function PublishToParty(PartyId: string, Body: unknown): number {
     return Publish("party", PartyId, Body);
 }
-
-export function StompSubscriptionCount(): number {
-    return Subscriptions.size;
-}

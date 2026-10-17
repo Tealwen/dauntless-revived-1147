@@ -1,6 +1,4 @@
 import crypto from "node:crypto";
-import fs from "node:fs";
-import path from "node:path";
 import { Router } from "express";
 import { and, eq, isNull, lt } from "drizzle-orm";
 import { GetDb } from "../db";
@@ -13,6 +11,7 @@ import { GetActiveCharacter } from "../controllers/activecharacter";
 import { GrantKind } from "../controllers/freestore";
 import { ApplyInventoryTransactionInTx, InventoryErrorOf } from "../controllers/inventory";
 import { Tx } from "../controllers/savehistory";
+import { StoreImages } from "../controllers/storeimages";
 import { ParseOnOff } from "../features";
 import rewardCache from "../vendor/store_rewardcache_1147.json";
 
@@ -70,17 +69,8 @@ const PriceOf = (Offer: CacheOffer) => RewardCacheFree() ? 0 : Offer.price;
 // The token is bound to the offer as sold when it was issued (a price change in between needs a new token)
 const OfferHash = (Offer: CacheOffer) => Hash(JSON.stringify({ ...Offer, price: PriceOf(Offer) }));
 
-// The items' 1.4.4 icons, served by routes/store.ts at /store-images/<catalog id>.png
-const STORE_IMAGES_DIR = path.join(process.cwd(), "store-images");
-let StoreImageFiles: Set<string> | undefined;
-
-function ImagesFor(req: any, Offer: CacheOffer){
-    StoreImageFiles ??= new Set(fs.existsSync(STORE_IMAGES_DIR) ? fs.readdirSync(STORE_IMAGES_DIR) : []);
-    const File = `${(Offer.items[0]?.catalogId ?? "").toLowerCase()}.png`;
-    if(!StoreImageFiles.has(File)) return {};
-    const Url = `${req.protocol}://${req.get("host")}/store-images/${File}`;
-    return { standard: Url, feature: Url };
-}
+// The items' icons (controllers/storeimages.ts): the first item that has one
+const ImagesFor = (req: any, Offer: CacheOffer) => StoreImages(req, Offer.items.map((Item) => Item.catalogId));
 
 function Stacks(tx: Tx, CharacterId: string){
     const Row = tx.select().from(inventory).where(eq(inventory.characterId, CharacterId)).get();

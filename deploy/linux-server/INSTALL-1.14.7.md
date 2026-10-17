@@ -59,11 +59,12 @@ The game's feature flags (`*_bpff` assets) are turned on with `DR_FEATURES` in
 `/etc/dauntless-revived/deployserver.env`, comma-separated, by short name; a leading `-` turns one off:
 
 ```sh
-DR_FEATURES=city_event_dark_harvest_bpff
+DR_FEATURES=city_event_dark_harvest_bpff,city_event_stall_bpff
 ```
 
 Then `sudo systemctl restart dauntless-deploy` (open Ramsgates close and the next ones load the flags). Known
-seasonal ones: `city_event_dark_harvest_bpff` (Halloween), `enable_city_event_frostfall_bpff` (winter),
+seasonal ones: `city_event_dark_harvest_bpff` (Halloween), `city_event_stall_bpff` (the event stall next to the
+potion vendor, whose NPC opens the event store), `enable_city_event_frostfall_bpff` (winter),
 `city_event_Springtide_bpff`, `city_event_SaintsBond_bpff`. The full list is in
 `UndauntedInternalServer1147/FeatureFlags1147.h`. The PhynariaMC launcher gives players the same flags from
 `"dauntless": { "features": [...] }` in its config.json. A reinstall keeps `DR_FEATURES` and `DR_LOG_FILE`.

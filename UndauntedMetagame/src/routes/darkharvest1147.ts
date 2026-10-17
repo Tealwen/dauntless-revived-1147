@@ -1,6 +1,4 @@
 import crypto from "node:crypto";
-import fs from "node:fs";
-import path from "node:path";
 import { Router } from "express";
 import { and, eq, isNull, lt } from "drizzle-orm";
 import { GetDb } from "../db";
@@ -12,6 +10,7 @@ import { PlayerMutationRateLimit } from "../middleware/RateLimits";
 import { GetActiveCharacter } from "../controllers/activecharacter";
 import { ApplyInventoryTransactionInTx, InventoryErrorOf } from "../controllers/inventory";
 import { Tx } from "../controllers/savehistory";
+import { StoreImages } from "../controllers/storeimages";
 import { ParseOnOff } from "../features";
 import darkHarvest from "../vendor/store_darkharvest_1147.json";
 
@@ -82,17 +81,10 @@ const GrantsOf = (Offer: EventOffer): Grant[] => Offer.group === "rumour" && Rum
 // The token is bound to the offer as sold when it was issued (a price or rumour-mode change needs a new token)
 const OfferHash = (Offer: EventOffer) => Hash(JSON.stringify({ ...Offer, price: PriceOf(Offer), grants: GrantsOf(Offer) }));
 
-const STORE_IMAGES_DIR = path.join(process.cwd(), "store-images");
-let StoreImageFiles: Set<string> | undefined;
-
-function ImagesFor(req: any, Offer: EventOffer){
-    StoreImageFiles ??= new Set(fs.existsSync(STORE_IMAGES_DIR) ? fs.readdirSync(STORE_IMAGES_DIR) : []);
-    const First = Offer.items[0]?.catalogId ?? Offer.drop?.results[0]?.catalogId ?? "";
-    const File = `${First.toLowerCase()}.png`;
-    if(!StoreImageFiles.has(File)) return {};
-    const Url = `${req.protocol}://${req.get("host")}/store-images/${File}`;
-    return { standard: Url, feature: Url };
-}
+// The items' icons (controllers/storeimages.ts): the first granted item or drop result that has one; a rumour
+// token shows the item it unlocks
+const ImagesFor = (req: any, Offer: EventOffer) =>
+    StoreImages(req, [...Offer.items, ...(Offer.drop?.results ?? [])].map((Item) => Item.catalogId.replace(/^TOKEN_RUMOUR_/i, "")));
 
 function Stacks(tx: Tx, CharacterId: string){
     const Row = tx.select().from(inventory).where(eq(inventory.characterId, CharacterId)).get();

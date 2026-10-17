@@ -1,7 +1,5 @@
 // Dauntless Revived server/client DLL for the Dauntless 1.14.7 client (CL 647472, UE 4.26.2).
-// Port of UndauntedInternalServer (1.4.4). This first version carries the minimum needed to boot
-// a Ramsgate game server and let a client connect; the gameplay helpers of the 1.4.4 DLL
-// (abilities RPC fix, fall recovery, trials, vendor tabs, ...) are not ported yet.
+// Port of UndauntedInternalServer (1.4.4): game servers (Ramsgate and hunts) and the client helpers.
 
 #include <windows.h>
 #include <shellapi.h>
@@ -39,7 +37,6 @@
 #include "SeasonalSchedule1147.h"
 #include "ServerFrameLimit.h"
 #include "Social1147.h"
-#include "UiHitchProfile1147.h"
 #include "VendorTabs1147.h"
 #include "constants.h"
 
@@ -267,40 +264,10 @@ static void ResolveAbilityFunctions() {
 }
 
 static void* OrigProcessEvent = nullptr;
-// DR_TRACE_EVENTS=word1,word2: logs (once per function) every ProcessEvent whose function name
-// contains one of the words. A diagnostic for finding which gameplay calls a server runs.
-static std::vector<std::string> TraceWords = [] {
-    std::vector<std::string> Words;
-    char Value[512] = {};
-    const auto Length = GetEnvironmentVariableA("DR_TRACE_EVENTS", Value, sizeof(Value));
-    if (Length == 0 || Length >= sizeof(Value)) return Words;
-    std::string All(Value), Word;
-    for (char C : All + ",") {
-        if (C == ',') { if (!Word.empty()) Words.push_back(Word); Word.clear(); }
-        else Word += static_cast<char>(tolower(C));
-    }
-    return Words;
-}();
-
-static void TraceEvent(UObject* Object, UFunction* Function) {
-    static std::map<UFunction*, int> Seen;
-    if (TraceWords.empty() || !Function || Seen.size() > 4000) return;
-    auto& Count = Seen[Function];
-    if (Count++ > 0) return; // first call of each function only
-    std::string Name = Function->GetFullName(), Lower = Name;
-    for (auto& C : Lower) C = static_cast<char>(tolower(C));
-    for (const auto& Word : TraceWords)
-        if (Lower.find(Word) != std::string::npos) {
-            std::cout << "[event] " << Name << " on " << (Object ? Object->GetName() : "null") << std::endl;
-            return;
-        }
-}
-
-// Diagnostic (with DR_TRACE_EVENTS): why a damage-number multicast does not reach the clients.
+// Server: the ability RPCs. Client: the UI helpers, after the original ran.
 static void ProcessEventHook(UObject* Object, UFunction* Function, void* Parms) {
     UFunction* const WithEventData = TryActivateWithEventData;
     UFunction* const Plain = TryActivatePlain;
-    TraceEvent(Object, Function);
 
     if (Function && Function == WithEventData) {
         auto* P = static_cast<Params::AbilitySystemComponent_ServerTryActivateAbilityWithEventData*>(Parms);
@@ -312,9 +279,7 @@ static void ProcessEventHook(UObject* Object, UFunction* Function, void* Parms) 
         TryActivateAbility(static_cast<UAbilitySystemComponent*>(Object), P->AbilityToActivate, P->InputPressed, P->PredictionKey, nullptr);
         return;
     }
-    const bool Profiled = UiHitchProfile::Begin(Object, Function);
     Original<void(*)(UObject*, UFunction*, void*)>(OrigProcessEvent)(Object, Function, Parms);
-    if (Profiled) UiHitchProfile::End();
     if (!Globals::AmServer) {
         AutoPressStart1147::OnProcessEvent(Object, Function);
         DeveloperStyle::OnProcessEvent(Object, Function);
@@ -418,7 +383,6 @@ static void EngineTickHook(UGameEngine* Engine, float DeltaTime, bool bIdleMode)
     Perf.EngineMicros += EngineMicros;
     Perf.WorstMicros = (std::max)(Perf.WorstMicros, static_cast<unsigned long long>(EngineMicros));
     if (Globals::Listening) ReportPerf();
-
 
     ResolveAbilityFunctions();
     KickProgressionConfiguration();
@@ -550,21 +514,7 @@ static void MainThread() {
     }
 }
 
-// DR_TRACE_FILE: one line per start-up step, written without the CRT (start-up diagnostics).
-static void Trace(const char* Step) {
-    wchar_t Path[MAX_PATH] = {};
-    const auto Length = GetEnvironmentVariableW(L"DR_TRACE_FILE", Path, MAX_PATH);
-    if (!Length || Length >= MAX_PATH) return;
-    HANDLE File = CreateFileW(Path, FILE_APPEND_DATA, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_ALWAYS, 0, nullptr);
-    if (File == INVALID_HANDLE_VALUE) return;
-    DWORD Written = 0;
-    WriteFile(File, Step, static_cast<DWORD>(strlen(Step)), &Written, nullptr);
-    WriteFile(File, "\r\n", 2, &Written, nullptr);
-    CloseHandle(File);
-}
-
 static void Init() {
-    Trace("init");
     Hooking::Base = reinterpret_cast<uintptr_t>(GetModuleHandleW(nullptr));
     Globals::AmServer = std::string(GetCommandLineA()).contains("-server");
 
@@ -573,10 +523,8 @@ static void Init() {
         return;
     }
 
-    Trace("build ok");
     int NumArgs = 0;
     wchar_t** Args = CommandLineToArgvW(GetCommandLineW(), &NumArgs);
-    Trace("args");
 
     if (Globals::AmServer) {
         // <apikey> <port> <map> <behemoth|NO_BEHEMOTH> <mmHuntId|NO_MM_HUNTID> <uid:hunt,...|NO_EXPECTED_PLAYERS> <ip:port> -server
@@ -604,34 +552,24 @@ static void Init() {
     } else {
         if (NumArgs > 2) Globals::MetagameAddress = Args[1];
         Social1147::Init(Globals::MetagameAddress);
-        Trace("client args");
         OpenConsole();
-        Trace("console");
         std::cout << "Running as a client, metagame " << std::string(Globals::MetagameAddress.begin(), Globals::MetagameAddress.end()) << std::endl;
     }
 
     if (!Globals::MetagameAddress.empty())
         BuildEndpointMap();
 
-    Trace("endpoints");
     // DR_FEATURES: the game's feature flags (FeatureFlags1147.h), written before the engine reads its config
     FeatureFlags1147::Apply();
     DR_InitDiagnostics();
     MH_Initialize();
-    Trace("minhook");
     InstallSharedHooks();
-    Trace("shared hooks");
     if (Globals::AmServer)
         InstallServerHooks();
     else {
         Hooking::Hook("FCommandLine::Get", Addr::CommandLineGet, Prologue::CommandLineGet, ClientCommandLineHook, &OrigCommandLine);
-        // Client: press start, the F2 console, developer style, and the DR_TRACE_EVENTS diagnostic
-        // (the ability RPCs stay unresolved here).
+        // Client: press start, the F2 console, developer style and the UI fixes (the ability RPCs stay unresolved here).
         Hooking::Hook("UObject::ProcessEvent", Addr::ProcessEvent, Prologue::ProcessEvent, ProcessEventHook, &OrigProcessEvent);
-        // DR_PROFILE_UI=1: [ui-hitch] lines for frames of 500 ms or more (UiHitchProfile1147.h)
-        if (UiHitchProfile::Enabled())
-            Hooking::Hook("UGameEngine::Tick (ui profile)", Addr::GameEngineTick, Prologue::GameEngineTick,
-                UiHitchProfile::EngineTickHook, &UiHitchProfile::OrigEngineTick);
     }
 
     if (Hooking::Failures)

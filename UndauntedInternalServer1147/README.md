@@ -42,8 +42,7 @@ The DLL refuses to start on any other build.
 | Stores: main store (Platinum), Reward Cache, Lady Luck, Research Lab | metagame side; main store tested in game, the others not yet |
 | Ported 1.4.4 helpers: hunt unlocks and trials (`HuntUnlock1147.h`), fall recovery, developer style, press start, F2 console, connected-player headers, cell fusion time, vendor tabs, no platinum price, Ramsgate input-setup crash fix | built, partly checked in game (press start, console, cell fusion, trials table patch, chat) |
 
-`DR_PROFILE_UI=1` on a client logs `[ui-hitch]` lines (per-event ProcessEvent times, object count) for frames of 500 ms
-or more (`UiHitchProfile1147.h`). The project defines `_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR`: the game loads an older
+The project defines `_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR`: the game loads an older
 MSVCP140.dll, and a `std::mutex` built with the constexpr constructor crashes it on the first lock.
 
 What made combat work, in order (details in the code comments):
@@ -55,12 +54,8 @@ What made combat work, in order (details in the code comments):
    (null) driver into `World->NetDriver` during the world tick, so every gameplay RPC was dropped (found on 2.1.1;
    the 1.4.4 DLL patched the same lookup with its `GetNetDriverInternal` hook).
 
-Not ported yet from the 1.4.4 DLL: fall recovery, trials, vendor tabs, cell fusion, platinum price, developer
-style, the in-game console, the connected-player headers, and the unnamed 1.4.4 crash-fix hooks.
-
-Diagnostics: `DR_LOG_FILE` (the log, the engine's own included), `DR_TRACE_EVENTS=word,...` (logs the first call of
-each ProcessEvent function whose name contains a word, on server and client), `DR_TRACE_FILE` (start-up steps), and a
-`[perf]` line every 10 s on servers.
+Diagnostics: `DR_LOG_FILE` (the log, the engine's own included), `native-fault-<pid>.log` in `GAMESERVER_READY_DIR`
+(access violations), and a `[perf]` line every 10 s on servers.
 
 ## Build
 

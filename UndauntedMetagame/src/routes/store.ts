@@ -1,7 +1,7 @@
-import fs from "node:fs";
 import path from "node:path";
 import { Router } from "express";
 import { logger } from "../logger";
+import { STORE_IMAGES_DIR, StoreImageFile, StoreImages } from "../controllers/storeimages";
 import { HasUndauntedMetagameAuth } from "../middleware/HasUndauntedMetagameAuth";
 import { GetHeldCurrencies, GetNotesForUser, OverlayHeldCurrencies } from "../controllers/store";
 import { PlayerTokenOnly } from "../middleware/PlayerAuth";
@@ -156,34 +156,16 @@ function SendStoreError(res: any, error: unknown, What: string){
     res.json({ code: "500", message: "Store request failed" });
 }
 
-// ---- Store offer images. ----
-// The 1.4.4 client downloads an offer's picture from images.standard / images.feature (its ImageURL);
-// retail served them from Phoenix's CDN. store-images/ holds the items' own 1.4.4 icons, one PNG per
-// catalog id (lower case), extracted from the game's textures. An offer whose first item has one gets
-// its URL on this server, built from the host the client called so it works behind the relay too.
-// 1.14.7: the icons of its own catalogue (store-images-1147, extracted from the 1.14.7 paks, PORT-1.14.7 doc 18)
-const STORE_IMAGES_DIR = path.join(process.cwd(), process.env.TARGET_GAME_VERSION === "1.14.7" ? "store-images-1147" : "store-images");
-let StoreImageFiles: Set<string> | undefined;
-
-function StoreImageFor(Offer: any){
-    StoreImageFiles ??= new Set(fs.existsSync(STORE_IMAGES_DIR) ? fs.readdirSync(STORE_IMAGES_DIR) : []);
-    const CatalogId = Offer?.items?.[0]?.catalogId;
-    const File = typeof CatalogId === "string" ? `${CatalogId.toLowerCase()}.png` : undefined;
-    return File != undefined && StoreImageFiles.has(File) ? File : undefined;
-}
-
+// An offer whose first item has an icon (controllers/storeimages.ts) gets its URL on this server
 function WithStoreImage(req: any, Offer: any){
-    const File = StoreImageFor(Offer);
-    if(File == undefined) return Offer;
-
-    const Url = `${req.protocol}://${req.get("host")}/store-images/${File}`;
-    return {...Offer, images: {...(Offer.images ?? {}), standard: Url, feature: Url}};
+    const Images = StoreImages(req, [Offer?.items?.[0]?.catalogId]);
+    return Images.standard == undefined ? Offer : {...Offer, images: {...(Offer.images ?? {}), ...Images}};
 }
 
 storeRouter.get("/store-images/:file", (req, res) => {
     const File = req.params.file;
 
-    if(!/^[a-z0-9_]+\.png$/.test(File) || !StoreImageFor({items: [{catalogId: File.slice(0, -4)}]})){
+    if(!/^[a-z0-9_]+\.png$/.test(File) || !StoreImageFile(File.slice(0, -4))){
         res.status(404);
         res.send();
         return;

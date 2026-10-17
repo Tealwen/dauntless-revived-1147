@@ -24,21 +24,20 @@
 //   separated; an entry ending in '*' is a prefix. When neither is set and DR_FEATURES turns
 //   city_event_dark_harvest_bpff on, the Dark Harvest ids are used:
 //   EVENT_DARKHARVEST,DarkHarvest,Dark_Harvest_*. EVENT_DARKHARVEST or DarkHarvest in a list implies Dark_Harvest_*.
-// "-" (DR_SEASONAL_EVENTS=-) turns the override off. Every distinct id the game asks about is logged once:
-//   [schedule] id=<id> game=<0|1> forced=<0|1>
+// "-" (DR_SEASONAL_EVENTS=-) turns the override off. Each id forced on is logged once:
+//   [schedule] forced on: <id>
 
 #include <windows.h>
 #include <cstdint>
 #include <cstring>
 #include <initializer_list>
 #include <iostream>
-#include <set>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "Hooking.h"
-#include "NativeDiagnostics.h"
 #include "SDK.hpp"
 
 namespace SeasonalSchedule1147 {
@@ -94,24 +93,22 @@ inline bool IsForced(const std::string& Id) {
     return false;
 }
 
-inline void Report(const std::string& Id, bool Game, bool Forced) {
-    static std::set<std::string> Seen;
-    if (Seen.size() >= 256 || !Seen.insert(Id).second) return;
-    char Line[320];
-    const int Size = sprintf_s(Line, "[schedule] id=%.200s game=%d forced=%d\n", Id.c_str(), Game ? 1 : 0, Forced ? 1 : 0);
-    std::cout << Line;
-    if (Size > 0) DR_WriteDiagnostic(Line, static_cast<DWORD>(Size));
+// Whether an id is forced, cached per FName (game thread only): each id is converted and matched once
+inline bool IsForcedCached(uint64_t RawId) {
+    static std::unordered_map<uint64_t, bool> Known;
+    if (auto It = Known.find(RawId); It != Known.end()) return It->second;
+    SDK::FName Id;
+    std::memcpy(&Id, &RawId, sizeof(Id));
+    const std::string Name = Id.IsNone() ? std::string() : Id.ToString();
+    const bool Forced = !Name.empty() && IsForced(Name);
+    if (Forced) std::cout << "[schedule] forced on: " << Name << std::endl;
+    Known.emplace(RawId, Forced);
+    return Forced;
 }
 
 inline bool IsScheduledItemActiveHook(SDK::UObject* WorldContext, uint64_t RawId, int64_t NowTicks) {
-    const bool Game = reinterpret_cast<IsScheduledItemActiveFn>(OrigIsScheduledItemActive)(WorldContext, RawId, NowTicks);
-    SDK::FName Id;
-    std::memcpy(&Id, &RawId, sizeof(Id));
-    if (Id.IsNone()) return Game;
-    const std::string Name = Id.ToString();
-    const bool Forced = !Game && IsForced(Name);
-    Report(Name, Game, Forced);
-    return Game || Forced;
+    return reinterpret_cast<IsScheduledItemActiveFn>(OrigIsScheduledItemActive)(WorldContext, RawId, NowTicks)
+        || IsForcedCached(RawId);
 }
 
 // Servers only: clients get their schedule from the metagame (SEASONAL_EVENTS) and cannot destroy level actors.
@@ -129,8 +126,8 @@ inline void Install() {
     // alone (the metagame's usual SEASONAL_EVENTS=EVENT_DARKHARVEST,DarkHarvest) covers them too.
     for (const auto& E : std::vector<std::string>(Exact))
         if (E == "event_darkharvest" || E == "darkharvest") { Prefixes.push_back("dark_harvest_"); break; }
-    std::cout << "[schedule] seasonal events forced on: " << (List.empty() ? "none" : List) << std::endl;
-    // Hooked even with an empty list: the [schedule] lines show which ids this build's content asks about.
+    if (Exact.empty() && Prefixes.empty()) return; // nothing to force: the game's own answer stands
+    std::cout << "[schedule] seasonal events forced on: " << List << std::endl;
     Hooking::Hook("UTuningDataStatics::IsScheduledItemActive", IsScheduledItemActiveRva, IsScheduledItemActivePrologue,
         IsScheduledItemActiveHook, &OrigIsScheduledItemActive);
 }
