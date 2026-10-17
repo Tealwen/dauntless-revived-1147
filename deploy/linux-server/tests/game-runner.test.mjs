@@ -52,7 +52,7 @@ test("explicit Proton takes priority and receives its own compat-data path", () 
     });
     assert.equal(spec.command, proton);
     assert.deepEqual(spec.args.slice(0, 2), ["run", game]);
-    assert.equal(spec.env.STEAM_COMPAT_DATA_PATH, compat);
+    assert.equal(spec.env.STEAM_COMPAT_DATA_PATH, path.join(compat, "port-1"));
     assert.equal(spec.env.STEAM_COMPAT_CLIENT_INSTALL_PATH, path.join(root, "Steam"));
     assert.match(spec.env.WINEDLLOVERRIDES, /dxgi=n,b/);
   } finally {
@@ -150,4 +150,29 @@ test("1.14.7 servers force the native winmm loader instead of dxgi", () => {
   assert.equal(dllOverrides("foo=n;winmm=b", "1.14.7"), "foo=n;winmm=n,b");
   assert.equal(dllOverrides("", "1.14.7"), "winmm=n,b");
   assert.equal(dllOverrides("dxgi=b", undefined), "dxgi=n,b");
+});
+
+test("each game-server port gets its own Proton prefix so simultaneous hunts don't share a wineserver", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "dr-unix-proton-"));
+  try {
+    const game = exe(path.join(root, "game", "Dauntless-Win64-Shipping.exe"));
+    const proton = exe(path.join(root, "opt", "proton", "GE-Proton11-7-x86_64", "proton"));
+    const base = {
+      PATH: "",
+      DISPLAY: ":99",
+      HOME: root,
+      DR_GAME_EXE: game,
+      DR_PROTON_BINARY: proton,
+      DR_PROTON_COMPAT_DATA: path.join(root, "data", "proton"),
+    };
+    const a = buildWineLaunch(["id-a", "8775", "/Game/Maps/islands/x"], base);
+    const b = buildWineLaunch(["id-b", "8776", "/Game/Maps/islands/x"], base);
+    assert.equal(a.env.STEAM_COMPAT_DATA_PATH, path.join(root, "data", "proton", "port-8775"));
+    assert.equal(b.env.STEAM_COMPAT_DATA_PATH, path.join(root, "data", "proton", "port-8776"));
+    assert.equal(a.env.STEAM_COMPAT_CLIENT_INSTALL_PATH, path.join(root, "data", "steam"));
+    const shared = buildWineLaunch(["id-a", "8775"], { ...base, DR_SHARED_PREFIX: "1" });
+    assert.equal(shared.env.STEAM_COMPAT_DATA_PATH, path.join(root, "data", "proton"));
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });
