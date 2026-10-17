@@ -1001,8 +1001,12 @@ async function HandlePartyMatchmaking(GameMode: unknown, GameArgs: unknown, Hunt
         return "solo";
     }
 
-    const Mode = typeof GameMode === "string" ? GameMode : "";
     const Hunt = typeof HuntId === "string" ? HuntId : "";
+    // 1.14.7 starts its open-world hunts (ShatteredIsles_IslandA...) as SHARED with a hunt id; the
+    // solo code queues them as hunts, so the party takes them like one: the leader brings everyone.
+    // SHARED stays the Dojo's shared world otherwise.
+    const Mode = GameMode === "SHARED" && Hunt.trim().length > 0 && HuntIdRequiresMatchmaking(Hunt) ? "ISLAND"
+        : typeof GameMode === "string" ? GameMode : "";
     const IsLeader = TheParty.LeaderId === PlayerId;
 
     if(Mode === "ISLAND" && typeof GameArgs === "string" && GameArgs.trim().length > 0){

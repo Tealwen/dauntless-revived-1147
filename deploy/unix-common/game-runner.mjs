@@ -78,6 +78,16 @@ export function dllOverrides(existing, version) {
   return parts.join(";");
 }
 
+// One Proton/Wine prefix per game-server port. A shared prefix means a shared wineserver, and
+// starting a second hunt or tutorial in it ends the first one. The port is the 2nd launch argument;
+// the deploy server never runs two servers on one port, so a port's prefix is never used twice at once.
+// DR_SHARED_PREFIX=1 keeps the old single prefix.
+export function instancePrefix(base, args, env = process.env) {
+  if (env.DR_SHARED_PREFIX === "1") return base;
+  const port = Number(args[1]);
+  return Number.isInteger(port) && port > 0 && port < 65536 ? path.join(base, "port-" + port) : base;
+}
+
 export function buildWineLaunch(args, env = process.env) {
   const gameExe = env.DR_GAME_EXE;
   if (!gameExe || !path.isAbsolute(gameExe) || !existsSync(gameExe)) {
@@ -93,15 +103,22 @@ export function buildWineLaunch(args, env = process.env) {
   let launchEnv;
   let runtime;
   if (proton) {
-    const compatData = path.resolve(env.DR_PROTON_COMPAT_DATA ?? path.join(home, ".local", "share", "dauntless-revived", "proton"));
+    const compatBase = path.resolve(env.DR_PROTON_COMPAT_DATA ?? path.join(home, ".local", "share", "dauntless-revived", "proton"));
+    const compatData = instancePrefix(compatBase, args, env);
     mkdirSync(compatData, { recursive: true });
-    const steamRoot = steamRootFor(proton);
+    // Proton's setup_prefix requires STEAM_COMPAT_CLIENT_INSTALL_PATH. A standalone Proton (e.g. GE-Proton in /opt)
+    // has no Steam root, so give it an empty "steam" dir next to the compat data.
+    let steamRoot = env.STEAM_COMPAT_CLIENT_INSTALL_PATH || steamRootFor(proton);
+    if (!steamRoot) {
+      steamRoot = path.join(path.dirname(compatBase), "steam");
+      mkdirSync(steamRoot, { recursive: true });
+    }
     command = proton;
     gameArgs = ["run", gameExe, ...args];
     launchEnv = {
       ...env,
       STEAM_COMPAT_DATA_PATH: compatData,
-      ...(steamRoot ? { STEAM_COMPAT_CLIENT_INSTALL_PATH: steamRoot } : {}),
+      STEAM_COMPAT_CLIENT_INSTALL_PATH: steamRoot,
       STEAM_COMPAT_APP_ID: "0",
       PROTON_LOG: "0",
       WINEDLLOVERRIDES: dllOverrides(env.WINEDLLOVERRIDES, env.DR_GAME_VERSION),
@@ -110,7 +127,7 @@ export function buildWineLaunch(args, env = process.env) {
   } else {
     const wine = explicitWine ?? findOnPath(["wine64", "wine"], env);
     if (!wine) throw new Error("Proton or Wine was not found; set DR_PROTON_BINARY/DR_WINE_BINARY or install a runtime");
-    const prefix = path.resolve(env.DR_WINEPREFIX ?? path.join(home, ".local", "share", "dauntless-revived", "wineprefix"));
+    const prefix = instancePrefix(path.resolve(env.DR_WINEPREFIX ?? path.join(home, ".local", "share", "dauntless-revived", "wineprefix")), args, env);
     mkdirSync(prefix, { recursive: true });
     command = wine;
     gameArgs = [gameExe, ...args];

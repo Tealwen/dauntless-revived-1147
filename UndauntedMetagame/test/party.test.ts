@@ -566,6 +566,28 @@ describe("T6: back to Ramsgate together", () => {
     });
 });
 
+describe("1.14.7 open-world hunts (SHARED with a hunt id)", () => {
+    // 17 October 2026: the leader's SHARED ShatteredIsles_IslandA went alone ("no member is on the
+    // leader's server") and the member never got the hunt.
+    it("the leader's join takes every member along, as a hunt", async () => {
+        await FormParty(A, B);
+        Deploy.Calls.length = 0;
+
+        assert.equal(await HandlePlayerMatchmaking("SHARED", "", "ShatteredIsles_IslandA", A), true);
+        assert.equal(Deploy.Calls.length, 1);
+        assert.equal(Deploy.Calls[0].GameMode, "ISLAND");
+        assert.equal(Deploy.Calls[0].HuntId, "ShatteredIsles_IslandA");
+        assert.deepEqual([...Deploy.Calls[0].ExpectedPlayers].sort(), [A, B].sort());
+        assert.equal((await PollParty(B) as any).playerHuntId, "ShatteredIsles_IslandA");
+        for(const Member of [A, B]) assert.equal((await DecideCandidateStatus(Member)).Kind, "travel", Member);
+    });
+
+    it("a member can't start one for the party", async () => {
+        await FormParty(A, B);
+        assert.equal(await HandlePlayerMatchmaking("SHARED", "", "ShatteredIsles_IslandA", B), false);
+    });
+});
+
 describe("solo matchmaking fixes", () => {
     it("a queue whose launch fails answers FAILED instead of sending players to ':0'", async () => {
         Deploy.Fail = true;
