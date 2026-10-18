@@ -68,6 +68,7 @@ type LogEntry = Omit<typeof inventorylog.$inferInsert, "time" | "userId" | "char
 
 const DAILY_CHALLENGE_DRAFT_TOKEN = "TOKEN_DAILY_CHALLENGE_DRAFT";
 const BOUNTY_DRAFT_TOKEN = "TOKEN_BOUNTY_DRAFT";
+const PATROL_BONUS_TOKEN = "TOKEN_DAILY_PATROL_BONUS";
 
 function MakeEmptyInventoryRow(CharacterId: string): typeof inventory.$inferInsert {
     return {
@@ -863,17 +864,26 @@ export async function GetInventoryForUserIdAndCharacterId(UserId: string, Charac
                 logger.info(`Seeded ${DAILY_CHALLENGE_DRAFT_TOKEN} for characterId ${CharacterId}`);
             }
 
-            // Bounty board tokens: 1.14.7 never grants TOKEN_BOUNTY_DRAFT (retail got them from the Hunt Pass),
-            // so the board could never draft. Refill to the daily amount once per daily reset (17:00 UTC).
+            // Daily refills, once per daily reset (17:00 UTC), up to the daily amount and never past it: a stack
+            // already at or above it is left as it is (bought or saved keys are never taken away).
+            // - Bounty board tokens: 1.14.7 never grants TOKEN_BOUNTY_DRAFT (retail got them from the Hunt Pass),
+            //   so the board could never draft.
+            // - Patrol keys (TOKEN_DAILY_PATROL_BONUS, the map's free patrol boosts; the bought ones are
+            //   TOKEN_DAILY_PATROL_BONUS_PURCHASED, untouched): the 1.14.7 game server never sends the 1.4.4
+            //   PERIODIC_REWARD top-up, so spent keys never came back.
             const ResetDay = new Date(Date.now() - 17 * 3600 * 1000).toISOString().slice(0, 10);
-            const JobId = `bounty_tokens_${CharacterId}_${ResetDay}`;
-            if(await GetDb().query.onetimejobs.findFirst({where: eq(onetimejobs.jobId, JobId)}) == undefined){
-                const Stack = StackedItems.find((Item: any) => Item?.catalogId === BOUNTY_DRAFT_TOKEN);
-                if(Stack == undefined) StackedItems.push({catalogId: BOUNTY_DRAFT_TOKEN, quantity: BOUNTY_TOKENS_DAILY});
-                else Stack.quantity = Math.max(Stack.quantity ?? 0, BOUNTY_TOKENS_DAILY);
+            for(const [CatalogId, Amount, JobPrefix] of [[BOUNTY_DRAFT_TOKEN, BOUNTY_TOKENS_DAILY, "bounty_tokens"], [PATROL_BONUS_TOKEN, PATROL_BONUS_DAILY, "patrol_keys"]] as const){
+                const JobId = `${JobPrefix}_${CharacterId}_${ResetDay}`;
+                if(await GetDb().query.onetimejobs.findFirst({where: eq(onetimejobs.jobId, JobId)}) != undefined) continue;
+                const Stack = StackedItems.find((Item: any) => Item?.catalogId === CatalogId);
+                const Held = Stack?.quantity ?? 0;
+                if(Held < Amount){
+                    if(Stack == undefined) StackedItems.push({catalogId: CatalogId, quantity: Amount});
+                    else Stack.quantity = Amount;
+                    Touched = true;
+                    logger.info(`Refilled ${CatalogId} from ${Held} to ${Amount} for characterId ${CharacterId} (reset day ${ResetDay})`);
+                }
                 await GetDb().insert(onetimejobs).values({jobId: JobId, doneDate: new Date().toISOString()}).onConflictDoNothing();
-                Touched = true;
-                logger.info(`Refilled ${BOUNTY_DRAFT_TOKEN} to ${BOUNTY_TOKENS_DAILY} for characterId ${CharacterId} (reset day ${ResetDay})`);
             }
 
             if(Touched){
