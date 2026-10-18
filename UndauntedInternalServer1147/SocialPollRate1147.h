@@ -28,6 +28,11 @@ inline const std::vector<uint8_t> Nop8 = { 0x0F, 0x1F, 0x84, 0x00, 0x00, 0x00, 0
 
 inline void Apply() {
     using Hooking::Patch;
+    // The loads below are redirected to this constant: it must still be 3.0f
+    if (!Hooking::BytesMatch(ThreeSecondsRva, std::initializer_list<int>{0x00, 0x00, 0x40, 0x40})) {
+        Hooking::Fail("social poll 3.0f constant", ThreeSecondsRva, "unexpected bytes; poll intervals left as they are");
+        return;
+    }
     // Party
     Patch("party poll interval (field -> 3 s)", 0x1C8BB97, {0xF3, 0x0F, 0x10, 0xB3, 0xE8, 0x00, 0x00, 0x00}, LoadThreeSeconds(0x1C8BB97));
     Patch("party poll interval (5 s state)", 0x1C8BBED, {0xF3, 0x0F, 0x10, 0x35, 0x73, 0xCB, 0x3A, 0x03}, Nop8);

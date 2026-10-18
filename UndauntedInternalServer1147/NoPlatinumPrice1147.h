@@ -184,7 +184,9 @@ inline void OnProcessEvent(SDK::UObject* Object) {
 
     // Drop widgets whose slot no longer holds them (destroyed), then re-apply to the rest.
     std::erase_if(Seen, [](const FSeen& Entry) { return SDK::UObject::GObjects->GetByIndex(Entry.Index) != Entry.Object; });
-    for (const FSeen& Entry : Seen)
+    // Apply calls ProcessEvent, which comes back here and may add to or trim Seen: walk a copy
+    const std::vector<FSeen> Current = Seen;
+    for (const FSeen& Entry : Current)
         Apply(Entry);
 }
 

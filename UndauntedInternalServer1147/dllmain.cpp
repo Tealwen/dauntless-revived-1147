@@ -6,6 +6,7 @@
 #include <io.h>
 #include <share.h>
 #include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <filesystem>
 #include <fstream>
@@ -31,6 +32,7 @@
 #include "Hooking.h"
 #include "HuntIdlePolicy.h"
 #include "HuntUnlock1147.h"
+#include "MetagameRequests1147.h"
 #include "MiddlemanDustPrice1147.h"
 #include "NativeDiagnostics.h"
 #include "Networking.h"
@@ -47,7 +49,7 @@ using namespace SDK;
 namespace Globals {
     static bool AmServer = false;
     bool Listening = false;
-    bool DoListen = false;
+    std::atomic<bool> DoListen = false; // set by MainThread, read on the game thread
     const wchar_t* ServerAPIKey = nullptr;
     const wchar_t* MapPath = nullptr;
     const wchar_t* BehemothPath = nullptr;
@@ -188,6 +190,9 @@ static void* OrigNetDriverNetMode = nullptr;
 
 static void* OrigProcessRequest = nullptr;
 static bool ProcessRequestHook(void* Request) {
+    // Credentials only for the metagame (or this machine), see MetagameRequests1147.h
+    if (!MetagameRequests::MayCarryCredentials(Request, Globals::MetagameAddress))
+        return Original<bool(*)(void*)>(OrigProcessRequest)(Request);
     const auto SetHeader = reinterpret_cast<void(*)(void*, FString*, FString*)>(Hooking::Base + Addr::CurlSetHeader);
     FString Header(L"x-undaunted-gameserver-apikey");
     FString Key(Globals::ServerAPIKey);
@@ -289,6 +294,18 @@ static void ProcessEventHook(UObject* Object, UFunction* Function, void* Parms) 
         VendorTabs::OnProcessEvent(Object);
         NoPlatinumPrice::OnProcessEvent(Object);
     }
+}
+
+// The functions the DLL calls directly (Patches::Called) hold the bytes recorded for them. Checked at start-up on
+// both sides (the client calls FMemory::Realloc through EngineString); a server whose check failed does not
+// listen, rather than call into code that is not what it expects.
+static bool CalledFunctionsOk = true;
+static void CheckCalledFunctions() {
+    for (const auto& F : Patches::Called)
+        if (!Hooking::BytesMatch(F.Rva, F.Prologue)) {
+            Hooking::Fail(F.Name, F.Rva, "unexpected bytes in a function the DLL calls");
+            CalledFunctionsOk = false;
+        }
 }
 
 static HuntIdlePolicy HuntIdle;
@@ -394,9 +411,12 @@ static void EngineTickHook(UGameEngine* Engine, float DeltaTime, bool bIdleMode)
         ConnectedPlayers1147::Update(ListeningDriver);
     }
 
-    if (Globals::DoListen) {
-        Globals::DoListen = false;
-        Globals::Listening = Networking::Listen(UEngine::GetEngine(), Globals::Port);
+    if (Globals::DoListen.exchange(false)) {
+        if (UWorld* World = UWorld::GetWorld()) std::cout << "Listening in " << World->GetFullName() << std::endl;
+        if (CalledFunctionsOk)
+            Globals::Listening = Networking::Listen(UEngine::GetEngine(), Globals::Port);
+        else
+            std::cout << "Not listening: a function the DLL calls has unexpected bytes (see [hook] FAILED above)" << std::endl;
     }
 
     if (Globals::Listening && Networking::NetDriver) {
@@ -417,11 +437,16 @@ static void EngineTickHook(UGameEngine* Engine, float DeltaTime, bool bIdleMode)
             static auto NextOccupancyWrite = Now;
             if (Now >= NextOccupancyWrite) {
                 NextOccupancyWrite = Now + std::chrono::seconds(1);
-                wchar_t Directory[32768] = {};
-                const auto Length = GetEnvironmentVariableW(L"GAMESERVER_READY_DIR", Directory, 32768);
-                if (Length > 0 && Length < 32768) {
-                    const auto File = std::filesystem::path(Directory) / (L"city-occupancy-" + std::to_wstring(GetCurrentProcessId()) + L".txt");
-                    const auto Temporary = std::filesystem::path(File.wstring() + L".tmp");
+                // The path once (a 64 KB buffer in this frame was allocated, and probed, on every tick)
+                static const std::filesystem::path File = [] {
+                    std::wstring Directory(32768, L'\0');
+                    const auto Length = GetEnvironmentVariableW(L"GAMESERVER_READY_DIR", Directory.data(), 32768);
+                    if (Length == 0 || Length >= 32768) return std::filesystem::path();
+                    Directory.resize(Length);
+                    return std::filesystem::path(Directory) / (L"city-occupancy-" + std::to_wstring(GetCurrentProcessId()) + L".txt");
+                }();
+                if (!File.empty()) {
+                    static const std::filesystem::path Temporary(File.wstring() + L".tmp");
                     { std::ofstream Output(Temporary); Output << GetCurrentProcessId() << " " << ActiveConnections << "\n"; }
                     MoveFileExW(Temporary.c_str(), File.c_str(), MOVEFILE_REPLACE_EXISTING);
                 }
@@ -446,6 +471,7 @@ static void EngineTickHook(UGameEngine* Engine, float DeltaTime, bool bIdleMode)
             static_cast<ABP_PlayerCharacter_C*>(Pawn)->TickStamina(ECityExecFilter::Both, ERemoteExecFilter::All);
         }
     }
+    DR_TickStage = 0; // a fault after this is outside the engine tick
 }
 
 // ---------------------------------------------------------------- install
@@ -470,9 +496,8 @@ static void InstallServerHooks() {
     Hook("UNetConnection::IsNetReady", Addr::ConnectionIsNetReady, Prologue::ConnectionIsNetReady, IsNetReadyHook, &OrigIsNetReady);
     Hook("UNetDriver::IsLevelInitializedForActor", Addr::IsLevelInitializedForActor, Prologue::IsLevelInitializedForActor,
         IsLevelInitializedForActorHook, &OrigIsLevelInitializedForActor);
-    for (const auto& F : Patches::Called)
-        if (!BytesMatch(F.Rva, F.Prologue)) Fail(F.Name, F.Rva, "unexpected bytes in a function the DLL calls");
     Hook("GetPlayerStartForPlayer", Addr::GetPlayerStartForPlayer, Prologue::GetPlayerStartForPlayer, GetStartSpotHook, &OrigGetStartSpot);
+    MetagameRequests::Init();
     Hook("FCurlHttpRequest::ProcessRequest", Addr::CurlProcessRequest, Prologue::CurlProcessRequest, ProcessRequestHook, &OrigProcessRequest);
     Hook("UObject::ProcessEvent", Addr::ProcessEvent, Prologue::ProcessEvent, ProcessEventHook, &OrigProcessEvent);
     Hook("UNetDriver::TickFlush", Addr::NetDriverTickFlush, Prologue::NetDriverTickFlush, TickFlushHook, &OrigTickFlush);
@@ -511,7 +536,8 @@ static void MainThread() {
         Sleep(Globals::AmServer ? 1000 : 10);
     Sleep(3000);
     if (Globals::AmServer) {
-        std::cout << "UWorld is live: " << UWorld::GetWorld()->GetFullName() << std::endl;
+        // The world's name is read on the game thread, when it starts listening (EngineTickHook)
+        std::cout << "UWorld is live" << std::endl;
         Globals::DoListen = true;
     }
 }
@@ -519,9 +545,21 @@ static void MainThread() {
 static void Init() {
     Hooking::Base = reinterpret_cast<uintptr_t>(GetModuleHandleW(nullptr));
     Globals::AmServer = std::string(GetCommandLineA()).contains("-server");
+    DR_InitDiagnostics(); // first, so a refused start (below) is recorded too
+
+    // Init runs inside DllMain: a game server has no one to click a message box (it would wait forever and
+    // the deploy server would only see a start-up timeout), so a server writes the reason to stderr and stops.
+    const auto Refuse = [](const char* Why) {
+        if (Globals::AmServer) {
+            std::fprintf(stderr, "Dauntless Revived: %s\n", Why);
+            DR_WriteDiagnostic(Why, static_cast<DWORD>(std::strlen(Why)));
+            ExitProcess(1);
+        }
+        MessageBoxA(nullptr, Why, "Dauntless Revived", MB_ICONERROR);
+    };
 
     if (!Hooking::IsExpectedBuild(Build::SizeOfImage, Build::CheckSum)) {
-        MessageBoxA(nullptr, "This DLL only supports the Dauntless 1.14.7 client (CL 647472).", "Dauntless Revived", MB_ICONERROR);
+        Refuse("This DLL only supports the Dauntless 1.14.7 client (CL 647472).");
         return;
     }
 
@@ -530,12 +568,13 @@ static void Init() {
 
     if (Globals::AmServer) {
         // <apikey> <port> <map> <behemoth|NO_BEHEMOTH> <mmHuntId|NO_MM_HUNTID> <uid:hunt,...|NO_EXPECTED_PLAYERS> <ip:port> -server
-        if (NumArgs <= 8) {
-            MessageBoxA(nullptr, "INVALID GAMESERVER ARGS", "INVALID GAMESERVER ARGS", 0);
-            ExitProcess(0);
-        }
+        if (NumArgs <= 8) Refuse("Invalid game server arguments");
         Globals::ServerAPIKey = Args[1];
-        Globals::Port = std::stoi(std::wstring(Args[2]));
+        // wcstol, not std::stoi: an exception thrown inside DllMain ends in terminate() with no message
+        wchar_t* PortEnd = nullptr;
+        const long Port = std::wcstol(Args[2], &PortEnd, 10);
+        if (PortEnd == Args[2] || *PortEnd != L'\0' || Port <= 0 || Port > 65535) Refuse("Invalid game server port");
+        Globals::Port = static_cast<int>(Port);
         Globals::MapPath = Args[3];
         Globals::BehemothPath = Args[4];
         Globals::MatchmakerHuntId = Args[5];
@@ -562,9 +601,9 @@ static void Init() {
         BuildEndpointMap();
 
     // DR_FEATURES: the game's feature flags (FeatureFlags1147.h), written before the engine reads its config
-    FeatureFlags1147::Apply();
-    DR_InitDiagnostics();
+    FeatureFlags1147::Apply(Globals::AmServer);
     MH_Initialize();
+    CheckCalledFunctions();
     InstallSharedHooks();
     if (Globals::AmServer)
         InstallServerHooks();

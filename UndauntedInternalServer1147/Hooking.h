@@ -51,7 +51,7 @@ namespace Hooking {
     inline bool Patch(const char* Name, uintptr_t Rva, const std::vector<int>& Expected, const std::vector<uint8_t>& Replacement) {
         if (!BytesMatch(Rva, Expected)) { Fail(Name, Rva, "unexpected bytes"); return false; }
         DWORD Old = 0;
-        VirtualProtect(At(Rva), Replacement.size(), PAGE_EXECUTE_READWRITE, &Old);
+        if (!VirtualProtect(At(Rva), Replacement.size(), PAGE_EXECUTE_READWRITE, &Old)) { Fail(Name, Rva, "VirtualProtect"); return false; }
         std::memcpy(At(Rva), Replacement.data(), Replacement.size());
         VirtualProtect(At(Rva), Replacement.size(), Old, &Old);
         FlushInstructionCache(GetCurrentProcess(), At(Rva), Replacement.size());

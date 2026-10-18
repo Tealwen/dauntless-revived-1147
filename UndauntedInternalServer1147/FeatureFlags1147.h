@@ -113,10 +113,35 @@ namespace FeatureFlags1147 {
         return Lines;
     }
 
-    inline void Apply() {
+    // Replaces File with Text through a temporary file, so an engine (Ramsgate, a hunt, the client) reading it
+    // at the same moment never sees it half written; an unchanged file is not touched at all.
+    inline void WriteIfChanged(const std::filesystem::path& File, const std::string& Text) {
+        {
+            std::ifstream Current(File, std::ios::binary);
+            if (Current) {
+                const std::string Old((std::istreambuf_iterator<char>(Current)), std::istreambuf_iterator<char>());
+                if (Old == Text) return;
+            }
+        }
+        const std::filesystem::path Temporary(File.wstring() + L"." + std::to_wstring(GetCurrentProcessId()) + L".tmp");
+        {
+            std::ofstream Out(Temporary, std::ios::binary | std::ios::trunc);
+            Out << Text;
+            if (!Out) return;
+        }
+        if (!MoveFileExW(Temporary.c_str(), File.c_str(), MOVEFILE_REPLACE_EXISTING)) {
+            std::error_code Ignored;
+            std::filesystem::remove(Temporary, Ignored);
+        }
+    }
+
+    // AmServer: game servers share the client's Game.ini (same %LOCALAPPDATA%). One started without DR_FEATURES
+    // leaves the file as it is instead of removing the flags the client (or another server) wrote.
+    inline void Apply(bool AmServer = false) {
         char Value[4096] = {};
         const DWORD Length = GetEnvironmentVariableA("DR_FEATURES", Value, sizeof(Value));
         const std::string Wanted = Length > 0 && Length < sizeof(Value) ? Value : "";
+        if (AmServer && Wanted.empty()) return;
 
         char LocalAppData[MAX_PATH] = {};
         const DWORD DirLength = GetEnvironmentVariableA("LOCALAPPDATA", LocalAppData, MAX_PATH);
@@ -164,14 +189,12 @@ namespace FeatureFlags1147 {
 
         std::error_code Error;
         std::filesystem::create_directories(Dir, Error);
-        {
-            std::ofstream Ini(GameIni, std::ios::trunc);
-            for (const auto& Line : Out) Ini << Line << "\r\n";
-        }
-        {
-            std::ofstream State(StateFile, std::ios::trunc);
-            for (const auto& [Section, On] : Sections) State << Section << "\n";
-        }
+        std::string IniText;
+        for (const auto& Line : Out) IniText += Line + "\r\n";
+        WriteIfChanged(GameIni, IniText);
+        std::string StateText;
+        for (const auto& [Section, On] : Sections) StateText += Section + "\n";
+        WriteIfChanged(StateFile, StateText);
         std::cout << "[features] " << Sections.size() << " flag(s) written to Game.ini"
                   << (Wanted.empty() ? " (DR_FEATURES unset: previous flags removed)" : (": " + Wanted)) << std::endl;
     }

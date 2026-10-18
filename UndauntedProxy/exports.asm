@@ -3,6 +3,7 @@
 ; slot first resolves the table (EnsureSystemDll).
 
 EXTERN EnsureSystemDll:PROC
+EXTERN MissingExport:PROC
 
 .data
 PUBLIC ProxyProcs
@@ -33,7 +34,16 @@ ResolveAndJump PROC
     pop rdx
     pop rcx
     lea rax, ProxyProcs
-    jmp qword ptr [rax + r11 * 8]
+    mov rax, qword ptr [rax + r11 * 8]
+    test rax, rax
+    jz Missing
+    jmp rax
+Missing:
+    ; The system DLL has no such export (or could not be loaded): say which and stop, instead of
+    ; jumping to address 0
+    mov rcx, r11
+    sub rsp, 28h
+    call MissingExport
 ResolveAndJump ENDP
 
 Proxy_CloseDriver PROC
