@@ -169,14 +169,27 @@ describe("1.14.7 Lady Luck and Research Lab through routes/store.ts", () => {
         assert.equal(Listed.json.length, 3);
         Listed.json.forEach(Assert1147Shape);
         const Offer = Listed.json[0];
-        assert.equal(Offer.prices[0].currencyId, "id_currency_celldust");
+        // Aetherdust or Platinum: the offering grid shows both (no -1 Platinum price)
+        assert.deepEqual(Offer.prices.map((Price: any) => Price.currencyId).sort(), ["id_currency_celldust", "id_currency_platinum"]);
+        const Dust = Offer.prices.find((Price: any) => Price.currencyId === "id_currency_celldust").price;
 
-        Credit(A.CharacterId, { CURRENCY_CELLDUST: Offer.prices[0].price });
-        // The client checks the balance under the offer's own currency code
-        assert.equal((await Call(A.UserId, "GET", "/balance")).json.CURRENCY_CELLDUST, Offer.prices[0].price);
+        Credit(A.CharacterId, { CURRENCY_CELLDUST: Dust });
         await Buy(A.UserId, "celldust", Offer.id);
         assert.equal(StackQuantity(A.CharacterId, "CURRENCY_CELLDUST"), 0);
         assert.equal(StackQuantity(A.CharacterId, Offer.items[0].catalogId), 1);
+    });
+
+    it("sells a weekly cell for Platinum too", async () => {
+        const A = await MakePlayer();
+        const Offer = (await Call(A.UserId, "GET", "/product/skus/public?requiredTags=weekly_cell_offering")).json[1];
+        const Platinum = Offer.prices.find((Price: any) => Price.currencyId === "id_currency_platinum").price;
+        assert.ok(Platinum > 0);
+
+        Credit(A.CharacterId, { CURRENCY_PLATINUM_UNIV: Platinum + 5 });
+        await Buy(A.UserId, "platinum", Offer.id);
+        assert.equal(StackQuantity(A.CharacterId, "CURRENCY_PLATINUM_UNIV"), 5);
+        assert.equal(StackQuantity(A.CharacterId, Offer.items[0].catalogId), 1);
+        assert.equal((await Call(A.UserId, "GET", `/token/celldust/${Offer.id}`)).status, 409, "one cell a week, whichever currency");
     });
 
     it("sells the second fusion slot (entitlement exchange_slot_2) on the platinum path", async () => {

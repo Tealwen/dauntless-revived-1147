@@ -84,7 +84,7 @@ const MIDDLEMAN_ROTATION_EPOCH = Date.UTC(1970, 0, 1, 18); // Thursday 18:00 UTC
 const MIDDLEMAN_WEEKLY_TAG = "weekly_cell_offering";
 
 const MiddlemanCellOffers: StoreOffer[] = MiddlemanCells.families.flatMap((Family) =>
-    ([["UC", 1, 40], ["R", 2, 100]] as const).map(([Suffix, Rank, Price]) => {
+    ([["UC", 1, 40, 60], ["R", 2, 100, 150]] as const).map(([Suffix, Rank, Price, PlatinumPrice]) => {
         const CatalogId = `CELL_${Family.id}_${Suffix}`;
         return {
             id: `middleman_weekly_${CatalogId.toLowerCase()}`,
@@ -95,6 +95,9 @@ const MiddlemanCellOffers: StoreOffer[] = MiddlemanCells.families.flatMap((Famil
             // Only the Aetherdust price: with a platinumPrice key present (even null) the 1.4.4 Middleman
             // offers the cell for Platinum instead.
             cellDustPrice: Price,
+            // 1.14.7: its offering grid shows a Platinum price and button beside the Aetherdust one
+            // (w_exchange_offering_Grid / w_catalog_GridCellItem PlatValue), -1 for an offer without one
+            ...(IS_1147 ? { platinumPrice: PlatinumPrice } : {}),
             items: [{catalogId: CatalogId, quantity: 1}],
             entitlements: [],
             maxAllowed: 1,
@@ -323,14 +326,23 @@ function FindOffer(SkuId: string){
     return AllOffers.find((Offer) => Offer.id === SkuId && IsListed(Offer)) ?? ExtraOffersForTests.find((Offer) => Offer.id === SkuId);
 }
 
-function ResolveOfferPricing(Offer: StoreOffer){
+// The price in the currency the client pays with (its /token/<currency> segment). An offer priced in one
+// currency only is sold in that one; the 1.14.7 Middleman cells have two (Aetherdust and Platinum).
+function ResolveOfferPricing(Offer: StoreOffer, Requested?: string){
     const Matches = Object.entries(CURRENCY_FIELDS).filter(([, Field]) => typeof Offer[Field.PriceField] === "number");
 
-    if(Matches.length !== 1){
-        throw new StoreError(500, `Offer ${Offer.id} has ${Matches.length} price field(s) set; exactly one is required`);
+    // 1.4.4 reads one flat price per offer: two are a catalogue error there
+    if(Matches.length === 0 || (Matches.length > 1 && (Requested === undefined || !IS_1147))){
+        throw new StoreError(500, `Offer ${Offer.id} has ${Matches.length} price field(s) set`);
     }
 
-    const [Currency, Field] = Matches[0];
+    const Match = Requested === undefined ? Matches[0] : Matches.find(([Currency]) => Currency === Requested);
+
+    if(Match === undefined){
+        throw new StoreError(400, "Offer is not sold in that currency");
+    }
+
+    const [Currency, Field] = Match;
     const Price = Offer[Field.PriceField] as number;
 
     if(!Number.isSafeInteger(Price) || Price < 0){
@@ -518,11 +530,7 @@ export function CreateStorePurchase(AccountId: string, Currency: string, SkuId: 
     FinalizeTrialsForOffer(Offer);
     CheckOffer(Offer);
 
-    const Pricing = ResolveOfferPricing(Offer);
-
-    if(Pricing.Currency !== Currency){
-        throw new StoreError(400, "Offer is not sold in that currency");
-    }
+    const Pricing = ResolveOfferPricing(Offer, Currency);
 
     if(Date.now() - LastSweep >= SWEEP_EVERY_MS){
         PruneExpiredStorePurchases();
@@ -628,11 +636,7 @@ export function RedeemStorePurchase(AccountId: string, Currency: string, Token: 
             throw new StoreError(409, "Offer changed; request a new token");
         }
 
-        const Pricing = ResolveOfferPricing(Offer);
-
-        if(Pricing.Currency !== Currency){
-            throw new StoreError(400, "Offer is not sold in that currency");
-        }
+        const Pricing = ResolveOfferPricing(Offer, Currency);
 
         // Two tokens issued before either was redeemed: only the first one buys this week's cell
         if(MIDDLEMAN_OFFER_IDS.has(Offer.id) && BoughtThisMiddlemanWeek(tx, AccountId, Offer.id)){
