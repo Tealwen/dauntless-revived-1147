@@ -202,6 +202,9 @@ writeEnv(path.join(config, "content.env"), {
 
 if (mode === "public") {
   const internalGatewayPort = platform === "openbsd" ? 61443 : externalGatewayPort;
+  // Kept from the previous file: the owner's per-address request limits (GATEWAY_RATE_GENERAL and the others)
+  const oldGateway = readEnv(path.join(config, "gateway.env"));
+  const keptRates = Object.fromEntries(Object.entries(oldGateway).filter(([key]) => key.startsWith("GATEWAY_RATE_")));
   writeEnv(path.join(config, "gateway.env"), {
     GATEWAY_BIND: platform === "openbsd" ? "127.0.0.1" : "0.0.0.0",
     GATEWAY_PORT: internalGatewayPort,
@@ -214,6 +217,7 @@ if (mode === "public") {
     ALLOWLIST_URL: "http://127.0.0.1:61005",
     ALLOWLIST_SECRET: allowlistSecret,
     NODE_ENV: "production",
+    ...keptRates,
   });
   writeEnv(path.join(config, "allowlist.env"), {
     ALLOWLIST_BIND: "127.0.0.1",

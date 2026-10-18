@@ -54,7 +54,10 @@ export const DEFAULT_LIMITS: GatewayLimits = {
     maxConnectionsPerIp: 128,
     maxHeadersCount: 100,
     rate: {
-        general: { burst: 300, perMinute: 180 },
+        // 1.14.7: the client polls the party and the Slayer Links every 3 s, about 190 requests a minute for one
+        // player (300,180 was sized from 1.4.4). Three players behind one home address got about 800 refusals a
+        // minute, their hunt requests among them. 1500,1200 leaves room for about six players per address.
+        general: { burst: 1500, perMinute: 1200 },
         content: { burst: 600, perMinute: 600 },
         register: { burst: 5, perMinute: 0.2 },
         token: { burst: 10, perMinute: 1 },
