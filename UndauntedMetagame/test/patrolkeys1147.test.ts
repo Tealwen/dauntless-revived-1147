@@ -5,7 +5,8 @@ import assert from "node:assert/strict";
 import { eq } from "drizzle-orm";
 import { GetDb } from "../src/db";
 import { inventory, onetimejobs } from "../src/db/schema";
-import { GetInventoryForUserIdAndCharacterId } from "../src/controllers/inventory";
+import { GetInventoryForUserIdAndCharacterId, RunInventoryTransaction } from "../src/controllers/inventory";
+import crypto from "node:crypto";
 import { MakePlayer, StackQuantity } from "./helpers";
 
 after(() => RemoveTestDb(() => GetDb().$client.close()));
@@ -50,5 +51,35 @@ describe("1.14.7 daily patrol keys", () => {
         await GetInventoryForUserIdAndCharacterId(UserId, CharacterId);
         assert.equal(StackQuantity(CharacterId, KEY), 14);
         assert.equal(StackQuantity(CharacterId, "TOKEN_DAILY_PATROL_BONUS_PURCHASED"), 2);
+    });
+});
+
+// controllers/inventory.ts on 1.14.7: a hunt's loot pays 1.5 times the Rams (CURRENCY_NOTES), quests do not
+describe("1.14.7 Rams from hunt loot", () => {
+    const Rams = { catalogId: "CURRENCY_NOTES", quantity: 120 };
+    const Grant = (UserId: string, CharacterId: string, Source: string) =>
+        RunInventoryTransaction(UserId, CharacterId, crypto.randomUUID(), undefined, [{ ...Rams }], undefined, undefined, undefined, { Caller: "gameserver", Source });
+
+    it("multiplies the loot of a hunt by 1.5, and leaves quest rewards alone", async () => {
+        const { UserId, CharacterId } = await MakePlayer();
+        await GetInventoryForUserIdAndCharacterId(UserId, CharacterId);
+        const Before = StackQuantity(CharacterId, "CURRENCY_NOTES");
+        await Grant(UserId, CharacterId, "PlayerLoot");
+        assert.equal(StackQuantity(CharacterId, "CURRENCY_NOTES") - Before, 180);
+        await Grant(UserId, CharacterId, "quest");
+        assert.equal(StackQuantity(CharacterId, "CURRENCY_NOTES") - Before, 300);
+    });
+
+    it("RAMS_LOOT_MULTIPLIER=1 turns it off", async () => {
+        process.env.RAMS_LOOT_MULTIPLIER = "1";
+        try {
+            const { UserId, CharacterId } = await MakePlayer();
+            await GetInventoryForUserIdAndCharacterId(UserId, CharacterId);
+            const Before = StackQuantity(CharacterId, "CURRENCY_NOTES");
+            await Grant(UserId, CharacterId, "PlayerLoot");
+            assert.equal(StackQuantity(CharacterId, "CURRENCY_NOTES") - Before, 120);
+        } finally {
+            delete process.env.RAMS_LOOT_MULTIPLIER;
+        }
     });
 });

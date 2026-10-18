@@ -193,6 +193,24 @@ function TopUpDailyTokens(StackedItems: any[], StackedItemsToAdd: any[], Source:
     }
 }
 
+// 1.14.7: the Rams (CURRENCY_NOTES) a hunt's loot grants (source PlayerLoot, about 100-130 per hunt) are multiplied
+// by RAMS_LOOT_MULTIPLIER (default 1.5, 1 turns it off, at most 5), rounded down. Quests and mastery rewards are not.
+const RAMS_CATALOG_ID = "CURRENCY_NOTES";
+export function RamsLootMultiplier(){
+    const Value = Number(process.env.RAMS_LOOT_MULTIPLIER ?? "1.5");
+    return Number.isFinite(Value) && Value >= 1 && Value <= 5 ? Value : 1.5;
+}
+
+function BoostHuntRams(StackedItemsToAdd: any[], Source: unknown){
+    if(process.env.TARGET_GAME_VERSION !== "1.14.7" || Source !== "PlayerLoot") return;
+    const Multiplier = RamsLootMultiplier();
+    for(const Item of StackedItemsToAdd){
+        if(Item?.catalogId === RAMS_CATALOG_ID && Number.isSafeInteger(Item.quantity) && Item.quantity > 0){
+            Item.quantity = Math.floor(Item.quantity * Multiplier);
+        }
+    }
+}
+
 // Once, on the first start with the daily tokens: every character's stacks are set to the daily
 // amounts (added where missing), so a deploy is all it takes. Returns the characters changed, or
 // undefined when the job had already run.
@@ -672,6 +690,7 @@ function ApplyPreparedInventoryTransaction(tx: Tx, Prepared: PreparedInventoryTr
 
         if(Context.Caller === "gameserver"){
             TopUpDailyTokens(StackedItems, StackedItemsToAdd, Context.Source);
+            BoostHuntRams(StackedItemsToAdd, Context.Source);
         }
 
         const Applied = ApplyStackedChanges(StackedItems, StackedItemsToRemove, StackedItemsToAdd, IsOverspendRefused());
