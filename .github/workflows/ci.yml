@@ -18,11 +18,8 @@
 # The same checks, run locally: see "Checks" in CONTRIBUTING.md. Actions are pinned by commit.
 name: CI
 
+# On this fork the checks run only by hand (Actions > CI > Run workflow): a push or a pull request starts nothing.
 on:
-  push:
-    branches:
-      - "**"
-  pull_request:
   workflow_dispatch:
 
 permissions:
