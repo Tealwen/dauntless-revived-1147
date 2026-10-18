@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>Panel Slayer</title>
+  <link rel="icon" href="crest.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div id="login" class="login hidden">
+    <form id="login-form" class="card login-card">
+      <img src="crest.svg" alt="" class="crest-big">
+      <h1>Panel Slayer</h1>
+      <p class="muted">Dauntless Revived 1.14.7</p>
+      <label>Nom<input id="login-name" autocomplete="username" required maxlength="32"></label>
+      <label>Mot de passe<input id="login-password" type="password" autocomplete="current-password" required maxlength="200"></label>
+      <button class="btn btn-gold" type="submit">Entrer dans la Cité</button>
+      <p id="login-error" class="error" role="alert"></p>
+    </form>
+  </div>
+
+  <div id="shell" class="shell hidden">
+    <header class="topbar">
+      <button id="menu-toggle" class="btn btn-icon" aria-label="Menu">☰</button>
+      <img src="crest.svg" alt="" class="crest">
+      <span class="brand">Panel Slayer</span>
+      <span id="game-badge" class="badge"></span>
+      <span class="spacer"></span>
+      <span id="me" class="me"></span>
+      <button id="logout" class="btn btn-small">Quitter</button>
+    </header>
+    <nav id="nav" class="nav">
+      <a href="#dashboard" data-page="dashboard">🏰 Tableau de bord</a>
+      <a href="#hunts" data-page="hunts">🐾 Chasses</a>
+      <a href="#players" data-page="players">⚔️ Slayers</a>
+      <a href="#invites" data-page="invites" data-can="invite">📜 Invitations</a>
+      <a href="#logs" data-page="logs" data-can="logs">📖 Journaux</a>
+      <a href="#audit" data-page="audit">🕯️ Historique</a>
+      <a href="#team" data-page="team" data-can="team">🛡️ Équipe</a>
+      <a href="#account" data-page="account">🔑 Mon compte</a>
+    </nav>
+    <main id="main" class="main"></main>
+  </div>
+  <div id="toast" class="toast hidden" role="status"></div>
+</body>
+</html>

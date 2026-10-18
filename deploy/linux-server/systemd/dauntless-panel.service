@@ -1,0 +1,29 @@
+[Unit]
+Description=Dauntless Revived admin panel (Panel Slayer, HTTPS, panel accounts)
+After=network-online.target dauntless-metagame.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=@USER@
+Group=@USER@
+# journalctl for the Logs page; the panel never starts or stops a service
+SupplementaryGroups=systemd-journal
+EnvironmentFile=@CONFIG@/panel.env
+WorkingDirectory=@ROOT@/UndauntedPanel
+ExecStart=@NODE@ @ROOT@/UndauntedPanel/src/server.mjs
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=@DATA@/panel
+CapabilityBoundingSet=
+AmbientCapabilities=
+LockPersonality=yes
+RestrictSUIDSGID=yes
+
+[Install]
+WantedBy=multi-user.target
