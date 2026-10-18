@@ -49,6 +49,16 @@ export function StopExpiredHunt(server:Gameserver):boolean {
     const child=SpawnedChildren.get(server.id);
     return !!child && child.pid===server.processId && child.exitCode===null && !child.killed && child.kill();
 }
+// On shutdown (Ctrl+C, SIGTERM): the game servers are detached (unref), so without this they outlive the
+// deploy server, which forgets them, and hold their ports and memory. Returns how many were stopped.
+export function StopAllGameservers(): number {
+    let Stopped = 0;
+    for(const Child of SpawnedChildren.values()){
+        if(Child.exitCode === null && !Child.killed && Child.kill()) Stopped++;
+    }
+    SpawnedChildren.clear();
+    return Stopped;
+}
 let FreePorts: number[] = [];
 
 let RamsgateServer : Gameserver | undefined;
@@ -433,26 +443,37 @@ export async function StartupGameserverWithArgs(GameArgs: string){
     };
 }
 
+// The hunt tables (vendor/*.json) come from the 1.4.4 client: a 1.14.7 hunt missing from them (Escalation
+// Glitter and Patrol, Gauntlet, Anniversary, Ramsgiving, Linnea's story mission) is named in the error instead of
+// a TypeError on an undefined row.
 function GetMatchmakerHuntIdFromPlayerHuntId(PlayerHuntId: string){
-    const MatchmakerHuntIDs = (PlayerHuntTable[0].Rows as any)[PlayerHuntId].MatchmakerHuntIDs;
-
-    let MatchmakerHuntObject;
-
-    if(MatchmakerHuntIDs.length !== 0){
-        MatchmakerHuntObject = MatchmakerHuntIDs[crypto.randomInt(0, MatchmakerHuntIDs.length)];
+    const Row = (PlayerHuntTable[0].Rows as any)[PlayerHuntId];
+    if(Row == undefined){
+        throw new Error(`Unknown player hunt ${PlayerHuntId} (not in vendor/player_hunts_table.json)`);
+    }
+    const MatchmakerHuntIDs = Row.MatchmakerHuntIDs ?? [];
+    if(MatchmakerHuntIDs.length === 0){
+        throw new Error(`Player hunt ${PlayerHuntId} has no matchmaker hunt`);
     }
 
-    return MatchmakerHuntObject?.RowName;
+    return MatchmakerHuntIDs[crypto.randomInt(0, MatchmakerHuntIDs.length)].RowName as string;
+}
+
+function MatchmakerHuntRow(MatchmakerHuntId: string): any {
+    const Row = (MatchmakerHuntTable[0].Rows as any)[MatchmakerHuntId];
+    if(Row == undefined){
+        throw new Error(`Unknown matchmaker hunt ${MatchmakerHuntId} (not in the matchmaker hunt table)`);
+    }
+
+    return Row;
 }
 
 function GetBehemothPathFromMatchmakerHuntId(MatchmakerHuntId: string): string{
-    const MatchmakerHuntObject = (MatchmakerHuntTable[0].Rows as any)[MatchmakerHuntId];
-
-    return MatchmakerHuntObject.SpecificBehemoth.BehemothAsset.AssetPathName;
+    return MatchmakerHuntRow(MatchmakerHuntId).SpecificBehemoth.BehemothAsset.AssetPathName;
 }
 
 function GetMapPathFromMatchmakerHuntId(MatchmakerHuntId: string): string{
-    const MatchmakerHuntObject = (MatchmakerHuntTable[0].Rows as any)[MatchmakerHuntId];
+    const MatchmakerHuntObject = MatchmakerHuntRow(MatchmakerHuntId);
 
     const MapList = MatchmakerHuntObject.MapList;
 
@@ -460,7 +481,7 @@ function GetMapPathFromMatchmakerHuntId(MatchmakerHuntId: string): string{
 }
 
 function GetGameModeOverrideFromMatchmakerHuntId(MatchmakerHuntId: string): string{
-    const MatchmakerHuntObject = (MatchmakerHuntTable[0].Rows as any)[MatchmakerHuntId];
+    const MatchmakerHuntObject = MatchmakerHuntRow(MatchmakerHuntId);
 
     return MatchmakerHuntObject.GameModeOverride.replaceAll("Archon/Content", "/Game");
 }

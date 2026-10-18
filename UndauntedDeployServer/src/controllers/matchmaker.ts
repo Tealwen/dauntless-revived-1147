@@ -24,7 +24,8 @@ const Cities = new CityRouter(async () => {
     const key = process.env.CITY_STATUS_KEY;
     if (!key) throw new Error('CITY_STATUS_KEY is required for Ramsgate balancing');
     const [response, worker] = await Promise.all([
-        fetch('http://127.0.0.1:61000/undaunted/api/ServerStatus', {
+        // METAGAME_URL: the metagame this deploy server reports to (default: the local one)
+        fetch(new URL('/undaunted/api/ServerStatus', process.env.METAGAME_URL || 'http://127.0.0.1:61000'), {
             headers: {'x-undaunted-user-api-key': key}, signal: AbortSignal.timeout(5000)
         }), DescribeOverflow()
     ]);

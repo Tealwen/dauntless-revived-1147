@@ -1,5 +1,5 @@
 import { app } from "./app";
-import { IsPersistentWorldLivenessOn, StartupAndReportFailure } from "./controllers/gameservers";
+import { IsPersistentWorldLivenessOn, StartupAndReportFailure, StopAllGameservers } from "./controllers/gameservers";
 import { RunWatchdog } from "./controllers/watchdog";
 import { logger } from "./logger";
 
@@ -25,3 +25,12 @@ app.listen(PORT, BIND_HOST, (err?: Error) => {
   logger.info(`Ramsgate and Dojo liveness check before handing them out: ${IsPersistentWorldLivenessOn() ? "on" : "off (PERSISTENT_WORLD_LIVENESS=0)"}`);
   logger.info(`Clear Skies, Slayer.`);
 });
+
+// The game servers it started stop with it (a forced kill, e.g. Stop-Process -Force, runs none of this:
+// PORT-1.14.7/stack/restart-deploy.ps1 stops the leftover -server processes itself)
+for(const Signal of ["SIGINT", "SIGTERM", "SIGBREAK"] as const){
+  process.once(Signal, () => {
+    logger.info(`${Signal}: stopped ${StopAllGameservers()} game server(s), exiting`);
+    process.exit(0);
+  });
+}
