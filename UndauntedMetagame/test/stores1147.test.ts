@@ -153,7 +153,7 @@ describe("1.14.7 Lady Luck and Research Lab through routes/store.ts", () => {
         assert.equal(Listed.json.length, 58);
         Listed.json.forEach(Assert1147Shape);
         const Cell = Listed.json.find((Offer: any) => Offer.id === "trials_cell_discipline_e");
-        assert.deepEqual(Cell.prices, [{ currencyId: "id_currency_marks_steel", price: 150, salesPrice: 0 }]);
+        assert.deepEqual(Cell.prices, [{ currencyId: "CURRENCY_MARKS_STEEL", price: 150, salesPrice: 0 }]);
 
         Credit(A.CharacterId, { CURRENCY_MARKS_STEEL: 150 });
         await Buy(A.UserId, "markssteel", "trials_cell_discipline_e");
@@ -169,9 +169,11 @@ describe("1.14.7 Lady Luck and Research Lab through routes/store.ts", () => {
         assert.equal(Listed.json.length, 3);
         Listed.json.forEach(Assert1147Shape);
         const Offer = Listed.json[0];
-        assert.equal(Offer.prices[0].currencyId, "id_currency_celldust");
+        assert.equal(Offer.prices[0].currencyId, "CURRENCY_CELLDUST");
 
         Credit(A.CharacterId, { CURRENCY_CELLDUST: Offer.prices[0].price });
+        // The client checks the balance under the offer's own currency code
+        assert.equal((await Call(A.UserId, "GET", "/balance")).json.CURRENCY_CELLDUST, Offer.prices[0].price);
         await Buy(A.UserId, "celldust", Offer.id);
         assert.equal(StackQuantity(A.CharacterId, "CURRENCY_CELLDUST"), 0);
         assert.equal(StackQuantity(A.CharacterId, Offer.items[0].catalogId), 1);
