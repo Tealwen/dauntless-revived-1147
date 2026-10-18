@@ -177,18 +177,18 @@ storeRouter.get("/store-images/:file", (req, res) => {
 
 // 1.14.7 reads an offer's prices from prices: [{currencyId, price, salesPrice}] and skips an offer with none;
 // the 1.4.4 flat price fields are unknown to it (PORT-1.14.7/09-store.md).
-// UStoreItemViewModel::SetStoreCurrency (0x220E020) knows a currency only as CURRENCY_PLATINUM, CURRENCY_CELLDUST,
-// CURRENCY_MARKS_STEEL, CURRENCY_MARKS_GILDED, CURRENCY_PRESTIGE, CURRENCY_EVENT_01 (PORT-1.14.7/12-stores-vendors.md).
-// An id_currency_* code fell back to Platinum: the Middleman's Aetherdust cells showed a negative Platinum price and
-// were bought on /token/platinum/, which refuses them. Platinum keeps the code the main store was tested with.
+// The client's offer parser (0xE46900) turns each prices[] entry into a currency variant through its own map
+// (0x146CD0280, built at 0x5EBAB0): id_currency_platinum / _celldust / _marks_steel / _marks_gilded / _event_01 ->
+// CURRENCY_PLATINUM / ... (the codes UStoreItemViewModel::SetStoreCurrency knows). A currencyId missing from that
+// map is dropped, so the prices must use the id_currency_* names.
 const Is1147 = process.env.TARGET_GAME_VERSION === "1.14.7";
 const PRICE_FIELDS_1147: Record<string, string> = {
     platinumPrice: "id_currency_platinum",
-    cellDustPrice: "CURRENCY_CELLDUST",
-    steelMarksPrice: "CURRENCY_MARKS_STEEL",
-    gildedMarksPrice: "CURRENCY_MARKS_GILDED",
-    prestigePrice: "CURRENCY_PRESTIGE",
-    event01Price: "CURRENCY_EVENT_01"
+    cellDustPrice: "id_currency_celldust",
+    steelMarksPrice: "id_currency_marks_steel",
+    gildedMarksPrice: "id_currency_marks_gilded",
+    prestigePrice: "id_currency_prestige",
+    event01Price: "id_currency_event_01"
 };
 
 function ToInt(Value: unknown, Default: number){

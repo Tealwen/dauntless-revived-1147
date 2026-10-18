@@ -298,8 +298,10 @@ inline bool IsHuntUnlockedHook(SDK::UHuntCatalog* Catalog, SDK::FString* HuntID,
     bool IsTrialRow = false;
     const bool TrialRowUnlocked = IsTrialRowUnlocked(Id, PC, IsTrialRow);
     if (IsTrialRow) {
-        Report(Id, "trial_week", TrialRowUnlocked);
-        return TrialRowUnlocked;
+        // This week's row only, and only once the game's own requirements (Slayer's Path nodes) are met
+        const bool Result = TrialRowUnlocked && (!UnlockChecksFound || (PC && PC->QuestSystem && RequirementsMet(Catalog, HuntID, Unlock, AltUnlock, PC)));
+        Report(Id, "trial_week", Result);
+        return Result;
     }
 
     // Arena (Trials) and Escalation hunts: their schedule rows expired in 2022, so the native's schedule test
