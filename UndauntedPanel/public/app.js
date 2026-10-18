@@ -71,11 +71,27 @@ function Where(Player) {
   return h("span", { class: "pill" }, ShortMap(Player.map) || "En ligne");
 }
 
-function Stat(Label, Value, Percent) {
-  return h("div", { class: "card stat" },
+function Stat(Label, Value, Icon, Colour, Percent) {
+  return h("div", { class: `tile ${Colour}` },
+    h("div", { class: "icon" }, Icon),
     h("div", { class: "value" }, Value),
     h("div", { class: "label" }, Label),
-    Percent === undefined ? null : h("div", { class: "bar" + (Percent > 85 ? " hot" : "") }, h("span", { style: `width:${Math.min(100, Percent)}%` })));
+    Percent === undefined || Percent === null ? null : h("div", { class: "bar" }, h("span", { style: `width:${Math.min(100, Percent)}%` })));
+}
+
+// A player as a round avatar card; the colour comes from the name, so it stays the same
+const AVATAR_COLOURS = ["#19a7ff", "#ff5e62", "#1fcf7a", "#9b5cff", "#ffa41b", "#ff4fa3", "#00b8a9", "#4f6bff"];
+function Chip(Player, Extra) {
+  let Hash = 0;
+  for (const Char of String(Player.username)) Hash = (Hash * 31 + Char.charCodeAt(0)) >>> 0;
+  return h("button", { class: "chip", type: "button", onclick: () => OpenPlayer(Player.accountId) },
+    h("span", { class: "avatar", style: `background:${AVATAR_COLOURS[Hash % AVATAR_COLOURS.length]}` }, String(Player.username).slice(0, 1).toUpperCase()),
+    h("span", {}, h("b", {}, Player.username), Extra));
+}
+
+function Chips(Players, Extra) {
+  if (Players.length === 0) return h("p", { class: "empty" }, "Personne pour l'instant.");
+  return h("div", { class: "chips" }, Players.map((Player) => Chip(Player, Extra(Player))));
 }
 
 function Chart(History) {
@@ -152,28 +168,27 @@ const Pages = {
     Main.replaceChildren(
       h("h1", {}, "🏰 Tableau de bord"),
       h("div", { class: "grid stats" },
-        Stat("Slayers en ligne", Num(D.players.length)),
-        Stat("Chasses en cours", Num(Hunts.length)),
-        Stat("Ramsgate / Dojo", Num(Cities.length)),
-        Stat("Processeur", `${S.cpu} %`, S.cpu),
-        Stat("Mémoire", `${S.memory.usedPercent} %`, S.memory.usedPercent),
-        Stat("Disque", S.disk ? `${S.disk.usedPercent} %` : "—", S.disk?.usedPercent)),
+        Stat("Slayers en ligne", Num(D.players.length), "⚔️", "aether"),
+        Stat("Chasses en cours", Num(Hunts.length), "🐾", "ember"),
+        Stat("Ramsgate / Dojo", Num(Cities.length), "🏰", "moss"),
+        Stat("Processeur", `${S.cpu} %`, "⚙️", "orchid", S.cpu),
+        Stat("Mémoire", `${S.memory.usedPercent} %`, "🧠", "sky", S.memory.usedPercent),
+        Stat("Disque", S.disk ? `${S.disk.usedPercent} %` : "—", "💾", "gold", S.disk?.usedPercent)),
+      h("div", { class: "card" },
+        h("h2", {}, "⚔️ Qui est où"),
+        Chips(D.players, (Player) => h("small", {}, Where(Player), Player.enteredHuntAt ? ` · ${Since(Player.enteredHuntAt)}` : ""))),
       h("div", { class: "grid two" },
         h("div", { class: "card" },
           h("h2", {}, "📈 CPU et RAM (15 min)"), Chart(S.history),
           h("div", { class: "legend" }, h("span", {}, h("i", { style: "background:#2fe0c8" }), "Processeur"), h("span", {}, h("i", { style: "background:#ffb547" }), "Mémoire")),
           h("p", { class: "muted" }, `${S.hostname} · ${S.cores} cœurs · charge ${S.load.join(" / ")} · allumé depuis ${Duration(S.uptimeSeconds)} · RAM ${Bytes(S.memory.used)} / ${Bytes(S.memory.total)} · disque ${Bytes(S.disk?.used)} / ${Bytes(S.disk?.total)}`)),
         h("div", { class: "card" },
-          h("h2", {}, "⚙️ Services"),
+          h("div", { class: "section-title" }, h("h2", {}, "⚙️ Services"), Can("restart") ? RestartButton("all", "🔄 Tout redémarrer", "btn btn-ember btn-small") : null),
           Table(["Service", "État", "Mémoire", "Depuis", ""], S.services.map((Service) => ({
             cells: [Service.unit.replace(/^dauntless-/, ""), h("span", { class: "pill " + (Service.active === "active" ? "ok" : "bad") }, Service.active === "active" ? "actif" : Service.active), Bytes(Service.memory), Since(Service.since),
               Can("restart") ? RestartButton(Service.unit, "🔄 Redémarrer") : ""],
           }))),
-          Can("restart") ? h("p", {}, RestartButton("all", "🔄 Tout redémarrer", "btn btn-ember")) : null,
           D.game ? h("p", { class: "muted" }, `Metagame lancé depuis ${Duration(D.game.uptimeSeconds)} · inscription : ${D.game.registration}`) : null)),
-      h("div", { class: "card" },
-        h("h2", {}, "⚔️ Qui est où"),
-        Table(["Slayer", "Où", "Depuis"], D.players.map((Player) => ({ item: Player, cells: [Player.username, Where(Player), Player.enteredHuntAt ? Since(Player.enteredHuntAt) : "—"] })), (Player) => OpenPlayer(Player.accountId))),
       h("div", { class: "card" },
         h("h2", {}, "🗺️ Instances"),
         Table(["Port", "Type", "Carte", "Chasse", "Joueurs attendus", "Depuis"], D.servers.map((Server) => ({
@@ -188,12 +203,12 @@ const Pages = {
       Hunts.length === 0 ? h("div", { class: "card" }, h("p", { class: "empty" }, "Aucune chasse en cours.")) :
         h("div", { class: "grid two" }, Hunts.map((Server) => {
           const Present = D.players.filter((Player) => Player.huntId === Server.huntId);
-          return h("div", { class: "card glow" },
+          return h("div", { class: "card glow hunt-card" },
             h("h2", {}, `🐾 ${HuntName(Server.huntId) ?? ShortMap(Server.map)}`),
             h("p", {}, h("span", { class: "pill" }, `port ${Server.port}`), " ", h("span", { class: "pill aether" }, `depuis ${Since(Server.startedAt)}`)),
             h("p", { class: "muted" }, `Carte : ${ShortMap(Server.map)}${Server.behemoth && Server.behemoth !== "None" ? ` · Béhémoth : ${Server.behemoth}` : ""}`),
             h("h3", {}, "Joueurs"),
-            h("p", {}, (Server.expectedPlayers.length ? Server.expectedPlayers : Present).map((Player) => h("span", { class: "pill", style: "margin:2px" }, Player.username))));
+            Chips(Server.expectedPlayers.length ? Server.expectedPlayers : Present, () => h("small", {}, "en chasse")));
         })));
   },
 
@@ -202,14 +217,12 @@ const Pages = {
     const List = h("div");
     const Load = async () => {
       const Players = await Api("GET", `/api/players?q=${encodeURIComponent(Search.value)}`);
-      List.replaceChildren(Table(["Slayer", "UID", "Statut"], Players.map((Player) => ({
-        item: Player,
-        cells: [Player.username, h("span", { class: "mono" }, Player.accountId), Player.online ? Where(Player) : h("span", { class: "pill" }, "hors ligne")],
-      })), (Player) => OpenPlayer(Player.accountId)));
+      List.replaceChildren(h("p", { class: "muted" }, `${Players.filter((Player) => Player.online).length} en ligne sur ${Players.length} comptes`),
+        Chips(Players, (Player) => h("small", {}, Player.online ? Where(Player) : h("span", { class: "pill" }, "hors ligne"))));
     };
     let Debounce;
     Search.addEventListener("input", () => { clearTimeout(Debounce); Debounce = setTimeout(() => Load().catch((E) => Toast(E.message, true)), 250); });
-    Main.replaceChildren(h("h1", {}, "⚔️ Slayers"), h("div", { class: "card" }, Search, List));
+    Main.replaceChildren(h("h1", {}, "⚔️ Slayers"), h("div", { class: "card" }, Search, h("div", { style: "height:14px" }), List));
     await Load();
   },
 
@@ -224,7 +237,7 @@ const Pages = {
         Ban?.active ? h("span", { class: "pill bad" }, `banni : ${Ban.reason}`) : null)];
 
     Body.push(h("div", { class: "card" }, h("h2", {}, "💰 Porte-monnaie"),
-      Character ? h("div", { class: "wallet" }, W.currencies.map((Currency) => h("div", { class: "coin" }, `${CURRENCY_ICONS[Currency.key] ?? ""} ${Currency.label}`, h("b", {}, Num(Character.balances[Currency.key]))))) :
+      Character ? h("div", { class: "wallet" }, W.currencies.map((Currency) => h("div", { class: "coin" }, h("span", { class: "coin-icon" }, CURRENCY_ICONS[Currency.key] ?? "🪙"), h("b", {}, Num(Character.balances[Currency.key])), Currency.label))) :
         h("p", { class: "empty" }, "Pas encore de personnage.")));
 
     if (Can("currency") && Character) {
