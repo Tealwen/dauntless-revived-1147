@@ -24,7 +24,8 @@ const backend = {
   setBan: async (Body) => { Calls.push(["ban", Body]); return { ok: true }; },
   rename: async () => ({}), invites: async () => [], registration: async () => "INVITECODE", createInvite: async () => ({ code: "ABC" }), setRegistration: async () => {},
 };
-const monitor = { overview: async () => ({ cpu: 1, memory: { usedPercent: 2 }, disk: null, services: [], history: [], load: [0, 0, 0] }), logs: async () => ["line"] };
+const monitor = { overview: async () => ({ cpu: 1, memory: { usedPercent: 2 }, disk: null, services: [], history: [], load: [0, 0, 0] }), logs: async () => ["line"],
+  restart: async (Unit) => { Calls.push(["restart", Unit]); return [{ unit: "dauntless-metagame", active: "active" }]; } };
 const config = { sessionHours: 12, idleMinutes: 120, services: ["dauntless-metagame"] };
 let Server;
 let Base;
@@ -115,8 +116,35 @@ describe("panel", () => {
     assert.equal((await Post({ accountId: "UID-11111111-aaaa", currency: "platinum", amount: 5_000_000 })).status, 400);
   });
 
+  it("lets an admin restart one service or all, and nobody else", async () => {
+    const Admin = await Login("Owner", "correct horse battery");
+    const Post = (S, Body) => Request("POST", "/api/services/restart", { cookie: S.cookie, csrf: S.csrf, body: Body });
+    assert.equal((await Post(Admin, { service: "dauntless-metagame" })).status, 200);
+    assert.equal((await Post(Admin, { service: "all" })).status, 200);
+    assert.equal((await Post(Admin, { service: "ssh" })).status, 400, "only the configured units");
+    assert.deepEqual(Calls.filter(([Kind]) => Kind === "restart").map(([, Unit]) => Unit), ["dauntless-metagame", "all"]);
+    store.add("Modo3", "moderator", "moderator pass 3");
+    const Modo = await Login("Modo3", "moderator pass 3");
+    assert.equal((await Post(Modo, { service: "dauntless-metagame" })).status, 403);
+    assert.ok(audit.read().some((Row) => Row.action === "restart" && Row.service === "all"));
+  });
+
   it("masks keys and tokens in log lines", () => {
     const Line = RedactLine('key UUK_abcdefghijklmnop Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.sig GATEWAY_SECRET=topsecret {"apiKey":"zzz"}');
     assert.ok(!/abcdefghijklmnop|topsecret|eyJzdWIi|zzz/.test(Line), Line);
+  });
+});
+
+describe("SystemMonitor.restart", () => {
+  it("restarts one unit without its dependents, or all units in one call, and refuses others", async () => {
+    const { SystemMonitor } = await import("../src/system.mjs");
+    const Monitor = new SystemMonitor(["dauntless-metagame", "dauntless-deploy"]);
+    Monitor.serviceStates = async () => [{ unit: "dauntless-metagame", active: "active" }, { unit: "dauntless-deploy", active: "active" }];
+    const Runs = [];
+    const Runner = async (Command, Args) => { Runs.push([Command, ...Args].join(" ")); };
+    await Monitor.restart("dauntless-metagame", Runner);
+    await Monitor.restart("all", Runner);
+    await assert.rejects(Monitor.restart("ssh", Runner), /unknown_service/);
+    assert.deepEqual(Runs, ["systemctl restart --job-mode=ignore-dependencies dauntless-metagame.service", "systemctl restart dauntless-metagame.service dauntless-deploy.service"]);
   });
 });

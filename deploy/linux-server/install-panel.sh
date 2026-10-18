@@ -6,7 +6,8 @@
 #   - the panel's own game admin account (PanelSlayer), whose key it keeps in <data>/panel/admin.key (600);
 #   - the TLS certificate: the Let's Encrypt one of --domain when certbot has it (with a renewal hook),
 #     otherwise the gateway's self-signed certificate (the browser warns once);
-#   - <config>/panel.env and the dauntless-panel service.
+#   - <config>/panel.env, the dauntless-panel service, and a polkit rule letting the service user restart
+#     (only restart) the game services from the panel.
 # Panel accounts are not created here: the script prints the command for the first one.
 set -eu
 
@@ -105,6 +106,11 @@ chown "root:$service_user" "$config_dir/panel.env"
 chmod 640 "$config_dir/panel.env"
 sed -e "s|@ROOT@|$install_root|g" -e "s|@CONFIG@|$config_dir|g" -e "s|@DATA@|$data_dir|g" -e "s|@USER@|$service_user|g" -e "s|@NODE@|$node|g" \
   "$install_root/deploy/linux-server/systemd/dauntless-panel.service" > /etc/systemd/system/dauntless-panel.service
+# The panel may restart the game services (and nothing else): a polkit rule for the service user
+units='"dauntless-metagame.service", "dauntless-deploy.service", "dauntless-gateway.service", "dauntless-content.service", "dauntless-allowlist.service", "dauntless-invite.service"'
+install -d -m 755 /etc/polkit-1/rules.d
+sed -e "s|@USER@|$service_user|g" -e "s|@UNITS@|$units|" "$install_root/deploy/linux-server/polkit/50-dauntless-panel.rules" > /etc/polkit-1/rules.d/50-dauntless-panel.rules
+chmod 644 /etc/polkit-1/rules.d/50-dauntless-panel.rules
 systemctl daemon-reload
 systemctl enable dauntless-panel >/dev/null 2>&1
 systemctl restart dauntless-panel

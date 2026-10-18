@@ -12,6 +12,7 @@ const ERRORS = {
   reason_required: "Un motif est obligatoire.", admin_account_protected: "Un compte administrateur ne peut pas être banni.", address_not_observed: "Cette adresse n'a jamais été vue pour ce compte.",
   metagame_unreachable: "Le metagame ne répond pas.", bad_amount: "Montant invalide (1 à 1 000 000).", bad_password: "Mot de passe actuel incorrect.",
   username_taken: "Ce pseudo est déjà pris.", invalid_username: "Pseudo invalide.",
+  restart_in_progress: "Un redémarrage est déjà en cours.", restart_failed: "Le redémarrage a échoué (voir l\u2019historique).", unknown_service: "Service inconnu.",
 };
 
 function h(Tag, Props = {}, ...Children) {
@@ -105,6 +106,40 @@ function Table(Headers, Rows, OnClick) {
     h("tbody", {}, Rows.map((Row) => h("tr", OnClick ? { class: "clickable", onclick: () => OnClick(Row.item) } : {}, Row.cells.map((Cell) => h("td", {}, Cell)))))));
 }
 
+// What a restart cuts for the players, shown before confirming
+const RESTART_EFFECTS = {
+  "dauntless-metagame": "Le chat, la boutique et les menus se coupent quelques secondes, et les groupes sont dissous. Les chasses et Ramsgate continuent.",
+  "dauntless-deploy": "Ramsgate et TOUTES les chasses en cours sont fermés : les joueurs sont renvoyés au menu.",
+  "dauntless-gateway": "Tous les joueurs perdent la connexion au serveur quelques secondes (le jeu se reconnecte).",
+  "dauntless-content": "Les téléchargements du launcher en cours sont interrompus.",
+  "dauntless-allowlist": "Le pare-feu des ports de jeu est rechargé ; les joueurs doivent repasser par le launcher pour être réautorisés.",
+  "dauntless-invite": "Les invitations du bot Discord sont indisponibles quelques secondes.",
+  all: "Tout le serveur redémarre : Ramsgate et toutes les chasses sont fermés, tous les joueurs sont déconnectés environ une minute, et les groupes sont dissous.",
+};
+
+function RestartButton(Unit, Label, Classes = "btn btn-small btn-ghost") {
+  const Button = h("button", { class: Classes, type: "button" }, Label);
+  Button.addEventListener("click", async () => {
+    const Name = Unit === "all" ? "TOUS les services" : Unit.replace(/^dauntless-/, "");
+    if (!confirm(`Redémarrer ${Name} ?\n\n${RESTART_EFFECTS[Unit] ?? ""}`)) return;
+    Button.disabled = true;
+    const Before = Button.textContent;
+    Button.textContent = "⏳ redémarrage…";
+    try {
+      const R = await Api("POST", "/api/services/restart", { service: Unit });
+      const Bad = R.services.filter((State) => State.active !== "active");
+      Toast(Bad.length ? `Redémarré, mais pas actif : ${Bad.map((State) => State.unit).join(", ")}` : `${Name} redémarré.`, Bad.length > 0);
+      Router();
+    } catch (E) {
+      Toast(E.message, true);
+    } finally {
+      Button.disabled = false;
+      Button.textContent = Before;
+    }
+  });
+  return Button;
+}
+
 // --- Pages -------------------------------------------------------------------------------------------
 
 const Pages = {
@@ -130,9 +165,11 @@ const Pages = {
           h("p", { class: "muted" }, `${S.hostname} · ${S.cores} cœurs · charge ${S.load.join(" / ")} · allumé depuis ${Duration(S.uptimeSeconds)} · RAM ${Bytes(S.memory.used)} / ${Bytes(S.memory.total)} · disque ${Bytes(S.disk?.used)} / ${Bytes(S.disk?.total)}`)),
         h("div", { class: "card" },
           h("h2", {}, "⚙️ Services"),
-          Table(["Service", "État", "Mémoire", "Depuis"], S.services.map((Service) => ({
-            cells: [Service.unit.replace(/^dauntless-/, ""), h("span", { class: "pill " + (Service.active === "active" ? "ok" : "bad") }, Service.active === "active" ? "actif" : Service.active), Bytes(Service.memory), Since(Service.since)],
+          Table(["Service", "État", "Mémoire", "Depuis", ""], S.services.map((Service) => ({
+            cells: [Service.unit.replace(/^dauntless-/, ""), h("span", { class: "pill " + (Service.active === "active" ? "ok" : "bad") }, Service.active === "active" ? "actif" : Service.active), Bytes(Service.memory), Since(Service.since),
+              Can("restart") ? RestartButton(Service.unit, "🔄 Redémarrer") : ""],
           }))),
+          Can("restart") ? h("p", {}, RestartButton("all", "🔄 Tout redémarrer", "btn btn-ember")) : null,
           D.game ? h("p", { class: "muted" }, `Metagame lancé depuis ${Duration(D.game.uptimeSeconds)} · inscription : ${D.game.registration}`) : null)),
       h("div", { class: "card" },
         h("h2", {}, "⚔️ Qui est où"),
@@ -290,7 +327,7 @@ const Pages = {
 
   async audit(Main) {
     const Rows = await Api("GET", "/api/audit");
-    const Labels = { login: "connexion", login_failed: "connexion refusée", currency_give: "don", currency_take: "retrait", ban: "bannissement", unban: "débannissement", rename: "renommage", invite_create: "invitation", registration: "inscription", team_add: "compte ajouté", team_role: "rôle changé", team_remove: "compte supprimé", password_change: "mot de passe changé" };
+    const Labels = { login: "connexion", login_failed: "connexion refusée", currency_give: "don", currency_take: "retrait", ban: "bannissement", unban: "débannissement", rename: "renommage", invite_create: "invitation", registration: "inscription", team_add: "compte ajouté", team_role: "rôle changé", team_remove: "compte supprimé", password_change: "mot de passe changé", restart_requested: "redémarrage demandé", restart: "redémarrage", restart_failed: "redémarrage échoué" };
     const Detail = (Row) => {
       const { at, actor, action, ...Rest } = Row;
       return Object.entries(Rest).map(([Key, Value]) => `${Key}: ${Value}`).join(" · ");

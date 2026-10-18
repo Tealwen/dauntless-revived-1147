@@ -5,7 +5,7 @@ HTTPS (default port 8450) and protected by its own accounts. No npm dependency: 
 
 | Page | What it shows or does |
 |---|---|
-| Tableau de bord | Players online, hunts, Ramsgate/Dojo instances, CPU, RAM, disk, load, uptime, a 15-minute CPU/RAM chart, each service's state and memory, who is where (refreshed every 10 s) |
+| Tableau de bord | Players online, hunts, Ramsgate/Dojo instances, CPU, RAM, disk, load, uptime, a 15-minute CPU/RAM chart, each service's state and memory, who is where (refreshed every 10 s); admins restart one service (its dependents keep running) or all of them, after a warning of what it cuts |
 | Chasses | Each running hunt: island, map, behemoth, port, age, players |
 | Slayers | Every account (search by name or UID); a player's page: wallet (Platinum, Rams, Aetherdust, Marks, Prestige, Dark Harvest), give or take back a currency, ban or unban (optionally with the address seen for the account), rename |
 | Invitations | Create and list invite codes, change the registration mode until the next metagame restart |
@@ -29,7 +29,8 @@ currencies, renames, registration mode or accounts).
   password hashes in `users.json` (600, never in the game database); `__Host-` session cookie (Secure, HttpOnly,
   SameSite=Strict), 12 h at most, 2 h idle; a CSRF token on every change; 5 failed logins per name or 10 per
   address lock for 15 minutes; a strict Content Security Policy, and every value shown as text. It never starts
-  or stops a game service.
+  or stops a game service: a polkit rule (`/etc/polkit-1/rules.d/50-dauntless-panel.rules`) lets the service user
+  `restart` the six game units and nothing else.
 
 ## Install
 

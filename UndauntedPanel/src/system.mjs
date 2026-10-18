@@ -14,6 +14,16 @@ function Run(Command, Args, Limit = 4 * 1024 * 1024) {
   });
 }
 
+// Like Run, but a failure (polkit refusal, timeout) is an error carrying systemctl's own message
+function RunChecked(Command, Args) {
+  return new Promise((Resolve, Reject) => {
+    execFile(Command, Args, { timeout: 180000, env: { PATH: "/usr/bin:/bin", LANG: "C.UTF-8" } }, (error, stdout, stderr) => {
+      if (error) Reject(new Error(`restart_failed: ${String(stderr || error.message).trim().split("\n")[0].slice(0, 200)}`));
+      else Resolve(String(stdout));
+    });
+  });
+}
+
 function CpuTimes() {
   try {
     const Line = fs.readFileSync("/proc/stat", "utf8").split("\n")[0].trim().split(/\s+/).slice(1).map(Number);
@@ -96,6 +106,24 @@ export class SystemMonitor {
       services: await this.serviceStates(),
       history: this.history,
     };
+  }
+
+  // Restarts one configured unit, or all of them. Allowed by the polkit rule of install-panel.sh: the service
+  // user may only "restart" these units (never stop, start or anything else). One unit alone is restarted with
+  // its dependents left running (restarting the metagame does not take the deploy server and its hunts along);
+  // all of them go in one systemctl call, which orders them. Resolves with the units' states after the job.
+  async restart(Unit, Runner = RunChecked) {
+    if (this.restarting) throw new Error("restart_in_progress");
+    const Units = Unit === "all" ? this.services : this.services.includes(Unit) ? [Unit] : null;
+    if (!Units) throw new Error("unknown_service");
+    this.restarting = true;
+    try {
+      const Args = Unit === "all" ? ["restart", ...Units.map((Name) => `${Name}.service`)] : ["restart", "--job-mode=ignore-dependencies", `${Units[0]}.service`];
+      await Runner("systemctl", Args);
+      return (await this.serviceStates()).filter((State) => Units.includes(State.unit));
+    } finally {
+      this.restarting = false;
+    }
   }
 
   // The last lines of one configured unit, keys and tokens masked; a filter keeps matching lines only

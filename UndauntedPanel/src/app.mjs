@@ -33,6 +33,7 @@ const CAN = {
   rename: ["admin"],
   registration: ["admin"],
   logs: ["admin"],
+  restart: ["admin"],
   team: ["admin"],
 };
 
@@ -244,6 +245,24 @@ export function CreatePanel({ config, store, backend, monitor, audit, now = () =
     },
 
     "GET /api/services": async (req, Session) => { Require(Session, "view"); return config.services; },
+
+    // One service, or "all"; admins only. The game services may be restarted, never stopped (polkit rule).
+    "POST /api/services/restart": async (req, Session, Body) => {
+      Require(Session, "restart");
+      const Unit = String(Body.service ?? "");
+      if (Unit !== "all" && !config.services.includes(Unit)) throw new HttpError(400, "unknown_service");
+      audit.write(Session.name, "restart_requested", { service: Unit });
+      try {
+        const States = await monitor.restart(Unit);
+        audit.write(Session.name, "restart", { service: Unit, result: States.map((State) => `${State.unit.replace(/^dauntless-/, "")}=${State.active}`).join(" ") });
+        return { services: States };
+      } catch (error) {
+        if (error.message === "restart_in_progress") throw new HttpError(409, "restart_in_progress");
+        audit.write(Session.name, "restart_failed", { service: Unit, error: error.message.slice(0, 200) });
+        if (error.message.startsWith("restart_failed")) throw new HttpError(502, "restart_failed");
+        throw error;
+      }
+    },
 
     "GET /api/audit": async (req, Session) => { Require(Session, "view"); return audit.read(300); },
 
