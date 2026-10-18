@@ -1,0 +1,12 @@
+// Panel Slayer: the panel's service user may restart the Dauntless Revived services, and nothing else
+// (no stop, start, enable, mask, other units or other actions). Installed by install-panel.sh.
+polkit.addRule(function (action, subject) {
+    if (action.id !== "org.freedesktop.systemd1.manage-units" || subject.user !== "@USER@") {
+        return polkit.Result.NOT_HANDLED;
+    }
+    var units = [@UNITS@];
+    if (action.lookup("verb") === "restart" && units.indexOf(action.lookup("unit")) >= 0) {
+        return polkit.Result.YES;
+    }
+    return polkit.Result.NOT_HANDLED;
+});

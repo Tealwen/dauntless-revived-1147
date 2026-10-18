@@ -1,0 +1,12 @@
+{
+  "name": "dauntless-revived-panel",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Panel Slayer: the owner's admin panel for a Dauntless Revived 1.14.7 server (HTTPS, panel accounts, no dependencies)",
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "start": "node src/server.mjs",
+    "test": "node --test test/*.test.mjs"
+  }
+}

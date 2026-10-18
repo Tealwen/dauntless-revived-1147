@@ -11,6 +11,7 @@ import { HasUndauntedUserApiKey } from "../middleware/HasUndauntedUserApiKey";
 import { HasUndauntedAdminApiKey } from "../middleware/HasUndauntedAdminApiKey";
 import { SignMetagameJWTForUid } from "../controllers/auth";
 import {ModerationInfo,SetAccountBan,EndPlayingAddress} from '../controllers/moderation';
+import { GetPlayerWallet, GrantCurrency, WalletError } from '../controllers/adminwallet';
 import { GetCharacterIdsForUserId, GetSaveHistory, RollbackCharacter, RollbackError, RollbackLoadout } from "../controllers/savehistory";
 import { GetObjectiveRecords, GetSelectedHuntPass, GetTrackRecords, SeedProgression } from "../controllers/realprogression";
 import { IsRealProgressionAccount } from "../controllers/progressionmode";
@@ -92,6 +93,27 @@ undauntedApiRouter.get('/DashboardAccounts', HealthReadRateLimit, HasUndauntedAd
 undauntedApiRouter.post('/PlayingEnded', HasUndauntedUserApiKey, (req:any,res)=>{
     EndPlayingAddress(req.UndauntedUserInfo.UserId);
     res.status(204).end();
+});
+
+// The owner's admin panel (UndauntedPanel): a player's currencies, and giving or taking them back.
+// Admin key, loopback only (HasUndauntedAdminApiKey refuses a proxied request), like every admin route.
+function SendWalletError(res: any, error: unknown){
+    if(error instanceof WalletError){
+        res.status(error.Status).json({ error: error.Code });
+        return;
+    }
+    throw error;
+}
+
+undauntedApiRouter.get('/PlayerWallet/:accountId', HasUndauntedAdminApiKey, (req, res) => {
+    res.setHeader('Cache-Control', 'no-store');
+    try { res.json(GetPlayerWallet(String(req.params.accountId))); }
+    catch(error){ SendWalletError(res, error); }
+});
+
+undauntedApiRouter.post('/GrantCurrency', AdminMutationRateLimit, HasUndauntedAdminApiKey, (req: any, res) => {
+    try { res.json(GrantCurrency(req.body, String(req.body?.actor ?? req.UndauntedUserInfo.UserId).slice(0, 64))); }
+    catch(error){ SendWalletError(res, error); }
 });
 
 undauntedApiRouter.get('/Moderation/:accountId', HasUndauntedAdminApiKey, (req,res)=>{
