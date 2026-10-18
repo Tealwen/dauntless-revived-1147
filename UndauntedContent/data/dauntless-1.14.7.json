@@ -3061,13 +3061,13 @@
   "overlay": [
     {
       "path": "Archon/Binaries/Win64/winmm.dll",
-      "size": 150016,
-      "sha256": "3c24f164f7464014317122620da521bf3b4ab042e1f5b495d7d2e0fd960603f2"
+      "size": 151552,
+      "sha256": "2cf7eabd8664544c3c71746cfd1430b93647516364dc3d29ac1f529a6af60209"
     },
     {
       "path": "Archon/Binaries/Win64/UndauntedInternalServer.dll",
-      "size": 306688,
-      "sha256": "dee76123288860cddba267852998c59248ddc604b887c7aa9dda30d1ea6aec9c"
+      "size": 313856,
+      "sha256": "6c1b3ea8169478a8c53f214ce6ecc05e0429a5507cb022b4de2a9c4104a51a1e"
     }
   ]
 }
