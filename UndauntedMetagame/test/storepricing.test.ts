@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { PlatinumPriceFor, StoreOffer } from "../src/controllers/freestore";
+import { LocalizedWebstore, PlatinumPriceFor, StoreOffer } from "../src/controllers/freestore";
 import { OverlayHeldCurrencies } from "../src/controllers/store";
 
 const Offer = (tags: string[], items = 1, platinumPrice: number | null = 0): StoreOffer => ({
@@ -27,5 +27,22 @@ describe("STORE_PRICING=platinum", () => {
         const Sheet: Record<string, unknown> = { id_currency_platinum: 0, CURRENCY_PLATINUM: 0 };
         OverlayHeldCurrencies(Sheet, new Map([["CURRENCY_PLATINUM_UNIV", 1234]]));
         assert.deepEqual(Sheet, { id_currency_platinum: 1234, CURRENCY_PLATINUM: 1234 });
+    });
+});
+
+describe("STORE_LANGUAGE=fr", () => {
+    const Base = [{ id: "single_armour_recruit_mask", tags: ["webstore"], displayName: "Recruit's Mask", displayDescription: "Light face protection for the novice Slayer.", items: [], entitlements: [], remaining: 1 },
+        { id: "not_in_the_file", tags: ["webstore"], displayName: "Kept", displayDescription: "Kept too", items: [], entitlements: [], remaining: 1 }];
+
+    it("names and describes the offers with the game's own French texts", () => {
+        const Fr = LocalizedWebstore(Base, "fr") as any[];
+        assert.equal(Fr[0].displayName, "Masque de recrue");
+        assert.equal(Fr[0].displayDescription, "Protection légère pour le visage de Slayer novice.");
+        assert.deepEqual([Fr[1].displayName, Fr[1].displayDescription], ["Kept", "Kept too"]);
+    });
+
+    it("keeps English when unset or unknown", () => {
+        assert.equal(LocalizedWebstore(Base, undefined), Base);
+        assert.equal(LocalizedWebstore(Base, "de"), Base);
     });
 });

@@ -144,6 +144,7 @@ const metagame = {
     ESCALATION_MODE: oldMeta.ESCALATION_MODE || "real",
     STORE: oldMeta.STORE || "free",
     STORE_PRICING: oldMeta.STORE_PRICING || "platinum",
+    ...(oldMeta.STORE_LANGUAGE ? { STORE_LANGUAGE: oldMeta.STORE_LANGUAGE } : {}),
     ...(oldMeta.CHALLENGE_SEASON_START ? { CHALLENGE_SEASON_START: oldMeta.CHALLENGE_SEASON_START } : {}),
     // Seasonal events kept running (routes/tuning.ts), e.g. EVENT_DARKHARVEST,DarkHarvest for Halloween
     ...(oldMeta.SEASONAL_EVENTS ? { SEASONAL_EVENTS: oldMeta.SEASONAL_EVENTS } : {}),

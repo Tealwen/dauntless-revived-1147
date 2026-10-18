@@ -10,6 +10,7 @@ import catalog from "../vendor/store_catalog.json";
 import curated30 from "../vendor/store_curated_30.json";
 import itemKinds from "../vendor/store_item_kinds.json";
 import catalog1147 from "../vendor/store_catalog_1147.json";
+import catalog1147Fr from "../vendor/store_catalog_1147.fr.json";
 import itemKinds1147 from "../vendor/store_item_kinds_1147.json";
 
 // 1.14.7 (TARGET_GAME_VERSION): the main store sells the 1.14.7 catalogue (vendor/store_catalog_1147.json, every
@@ -182,6 +183,19 @@ export function PlatinumPriceFor(Offer: StoreOffer): number | undefined {
     return Bundle !== undefined && (Offer.items ?? []).length > 1 ? Bundle : Single;
 }
 
+// STORE_LANGUAGE=fr (1.14.7 only): the webstore's names and descriptions in French, from
+// vendor/store_catalog_1147.fr.json (the game's own fr/Game.locres, matched by item key). The catalogue
+// itself stays in English; an offer the file does not name keeps its English text.
+const STORE_TRANSLATIONS: Record<string, Record<string, {displayName?: string, displayDescription?: string}>> = {
+    fr: (catalog1147Fr as {offers: Record<string, {displayName?: string, displayDescription?: string}>}).offers
+};
+
+export function LocalizedWebstore(Offers: unknown, Language = process.env.STORE_LANGUAGE){
+    const Texts = STORE_TRANSLATIONS[(Language ?? "").trim().toLowerCase()];
+    if(Texts == undefined || !Array.isArray(Offers)) return Offers;
+    return (Offers as StoreOffer[]).map((Offer) => Texts[Offer.id] ? {...Offer, ...Texts[Offer.id]} : Offer);
+}
+
 function PricedWebstore(Offers: unknown){
     if(process.env.STORE_PRICING !== "platinum" || !Array.isArray(Offers)) return Offers;
     return (Offers as StoreOffer[]).map((Offer) => {
@@ -192,7 +206,7 @@ function PricedWebstore(Offers: unknown){
 
 const Catalog: Record<string, unknown> = {
     ...(catalog as unknown as Record<string, unknown>),
-    webstore: PricedWebstore(IS_1147 ? (catalog1147 as unknown as Record<string, unknown>).webstore : (catalog as unknown as Record<string, unknown>).webstore),
+    webstore: PricedWebstore(IS_1147 ? LocalizedWebstore((catalog1147 as unknown as Record<string, unknown>).webstore) : (catalog as unknown as Record<string, unknown>).webstore),
     ladyluckstore: LadyLuck.offers,
     exchange_vendor_slot_2: MiddlemanCatalogData.exchange_vendor_slot_2,
     exchange_vendor_slot_3: MiddlemanCatalogData.exchange_vendor_slot_3,
