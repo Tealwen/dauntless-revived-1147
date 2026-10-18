@@ -180,15 +180,17 @@ storeRouter.get("/store-images/:file", (req, res) => {
 // The client's offer parser (0xE46900) turns each prices[] entry into a currency variant through its own map
 // (0x146CD0280, built at 0x5EBAB0): id_currency_platinum / _celldust / _marks_steel / _marks_gilded / _event_01 ->
 // CURRENCY_PLATINUM / ... (the codes UStoreItemViewModel::SetStoreCurrency knows). A currencyId missing from that
-// map is dropped, so the prices must use the id_currency_* names.
+// map is dropped, so the prices must use the id_currency_* names. Platinum comes last: the Middleman's cell
+// grid reads its first price as the cell's own currency (Aetherdust), so with Platinum first the Aetherdust
+// price showed -1 (98e917f gave those cells a second, Platinum price).
 const Is1147 = process.env.TARGET_GAME_VERSION === "1.14.7";
 const PRICE_FIELDS_1147: Record<string, string> = {
-    platinumPrice: "id_currency_platinum",
     cellDustPrice: "id_currency_celldust",
     steelMarksPrice: "id_currency_marks_steel",
     gildedMarksPrice: "id_currency_marks_gilded",
     prestigePrice: "id_currency_prestige",
-    event01Price: "id_currency_event_01"
+    event01Price: "id_currency_event_01",
+    platinumPrice: "id_currency_platinum"
 };
 
 function ToInt(Value: unknown, Default: number){

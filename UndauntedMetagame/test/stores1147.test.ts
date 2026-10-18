@@ -170,7 +170,8 @@ describe("1.14.7 Lady Luck and Research Lab through routes/store.ts", () => {
         Listed.json.forEach(Assert1147Shape);
         const Offer = Listed.json[0];
         // Aetherdust or Platinum: the offering grid shows both (no -1 Platinum price)
-        assert.deepEqual(Offer.prices.map((Price: any) => Price.currencyId).sort(), ["id_currency_celldust", "id_currency_platinum"]);
+        // Aetherdust first: the cell grid reads the first price as the cell's own; Platinum first showed it as -1
+        assert.deepEqual(Offer.prices.map((Price: any) => Price.currencyId), ["id_currency_celldust", "id_currency_platinum"]);
         const Dust = Offer.prices.find((Price: any) => Price.currencyId === "id_currency_celldust").price;
 
         Credit(A.CharacterId, { CURRENCY_CELLDUST: Dust });
