@@ -141,6 +141,7 @@ const metagame = {
     ENTITLEMENTS_DEFAULT: oldMeta.ENTITLEMENTS_DEFAULT || "season43_premium,season09b_premium,season_premium_any,season_free_any",
     STORE: oldMeta.STORE || "free",
     STORE_PRICING: oldMeta.STORE_PRICING || "platinum",
+    ...(oldMeta.STORE_LANGUAGE ? { STORE_LANGUAGE: oldMeta.STORE_LANGUAGE } : {}),
     ...(oldMeta.CHALLENGE_SEASON_START ? { CHALLENGE_SEASON_START: oldMeta.CHALLENGE_SEASON_START } : {}),
     // Seasonal events kept running (routes/tuning.ts), e.g. EVENT_DARKHARVEST,DarkHarvest for Halloween
     ...(oldMeta.SEASONAL_EVENTS ? { SEASONAL_EVENTS: oldMeta.SEASONAL_EVENTS } : {}),
