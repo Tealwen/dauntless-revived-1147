@@ -123,10 +123,11 @@ label > input, label > select { margin-top: 6px; text-transform: none; letter-sp
 .pill.bad { background: var(--bad); color: #fff; }
 .pill.warn { background: var(--warn); color: var(--ink); }
 .pill.aether { background: var(--aether-a); color: var(--ink); }
+/* Tabs wrap onto a second line rather than scroll: a hidden scroll cut the last tab off, and its overflow
+   clipped the lifted, shadowed tabs */
 .nav {
-  display: flex; gap: 10px; padding: 14px 22px 4px; overflow-x: auto; scrollbar-width: none; max-width: 1240px; margin: 0 auto;
+  display: flex; flex-wrap: wrap; gap: 10px 10px; padding: 16px 22px 6px; max-width: 1240px; margin: 0 auto;
 }
-.nav::-webkit-scrollbar { display: none; }
 .nav a {
   flex: 0 0 auto; color: var(--text); text-decoration: none; font-family: var(--font-title); font-size: 1.02rem; letter-spacing: .4px;
   padding: 9px 16px; border-radius: 999px; border: var(--outline); background: linear-gradient(180deg, #45349c, #33267a);
@@ -221,7 +222,8 @@ tr.clickable:hover td { background: rgba(63, 240, 224, .16); }
   .topbar { padding: 10px 14px; }
   .brand { font-size: 1.3rem; }
   .me, #game-badge { display: none; }
-  .nav { padding: 12px 14px 2px; }
+  .nav { padding: 12px 14px 4px; gap: 8px; }
+  .nav a { font-size: .92rem; padding: 7px 12px; }
   .main { padding: 16px 14px; }
   h1 { font-size: 1.8rem; }
   .two { grid-template-columns: 1fr; }
