@@ -21,6 +21,8 @@ type RosterMember = RosterMemberInput & {
     allocationId?: string;
     servedAt?: number;
     removalReason?: 'cancelled' | 'replaced';
+    // Sent to an allocation that was already running (joinAllocation): not in the game server's own list
+    lateJoin?: boolean;
 };
 
 type Allocation = {
@@ -34,6 +36,8 @@ type Allocation = {
     lastSeen: number;
     arrived: Set<string>;
     missingSince: Map<string, number>;
+    // The game server's last complete connected-player snapshot
+    connected?: Set<string>;
 };
 
 export class CandidateRoster {
@@ -195,6 +199,35 @@ export class CandidateRoster {
         }
     }
 
+    // A running allocation takes more players (a hunt joined in progress, controllers/matchmaking.ts). Each must
+    // already be the player's current queued record (StoreEntry). False when the allocation is gone or not assigned.
+    joinAllocation(allocationId: string, members: RosterMemberInput[]) {
+        const allocation = this.allocations.get(allocationId);
+        if (!allocation || allocation.assignedAt === undefined) return false;
+        for (const input of members) {
+            const member = this.current.get(input.playerId);
+            if (!member || member.candidateId !== input.candidateId || member.phase === 'removed') continue;
+            member.phase = 'assigned';
+            member.allocationId = allocationId;
+            member.lateJoin = true;
+            member.lastActivity = this.now();
+            allocation.members.set(input.playerId, member);
+            allocation.arrived.delete(input.playerId);
+            allocation.missingSince.delete(input.playerId);
+            const ids = this.candidateAllocations.get(member.candidateId) ?? new Set<string>();
+            ids.add(allocationId);
+            this.candidateAllocations.set(member.candidateId, ids);
+        }
+        return true;
+    }
+
+    // How many players the allocation has or is waiting for: the members the expected-player answer would keep
+    occupancy(allocationId: string) {
+        const allocation = this.allocations.get(allocationId);
+        if (!allocation) return undefined;
+        return [...allocation.members.keys()].filter(playerId => this.keeps(allocation, playerId, allocation.connected, false)).length;
+    }
+
     reconcileExpected(playerIds: string[], context: RosterContext = {}) {
         const allocation = this.findAllocation(context);
         // Legacy workers and workers surviving a metagame restart cannot be
@@ -205,29 +238,41 @@ export class CandidateRoster {
         // An incomplete snapshot says nothing about absence. Require fresh,
         // continuous complete evidence before removing a previously arrived player.
         if (!connected) allocation.missingSince.clear();
-        return playerIds.filter(playerId => {
-            const member = allocation.members.get(playerId);
-            if (!member) return true;
-            if (connected?.has(playerId)) {
+        else allocation.connected = connected;
+        const kept = playerIds.filter(playerId => this.keeps(allocation, playerId, connected, true));
+        // Players sent to the running hunt after it started are not in its own list
+        for (const [playerId, member] of allocation.members) {
+            if (member.lateJoin && !kept.includes(playerId) && this.keeps(allocation, playerId, connected, true)) kept.push(playerId);
+        }
+        return kept;
+    }
+
+    private keeps(allocation: Allocation, playerId: string, connected: Set<string> | undefined, record: boolean) {
+        const member = allocation.members.get(playerId);
+        if (!member) return true;
+        if (connected?.has(playerId)) {
+            if (record) {
                 allocation.arrived.add(playerId);
                 allocation.missingSince.delete(playerId);
-                return true;
             }
-            if (allocation.arrived.has(playerId)) {
-                if (!connected) return true;
-                const missingSince = allocation.missingSince.get(playerId) ?? this.now();
-                allocation.missingSince.set(playerId, missingSince);
-                if (this.now() - missingSince <= CONNECTED_PLAYER_ABSENCE_GRACE_MS) return true;
-            }
-            if (member.phase === 'removed' || this.current.get(playerId) !== member || member.allocationId !== allocation.id) return false;
-            // ExpectedPlayerStatus sends the entire original roster, including
-            // players already connected. Silence alone cannot identify a no-show.
+            return true;
+        }
+        if (allocation.arrived.has(playerId)) {
             if (!connected) return true;
-            if (allocation.assignedAt === undefined) return this.now() <= allocation.deadline;
-            const loadingStarted = member.servedAt ?? allocation.assignedAt;
-            return this.now() - loadingStarted <= PLAYER_LOADING_GRACE_MS
-                || this.now() - member.lastActivity <= QUEUED_PLAYER_LEASE_MS;
-        });
+            const missingSince = allocation.missingSince.get(playerId) ?? this.now();
+            if (record) allocation.missingSince.set(playerId, missingSince);
+            if (this.now() - missingSince <= CONNECTED_PLAYER_ABSENCE_GRACE_MS) return true;
+            // Counting seats: a player who arrived and has been gone past the grace has left
+            if (!record) return false;
+        }
+        if (member.phase === 'removed' || this.current.get(playerId) !== member || member.allocationId !== allocation.id) return false;
+        // ExpectedPlayerStatus sends the entire original roster, including
+        // players already connected. Silence alone cannot identify a no-show.
+        if (!connected) return true;
+        if (allocation.assignedAt === undefined) return this.now() <= allocation.deadline;
+        const loadingStarted = member.servedAt ?? (member.lateJoin ? member.lastActivity : allocation.assignedAt);
+        return this.now() - loadingStarted <= PLAYER_LOADING_GRACE_MS
+            || this.now() - member.lastActivity <= QUEUED_PLAYER_LEASE_MS;
     }
 
     reset() {

@@ -44,7 +44,8 @@ type MatchmakingQueueData = {
     Players: string[],
     CandidateIds: Map<string, string>,
     FirstPlayerAddedTime: number,
-    Resolved: boolean
+    Resolved: boolean,
+    Private?: boolean
 };
 
 export type MatchmakingResult = {
@@ -243,6 +244,61 @@ function ParkCapacity(CandidateId: string, retry: () => Promise<boolean>) {
     return true;
 }
 
+// ---- Hunts joined in progress (1.14.7 classic hunts) ----
+// A 1.14.7 classic hunt (ShatteredIsles_Island<X>, an open-world island whose behemoths keep spawning) does not
+// end with one kill. A player (or a party) asking for a classic hunt that is already running in their region is
+// sent to that server when it still has room for all of them, is under OPEN_HUNT_MAX_AGE_MS old and is alive;
+// only otherwise a new server is started. The players count is the allocation's (MatchmakingRoster.occupancy:
+// connected players from the game server's own snapshot, plus players on their way). Players sent there are
+// added to the server's expected-player answer (MatchmakingRoster.joinAllocation). JOIN_RUNNING_HUNTS=0 turns it off.
+const OPEN_HUNT_ID = /^ShatteredIsles_Island[A-Za-z0-9]+$/;
+const OPEN_HUNT_MAX_AGE_MS = 30 * 60 * 1000;
+const OPEN_HUNT_PLAYERS = 4;
+type OpenHunt = { AllocationId: string, HuntId: string, Region: HuntRegion, Host: string, Port: number, SessionId: string, StartedAt: number };
+const OpenHunts = new Map<string, OpenHunt>(); // by allocation id
+
+export function IsJoinableHunt(HuntId: string){
+    return process.env.TARGET_GAME_VERSION === "1.14.7" && process.env.JOIN_RUNNING_HUNTS !== "0" && OPEN_HUNT_ID.test(HuntId);
+}
+
+function RegisterOpenHunt(AllocationId: string, HuntId: string, Region: RegionChoice | undefined, Game: LaunchResult){
+    if (!IsJoinableHunt(HuntId) || !Game.succeeded || !Game.sessionId) return;
+    OpenHunts.set(AllocationId, { AllocationId, HuntId, Region: (Region ?? 'main') as HuntRegion, Host: Game.host, Port: Game.port, SessionId: Game.sessionId, StartedAt: Game.allocatedAt ?? PartyNow() });
+    logger.info(`mm: ${HuntId} at ${Game.host}:${Game.port} can be joined for ${OPEN_HUNT_MAX_AGE_MS / 60000} min`);
+}
+
+// The running hunt with the most players that still has room for Seats more, or undefined
+async function FindOpenHunt(HuntId: string, Region: HuntRegion, Seats: number): Promise<OpenHunt | undefined> {
+    if (!IsJoinableHunt(HuntId)) return undefined;
+    let Best: { Hunt: OpenHunt, Players: number } | undefined;
+    for (const Hunt of [...OpenHunts.values()]) {
+        const Players = MatchmakingRoster.occupancy(Hunt.AllocationId);
+        if (PartyNow() - Hunt.StartedAt >= OPEN_HUNT_MAX_AGE_MS || Players === undefined) { OpenHunts.delete(Hunt.AllocationId); continue; }
+        if (Hunt.HuntId !== HuntId || Hunt.Region !== Region || Players + Seats > OPEN_HUNT_PLAYERS) continue;
+        if (Best === undefined || Players > Best.Players) Best = { Hunt, Players };
+    }
+    if (Best === undefined) return undefined;
+    // The deploy server's list of running game servers: an exited one is dropped
+    const Alive = await AllocationHealth({ Ready: true, HuntId, CandidateId: '', Host: Best.Hunt.Host, Port: Best.Hunt.Port, SessionId: Best.Hunt.SessionId, AllocatedAt: Best.Hunt.StartedAt });
+    if (Alive === false) {
+        OpenHunts.delete(Best.Hunt.AllocationId);
+        return FindOpenHunt(HuntId, Region, Seats);
+    }
+    return Best.Hunt;
+}
+
+// Players' entries already stored (StoreEntry) follow them to the running hunt; false when it is gone
+function JoinOpenHunt(Hunt: OpenHunt, Members: { playerId: string, candidateId: string }[]){
+    if (!MatchmakingRoster.joinAllocation(Hunt.AllocationId, Members.map(Member => ({ ...Member, huntId: Hunt.HuntId })))) {
+        OpenHunts.delete(Hunt.AllocationId);
+        return false;
+    }
+    logger.info(`mm: ${Members.map(Member => Member.playerId).join(",")} join the running ${Hunt.HuntId} at ${Hunt.Host}:${Hunt.Port} (${MatchmakingRoster.occupancy(Hunt.AllocationId)} player(s) now)`);
+    return true;
+}
+
+const JoinedGame = (Hunt: OpenHunt): LaunchResult => ({ succeeded: true, readyNow: true, host: Hunt.Host, port: Hunt.Port, sessionId: Hunt.SessionId, allocatedAt: PartyNow() });
+
 function HuntIdRequiresMatchmaking(HuntId: string){
     return !HuntId.includes("Ramsgate") && !HuntId.includes("Dojo");
     //return HuntId.includes("CR19") || HuntId.includes("11A") || HuntId.includes("Story");
@@ -407,7 +463,10 @@ async function PopQueue(HuntId: string, MatchmakingQueue: MatchmakingQueueData |
         }
     }
 
-    if (GameOnDeployServer.succeeded) MatchmakingRoster.assignAllocation(allocationId, GameOnDeployServer.sessionId, GameOnDeployServer.host, GameOnDeployServer.port);
+    if (GameOnDeployServer.succeeded) {
+        MatchmakingRoster.assignAllocation(allocationId, GameOnDeployServer.sessionId, GameOnDeployServer.host, GameOnDeployServer.port);
+        if (!MatchmakingQueue.Private) RegisterOpenHunt(allocationId, HuntId, MatchmakingQueue.Region, GameOnDeployServer);
+    }
 
     for(const Player of MatchmakingQueue.Players){
         const PlayerMatchmakingResultToUpdate = MatchmakingResultMap.get(Player);
@@ -504,6 +563,20 @@ async function QueuePlayer(HuntId: string, PlayerId: string, Private = false){
         }
     }
 
+    // A classic hunt already running with room: go there instead of starting another server
+    const Running = Private ? undefined : await FindOpenHunt(HuntId, Region, 1);
+    if (Running !== undefined) {
+        LeaveWaitingQueues(PlayerId, "a running hunt takes them");
+        const Entry: MatchmakingResult = { Ready: false, CandidateId: crypto.randomUUID(), HuntId, Host: "", Port: 0, Private, Region, QueuedAt: PartyNow() };
+        StoreEntry(PlayerId, Entry);
+        if (JoinOpenHunt(Running, [{ playerId: PlayerId, candidateId: Entry.CandidateId }])) {
+            ApplyLaunchResult(PlayerId, Entry, JoinedGame(Running));
+            return true;
+        }
+        MatchmakingRoster.removePlayer(PlayerId, Entry.CandidateId, 'replaced');
+        MatchmakingResultMap.delete(PlayerId);
+    }
+
     const ExistingQueue = Private ? undefined : MatchmakingQueueMap.get(QueueKey);
     if (ExistingQueue) PruneWaitingQueue(ExistingQueue);
 
@@ -540,7 +613,8 @@ async function QueuePlayer(HuntId: string, PlayerId: string, Private = false){
             Players: [],
             CandidateIds: new Map<string, string>(),
             FirstPlayerAddedTime: PartyNow(),
-            Resolved: false
+            Resolved: false,
+            Private
         };
         if (!Private) MatchmakingQueueMap.set(QueueKey, Queue);
     }
@@ -841,12 +915,19 @@ async function StartPartyCandidate(TheParty: Party, GameMode: string, HuntId: st
 
     logger.info(`mm: party P=${TheParty.PartyId} candidate ${CandidateId} mode=${GameMode} hunt=${HuntId} members=${Members.join(",")} by=${LeaderId}`);
 
+    // A classic hunt already running with a seat for every member: the whole party goes there
+    const Running = GameMode === "ISLAND" ? await FindOpenHunt(HuntId, Region as HuntRegion, Members.length) : undefined;
+
     const TryLaunch = async () => {
         const Active = Members.filter(member => {
             const entry = MatchmakingResultMap.get(member);
             return entry?.CandidateId === CandidateId && !entry.Failed && TheParty.Members.includes(member);
         });
         if (TheParty.Candidate?.CandidateId !== CandidateId || Active.length === 0) return true;
+        if (Running !== undefined && JoinOpenHunt(Running, Active.map(playerId => ({playerId, candidateId: CandidateId})))) {
+            await FinishPartyCandidate(TheParty, CandidateId, Active, JoinedGame(Running));
+            return true;
+        }
         const deadline = PartyNow() + DeployTimeoutMs();
         TheParty.Candidate.LaunchDeadline = deadline;
         for (const member of Active) MatchmakingResultMap.get(member)!.LaunchDeadline = deadline;
@@ -866,7 +947,10 @@ async function StartPartyCandidate(TheParty: Party, GameMode: string, HuntId: st
             }
             return false;
         }
-        if (Game.succeeded) MatchmakingRoster.assignAllocation(allocationId, Game.sessionId, Game.host, Game.port);
+        if (Game.succeeded) {
+            MatchmakingRoster.assignAllocation(allocationId, Game.sessionId, Game.host, Game.port);
+            if (GameMode === "ISLAND") RegisterOpenHunt(allocationId, HuntId, Region, Game);
+        }
         await FinishPartyCandidate(TheParty, CandidateId, Active, Game);
         return true;
     };
@@ -1180,6 +1264,7 @@ export function ResetMatchmakingForTests(){
     HealthCache = undefined;
     HealthRequest = undefined;
     CapacityWaits.clear();
+    OpenHunts.clear();
     MatchmakingQueueMap.clear();
     MatchmakingResultMap.clear();
     PlayerQueueMap.clear();
