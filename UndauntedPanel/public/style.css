@@ -126,11 +126,12 @@ label > input, label > select { margin-top: 6px; text-transform: none; letter-sp
 /* Tabs wrap onto a second line rather than scroll: a hidden scroll cut the last tab off, and its overflow
    clipped the lifted, shadowed tabs */
 .nav {
-  display: flex; flex-wrap: wrap; gap: 10px 10px; padding: 16px 22px 6px; max-width: 1240px; margin: 0 auto;
+  display: flex; flex-wrap: nowrap; gap: 8px; padding: 16px 22px 6px; max-width: 1240px; margin: 0 auto;
 }
+.nav a { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
 .nav a {
-  flex: 0 0 auto; color: var(--text); text-decoration: none; font-family: var(--font-title); font-size: 1.02rem; letter-spacing: .4px;
-  padding: 9px 16px; border-radius: 999px; border: var(--outline); background: linear-gradient(180deg, #45349c, #33267a);
+  flex: 0 1 auto; color: var(--text); text-decoration: none; font-family: var(--font-title); font-size: .98rem; letter-spacing: .3px;
+  padding: 8px 13px; border-radius: 999px; border: var(--outline); background: linear-gradient(180deg, #45349c, #33267a);
   box-shadow: 0 4px 0 var(--ink); transition: transform .1s ease, box-shadow .1s ease;
 }
 .nav a:hover { transform: translateY(-2px); box-shadow: 0 6px 0 var(--ink); }
@@ -222,8 +223,7 @@ tr.clickable:hover td { background: rgba(63, 240, 224, .16); }
   .topbar { padding: 10px 14px; }
   .brand { font-size: 1.3rem; }
   .me, #game-badge { display: none; }
-  .nav { padding: 12px 14px 4px; gap: 8px; }
-  .nav a { font-size: .92rem; padding: 7px 12px; }
+  .nav { padding: 12px 14px 4px; gap: 6px; }
   .main { padding: 16px 14px; }
   h1 { font-size: 1.8rem; }
   .two { grid-template-columns: 1fr; }
@@ -238,3 +238,11 @@ tr.clickable:hover td { background: rgba(63, 240, 224, .16); }
 .pill, .badge { white-space: normal; max-width: 100%; overflow-wrap: anywhere; text-align: left; }
 .chip small { display: block; }
 .chip small .pill { margin-top: 3px; }
+
+/* All tabs on one line: smaller on medium screens, icons only (but the open page's) on small ones */
+@media (max-width: 1180px) { .nav { gap: 6px; } .nav a { font-size: .88rem; padding: 7px 10px; gap: 5px; } }
+@media (max-width: 1000px) {
+  .nav { justify-content: space-between; }
+  .nav a:not(.active) .txt { display: none; }
+  .nav a:not(.active) { padding: 7px 11px; font-size: 1.05rem; }
+}
