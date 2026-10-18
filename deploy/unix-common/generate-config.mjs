@@ -139,6 +139,9 @@ const metagame = {
     PROGRESSION_CONFIG_DIR: path.join(root, "UndauntedMetagame", "src", "vendor", "progression-1147"),
     ACTIVE_HUNT_PASS: oldMeta.ACTIVE_HUNT_PASS || "season43",
     ENTITLEMENTS_DEFAULT: oldMeta.ENTITLEMENTS_DEFAULT || "season43_premium,season09b_premium,season_premium_any,season_free_any",
+    // Real Escalation levels and talents (vendor/escalation/seasons_1147.json): the 1.14.7 talent menu
+    // does not open with the stub's level 99999
+    ESCALATION_MODE: oldMeta.ESCALATION_MODE || "real",
     STORE: oldMeta.STORE || "free",
     STORE_PRICING: oldMeta.STORE_PRICING || "platinum",
     ...(oldMeta.CHALLENGE_SEASON_START ? { CHALLENGE_SEASON_START: oldMeta.CHALLENGE_SEASON_START } : {}),

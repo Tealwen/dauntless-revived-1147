@@ -4,7 +4,8 @@
 // GetEscalationSeason hook (UHuntCatalog::IsHuntUnlocked, 1.4.4 RVA 0x14F2A30) and TrialsSchedule.h.
 // Evidence and open questions: PORT-1.14.7/11-hunts-trials.md.
 //
-//  - IsHuntUnlocked: Arena (Trials player hunts) and Escalation hunts always pass. A weekly Trial row
+//  - IsHuntUnlocked: Arena (Trials player hunts) and Escalation hunts get the game's unlock requirements
+//    (Slayer's Path nodes, quests, ranks) without its schedule test, whose rows expired. A weekly Trial row
 //    (Arena_MatchmakerHunt_{Hard,Elite}_NNN) passes only when it is this week's row, because the Trials
 //    screen shows the first row the catalog accepts. Everything else keeps the game's own rule.
 //    1.14.7 also asks the player's USchedulerComponent whether the hunt id is scheduled
@@ -254,6 +255,31 @@ inline bool IsTrialRowUnlocked(const std::string& HuntId, SDK::AArchonPlayerCont
 inline void* OrigIsHuntUnlocked = nullptr;
 using IsHuntUnlockedFn = bool (*)(SDK::UHuntCatalog*, SDK::FString*, SDK::FHunt_UnlockInfo*, SDK::FHunt_UnlockInfo*, SDK::AArchonPlayerController*);
 
+// The two steps of the native after its schedule test (disassembly of 0x1B2F8D0):
+//   bool Check(UHuntCatalog*, const FHunt_UnlockInfo*, AArchonPlayerController*, const FString* HuntID)  0x1B1EAE0
+//     (quests, item, ranks, feature flag, event, Slayer's Path nodes)
+//   bool Equals(const FHunt_UnlockInfo*, const FHunt_UnlockInfo*)  0x1B124B0, against the empty default at 0x69BF580:
+//     an empty AltUnlock is not checked.
+inline constexpr uintptr_t CheckUnlockInfoRva = 0x1B1EAE0;
+inline constexpr std::initializer_list<int> CheckUnlockInfoPrologue =
+    {0x48, 0x89, 0x5C, 0x24, 0x08, 0x4C, 0x89, 0x4C, 0x24, 0x20, 0x55, 0x56, 0x57};
+inline constexpr uintptr_t UnlockInfoEqualsRva = 0x1B124B0;
+inline constexpr std::initializer_list<int> UnlockInfoEqualsPrologue =
+    {0x48, 0x89, 0x5C, 0x24, 0x10, 0x48, 0x89, 0x6C, 0x24, 0x18, 0x48, 0x89, 0x74, 0x24, 0x20, 0x57};
+inline constexpr uintptr_t EmptyUnlockInfoRva = 0x69BF580;
+inline bool UnlockChecksFound = false;
+
+// The game's own rule without the schedule: Check(Unlock), or Check(Unlock) || Check(AltUnlock)
+inline bool RequirementsMet(SDK::UHuntCatalog* Catalog, SDK::FString* HuntID, SDK::FHunt_UnlockInfo* Unlock,
+                            SDK::FHunt_UnlockInfo* AltUnlock, SDK::AArchonPlayerController* PC) {
+    using CheckFn = bool (*)(SDK::UHuntCatalog*, SDK::FHunt_UnlockInfo*, SDK::AArchonPlayerController*, SDK::FString*);
+    using EqualsFn = bool (*)(SDK::FHunt_UnlockInfo*, const void*);
+    const auto Check = reinterpret_cast<CheckFn>(Hooking::At(CheckUnlockInfoRva));
+    const auto Equals = reinterpret_cast<EqualsFn>(Hooking::At(UnlockInfoEqualsRva));
+    if (Check(Catalog, Unlock, PC, HuntID)) return true;
+    return !Equals(AltUnlock, Hooking::At(EmptyUnlockInfoRva)) && Check(Catalog, AltUnlock, PC, HuntID);
+}
+
 // Logs each distinct hunt id once (bounded), so the user's log shows which ids 1.14.7 asks about.
 inline void Report(const std::string& Id, const char* Rule, bool Result) {
     static std::set<std::string> Seen;
@@ -276,13 +302,15 @@ inline bool IsHuntUnlockedHook(SDK::UHuntCatalog* Catalog, SDK::FString* HuntID,
         return TrialRowUnlocked;
     }
 
-    // Same rule as the 1.4.4 DLL, minus its "Mint" exception: the Frost (mint) Escalation was not
-    // finished in 1.4.4 but is shipped content in 1.14.7. The native returns false without a
-    // player controller or quest system, so keep that guard.
+    // Arena (Trials) and Escalation hunts: their schedule rows expired in 2022, so the native's schedule test
+    // locks them for good. They get the game's unlock requirements without that test, so the Slayer's Path
+    // nodes (and quests, ranks...) still decide; the 1.4.4 DLL unlocked them outright. The native returns
+    // false without a player controller or quest system, so that guard stays.
     // The Gauntlet keeps the game's rule: its backend (gauntlet-*) answers "no season running".
-    if (PC && !Id.contains("Gauntlet") && (Id.contains("Arena") || Id.contains("Esca"))) {
-        Report(Id, "forced", true);
-        return true;
+    if (UnlockChecksFound && PC && PC->QuestSystem && !Id.contains("Gauntlet") && (Id.contains("Arena") || Id.contains("Esca"))) {
+        const bool Result = RequirementsMet(Catalog, HuntID, Unlock, AltUnlock, PC);
+        Report(Id, "unscheduled", Result);
+        return Result;
     }
 
     const bool Result = reinterpret_cast<IsHuntUnlockedFn>(OrigIsHuntUnlocked)(Catalog, HuntID, Unlock, AltUnlock, PC);
@@ -292,6 +320,10 @@ inline bool IsHuntUnlockedHook(SDK::UHuntCatalog* Catalog, SDK::FString* HuntID,
 
 // Call once from InstallSharedHooks (client and server).
 inline void Install() {
+    // Without the two helpers, Arena and Escalation hunts keep the game's full rule (locked by their schedule)
+    UnlockChecksFound = Hooking::BytesMatch(CheckUnlockInfoRva, CheckUnlockInfoPrologue)
+        && Hooking::BytesMatch(UnlockInfoEqualsRva, UnlockInfoEqualsPrologue);
+    if (!UnlockChecksFound) Hooking::Fail("hunt unlock checks", CheckUnlockInfoRva, "unexpected bytes in a function the DLL calls");
     Hooking::Hook("UHuntCatalog::IsHuntUnlocked", IsHuntUnlockedRva, IsHuntUnlockedPrologue, IsHuntUnlockedHook, &OrigIsHuntUnlocked);
 }
 

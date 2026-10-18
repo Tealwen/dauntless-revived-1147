@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import bundledConfig from "../vendor/progression_config.json";
+import slayersPathItems from "../vendor/slayers_path_items_1147.json";
 
 // The progression config (the Hunt Pass seasons and the mastery tracks), loaded in one place: GET
 // /progression/config serves it and the rank math (progressionrank.ts) reads it, so the server and the
@@ -150,7 +151,39 @@ function ReadPathsFromFolder(Folder: string): ProgressionPath[] {
     return Paths;
 }
 
+// 1.14.7: the Slayer's Path unlocks the weapon specials and mods (PART_*), the Escalation crowns and the
+// lantern. The bundled 1.4.4 MasteryTrack_* tracks, which the 1.14.7 game server still advances and pays,
+// grant the same PART_* items at weapon mastery ranks 6/8/10/16, so a player got them without the node.
+// Those items are taken out of the MasteryTrack rewards (an emptied rank keeps its other items).
+const SLAYERS_PATH_ITEMS = new Set(Object.keys(slayersPathItems.items));
+
+function WithoutSlayersPathItems(Path: ProgressionPath): ProgressionPath {
+    if(process.env.TARGET_GAME_VERSION !== "1.14.7" || !Path.progression_id.startsWith("MasteryTrack_")) return Path;
+    // An item is a catalog id string or {catalog_id, ...}
+    const Keep = (Item: any) => !SLAYERS_PATH_ITEMS.has(typeof Item === "string" ? Item : Item?.catalog_id);
+    const Strip = (Rewards: unknown[] | undefined) => Rewards?.map((Reward: any) => {
+        const Out = {...Reward};
+        for(const List of ["stacked_items", "instanced_items", "ordered_instanced_items"])
+            if(Array.isArray(Reward?.[List])) Out[List] = Reward[List].filter(Keep);
+        return Out;
+    });
+    return {...Path, free_rewards: Strip(Path.free_rewards), premium_rewards: Strip(Path.premium_rewards)};
+}
+
 function Load(Folder: string | undefined, Active: string): LoadedConfig {
+    const Loaded = LoadPaths(Folder, Active);
+    if(process.env.TARGET_GAME_VERSION !== "1.14.7") return Loaded;
+    const Paths = Loaded.Paths.map(WithoutSlayersPathItems);
+    return {
+        ...Loaded,
+        Paths,
+        ById: new Map(Paths.map((Path) => [Path.progression_id, Path])),
+        Payload: {...(Loaded.Payload as any), payload: {...(Loaded.Payload as any).payload, paths: Paths}},
+        Description: `${Loaded.Description}; Slayer's Path items kept out of the MasteryTrack rewards`
+    };
+}
+
+function LoadPaths(Folder: string | undefined, Active: string): LoadedConfig {
     const Bundled = (bundledConfig as any).payload.paths as ProgressionPath[];
     let Paths = Bundled;
     let Payload: unknown = bundledConfig;

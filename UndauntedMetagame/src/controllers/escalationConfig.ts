@@ -1,9 +1,12 @@
 // Ported from Harmonicrain/Undaunted (895f7c7), Copyright (C) 2026 Harmonic, AGPL-3.0-only; modified for Dauntless Revived.
 
-import registry from "../vendor/escalation/seasons.json";
+import registry144 from "../vendor/escalation/seasons.json";
+import registry1147 from "../vendor/escalation/seasons_1147.json";
 
 // The Escalation season registry, exported from the installed client's own
-// tables (see the _comment in seasons.json).
+// tables (see the _comment in seasons.json). 1.14.7 has its own: six seasons (Frost and
+// Radiant are new), other level rewards and power per level (seasons_1147.json).
+const registry = process.env.TARGET_GAME_VERSION === "1.14.7" ? registry1147 : registry144;
 //
 // The world server does the arithmetic. These values exist so the backend can
 // refuse a snapshot that no legitimate native state could produce; they are

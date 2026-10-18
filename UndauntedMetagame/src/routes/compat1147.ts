@@ -110,7 +110,8 @@ const TUNING: Record<string, unknown> = {
         bounty_token_grant_hour: 0, bronze_count: 9, silver_count: 3, gold_count: 1, history_length: 10,
         max_slots: 4, num_draft_options: 3, num_spicy_options: 1, num_tokens_hp_start: 4, num_tokens_per_day: 0,
         new_season_reset_bounties: false, token_rollover_warning_days: 1000,
-        automatic_draft: false, automatic_claim: false, delete_claimed_bounties: false
+        // A claimed board bounty leaves its slot (controllers/bounties.ts removes it too)
+        automatic_draft: false, automatic_claim: false, delete_claimed_bounties: true
     },
     bounty_game_data_daily: {
         automatic_claim: true, automatic_draft: true, delete_claimed_bounties: false, bounty_data: [], item_grant_data: [],

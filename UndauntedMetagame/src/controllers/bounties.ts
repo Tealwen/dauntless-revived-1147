@@ -24,16 +24,24 @@ const DEFAULT_DRAFT_DATA = {
 const Is1147 = process.env.TARGET_GAME_VERSION === "1.14.7";
 const EXTRA_DRAFT_KEYS = ["draft_data_daily", "draft_data_weekly"] as const;
 
+// 1.14.7 board bounty (Bounty_*, not a daily/weekly challenge) the game server sent back as claimed. Its claim
+// posts the bounty with claimed: true instead of calling /bounty/delete; kept, it stayed in its slot (claimable
+// again for nothing) and the board could not draft into that slot. A claimed challenge is kept: its
+// claimed state is what stops the season or the day offering it again.
+const IsClaimedBoardBounty = (BountyId: string, Element: any) => Is1147 && !BountyId.includes("Challenge_") && Element?.claimed === true;
+
 function Board(tx: Tx, AccountId: string){
-    const Bounties = tx.select().from(bounties).where(eq(bounties.accountId, AccountId)).orderBy(asc(bounties.slotIndex), asc(bounties.bountyId)).all().map((Row) => {
+    const Bounties = tx.select().from(bounties).where(eq(bounties.accountId, AccountId)).orderBy(asc(bounties.slotIndex), asc(bounties.bountyId)).all().flatMap((Row) => {
         const Element = JSON.parse(Row.data);
+        // Stored before claimed board bounties were removed
+        if(IsClaimedBoardBounty(Row.bountyId, Element)) return [];
 
         // The client zeroes every bounty member except drafted_timestamp
         if(typeof Element.drafted_timestamp !== "string"){
             Element.drafted_timestamp = Row.updatedDate;
         }
 
-        return Element;
+        return [Element];
     });
 
     const Draft = tx.select().from(bountydraft).where(eq(bountydraft.accountId, AccountId)).get();
@@ -92,6 +100,12 @@ export function SetBounties(AccountId: string, Body: unknown, Who: Caller): Real
 
             if(Stored != undefined && Stored.updateVersion > Version){
                 Notes.push(`kept ${BountyId}: stored update_version ${Stored.updateVersion} is newer than ${Version}`);
+                continue;
+            }
+
+            if(IsClaimedBoardBounty(BountyId, Element)){
+                tx.delete(bounties).where(and(eq(bounties.accountId, AccountId), eq(bounties.bountyId, BountyId))).run();
+                Saved.push(`${BountyId} claimed, removed`);
                 continue;
             }
 

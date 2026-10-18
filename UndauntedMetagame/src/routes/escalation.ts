@@ -6,6 +6,7 @@ import { RefuseUnlessGameserver } from "../middleware/GameServerOnly";
 import { IsRealProgressionAccount } from "../controllers/progressionmode";
 import { CallerOf } from "../controllers/progressionevents";
 import { GetEscalationReply, SaveEscalation } from "../controllers/escalation";
+import { GetEscalationSeason } from "../controllers/escalationConfig";
 import { EscalationMode } from "../features";
 
 // Escalation (roadmap 2.16): GetSeasonalEscalationEndpoint and UpdateSeasonalEscalationEndpoint,
@@ -39,13 +40,17 @@ escalationRouter.get("/escalation/:escalationSeason/:userId", HasUndauntedMetaga
 
     logger.info(`Escalation Configuration for season ${EscalationSeason} (stubbed)`);
 
+    // 1.14.7 reads Levels[escalation_level] without clamping it: its talent menu does not open past the
+    // season's last level, so the stub's maximum is that level there
+    const LastLevel = process.env.TARGET_GAME_VERSION === "1.14.7" ? GetEscalationSeason(EscalationSeason)?.levels.length ?? 25 : 99999;
+
     res.status(200);
     res.json({
         code: null,
         message: "OK",
         payload: {
-            escalation_level: 99999,
-            next_level_xp: 99999,
+            escalation_level: LastLevel,
+            next_level_xp: process.env.TARGET_GAME_VERSION === "1.14.7" ? 0 : 99999,
             talents_progress: [],
             unlock_progress: [],
             update_version: 1,
