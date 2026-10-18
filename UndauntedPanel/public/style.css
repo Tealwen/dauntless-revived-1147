@@ -230,3 +230,11 @@ tr.clickable:hover td { background: rgba(63, 240, 224, .16); }
   .stats { grid-template-columns: repeat(2, 1fr); gap: 14px; }
   .tile .value { font-size: 1.9rem; }
 }
+
+/* Long names (maps, hunts, account ids) are single words: let them break inside their card instead of
+   spilling out of it */
+.card, .tile, .chip, .coin, td, .muted, h1, h2, .hunt-card p { overflow-wrap: anywhere; }
+.grid > *, .chips > *, .row > *, .chip > span:last-child { min-width: 0; }
+.pill, .badge { white-space: normal; max-width: 100%; overflow-wrap: anywhere; text-align: left; }
+.chip small { display: block; }
+.chip small .pill { margin-top: 3px; }
