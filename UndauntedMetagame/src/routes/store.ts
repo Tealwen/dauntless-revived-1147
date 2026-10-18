@@ -181,7 +181,7 @@ storeRouter.get("/store-images/:file", (req, res) => {
 // (0x146CD0280, built at 0x5EBAB0): id_currency_platinum / _celldust / _marks_steel / _marks_gilded / _event_01 ->
 // CURRENCY_PLATINUM / ... (the codes UStoreItemViewModel::SetStoreCurrency knows). A currencyId missing from that
 // map is dropped, so the prices must use the id_currency_* names.
-const Is1147 = process.env.TARGET_GAME_VERSION === "1.14.7";
+const Is1147 = () => process.env.TARGET_GAME_VERSION === "1.14.7";
 const PRICE_FIELDS_1147: Record<string, string> = {
     platinumPrice: "id_currency_platinum",
     cellDustPrice: "id_currency_celldust",
@@ -196,7 +196,7 @@ function ToInt(Value: unknown, Default: number){
 }
 
 function ToOffer1147(Offer: any){
-    if(!Is1147) return Offer;
+    if(!Is1147()) return Offer;
 
     const Out: any = {...Offer};
     const Prices: any[] = [];
@@ -300,7 +300,7 @@ storeRouter.get("/product/skus/public", HasUndauntedMetagameAuth, async (req: an
     // 1.14.7 takes a 400 as a broken store ("Unable to open the store") on every vendor screen; an empty list is fine
     // there. The main store (webstore) is the exception: with an empty list it spins forever, so it keeps the
     // 1.4.4 answer below and says the store is unavailable.
-    if(Is1147 && req.query.requiredTags !== "webstore"){
+    if(Is1147() && req.query.requiredTags !== "webstore"){
         res.status(200);
         res.json([]);
         return;

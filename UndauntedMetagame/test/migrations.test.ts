@@ -197,7 +197,9 @@ describe("migrations after the last release (0013_guilds)", () => {
             assert.ok(OldTables.includes(Name), Name);
             assert.equal(Snapshot(Updated, [Name])[Name], Before[Name], `${Name} is byte for byte the same`);
         }
-        assert.deepEqual(SchemaOf(Updated, OldTables).filter((row:any)=>row.name !== "inventorytransactions_created_date"), OldSchema, "no released table, index or trigger changed");
+        // Indexes added later on released tables (they change no row and no column)
+        const AddedIndexes = new Set(["inventorytransactions_created_date", "characters_user"]);
+        assert.deepEqual(SchemaOf(Updated, OldTables).filter((row:any)=>!AddedIndexes.has(row.name)), OldSchema, "no released table, index or trigger changed");
         for(const Name of NewTables){
             assert.equal(Rows(Updated, Name).length, 0, `${Name} starts empty`);
         }

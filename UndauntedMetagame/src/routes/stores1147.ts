@@ -213,6 +213,10 @@ export function RedeemRewardCachePurchase(AccountId: string, Currency: string, T
         // Unlocks: an item the character already holds is not granted twice (overlapping bundles)
         const HeldIds = Held(tx, Purchase.characterId);
         const ToGrant = Offer.items.filter((Item) => !HeldIds.has(Item.catalogId));
+        // Everything was obtained since the token was issued: charge nothing for nothing
+        if(ToGrant.length === 0 && Offer.items.length > 0){
+            throw new RewardCacheError(409, "You already own everything in this offer");
+        }
         const Stacked = ToGrant.filter((Item) => GrantKind(Item.catalogId) === "stacked").map((Item) => ({ catalogId: Item.catalogId, quantity: 1 }));
         // Instanced ids derived from the token: a retried transaction names the same instance
         const Instanced = ToGrant.filter((Item) => GrantKind(Item.catalogId) === "instanced")

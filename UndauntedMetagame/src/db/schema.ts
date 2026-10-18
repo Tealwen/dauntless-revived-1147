@@ -58,7 +58,7 @@ export const characters = sqliteTable("characters", {
     name: text("name").notNull(),
     updateVersion: integer("updateVersion").notNull(),
     data: text("data").notNull()
-});
+}, table => [index("characters_user").on(table.userId)]);
 
 export const inventory = sqliteTable("inventories", {
     characterId: text("characterId").notNull().primaryKey(),
@@ -269,6 +269,13 @@ export const playerjourney = sqliteTable("playerjourney", {
     journeyKey: text("journeyKey").notNull().primaryKey(),
     nodes: text("nodes").notNull(),
     updateVersion: integer("updateVersion").notNull(),
+    updatedDate: text("updatedDate").notNull()
+});
+
+// The 1.14.7 client's tracked quests and craftables (GET/POST /progression/tracked_objectives), one row per account.
+export const trackedobjectives1147 = sqliteTable("trackedobjectives1147", {
+    accountId: text("accountId").notNull().primaryKey(),
+    body: text("body").notNull(),
     updatedDate: text("updatedDate").notNull()
 });
 

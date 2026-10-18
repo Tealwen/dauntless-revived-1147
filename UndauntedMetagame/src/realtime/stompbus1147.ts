@@ -27,6 +27,8 @@ export type StompPeer = { Ws: WebSocket, Session: string, AccountId?: string, Se
 type Subscription = { Peer: StompPeer, Id: string, Destination: string, Kind: "player" | "party", Key: string };
 
 const Subscriptions = new Set<Subscription>();
+// The client subscribes to one player topic and one party topic
+const MAX_SUBSCRIPTIONS = 16;
 
 // STOMP 1.2 header escaping (\\ \n \r \c)
 function EscapeHeader(Value: string): string {
@@ -84,15 +86,28 @@ export function OnSubscribe(Peer: StompPeer, Headers: Record<string, string>): v
 
     logger.info(`stomp: ${Peer.Session} subscribe id=${Id.slice(0, 64)} destination=${Match ? Destination : "<other>"}`);
 
-    if (!Match || Id.length === 0 || Id.length > 128) {
+    // Nothing before a successful CONNECT (Session is set by it)
+    if (!Match || Id.length === 0 || Id.length > 128 || Peer.Session === "") {
         return;
     }
 
     const Kind = Match[1] as "player" | "party";
 
-    // A player may only listen on its own player topic
-    if (Kind === "player" && Peer.AccountId !== undefined && Match[3] !== Peer.AccountId && Match[2] !== Peer.AccountId) {
+    // A player topic carries that account's events (Slayer Links): only a peer logged in as that account
+    // listens on it. A dedicated server (no passcode check) or a peer admitted by STOMP_AUTH=log has no account.
+    if (Kind === "player" && (Peer.AccountId === undefined || (Match[3] !== Peer.AccountId && Match[2] !== Peer.AccountId))) {
         logger.warn(`stomp: ${Peer.Session} player topic of another account ignored`);
+        return;
+    }
+
+    // The same id again replaces the subscription; at most MAX_SUBSCRIPTIONS per socket
+    let Held = 0;
+    for (const Sub of Subscriptions) {
+        if (Sub.Peer !== Peer) continue;
+        if (Sub.Id === Id) Subscriptions.delete(Sub); else Held++;
+    }
+    if (Held >= MAX_SUBSCRIPTIONS) {
+        logger.warn(`stomp: ${Peer.Session} too many subscriptions, ignored`);
         return;
     }
 

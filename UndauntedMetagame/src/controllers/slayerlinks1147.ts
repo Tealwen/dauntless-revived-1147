@@ -132,9 +132,12 @@ function RemovedAt(State: StateRow, S: Side){
     return S === "sender" ? State.senderRemovedAt : State.targetRemovedAt;
 }
 
+function EmptyState(LinkId: string): StateRow {
+    return { linkId: LinkId, prizePool: null, poolSource: null, senderClaimedAt: null, targetClaimedAt: null, senderRewards: null, targetRewards: null, senderRemovedAt: null, targetRemovedAt: null };
+}
+
 function StateOf(tx: Tx, LinkId: string): StateRow {
-    return tx.select().from(slayerlinkstate1147).where(eq(slayerlinkstate1147.linkId, LinkId)).get()
-        ?? { linkId: LinkId, prizePool: null, poolSource: null, senderClaimedAt: null, targetClaimedAt: null, senderRewards: null, targetRewards: null, senderRemovedAt: null, targetRemovedAt: null };
+    return tx.select().from(slayerlinkstate1147).where(eq(slayerlinkstate1147.linkId, LinkId)).get() ?? EmptyState(LinkId);
 }
 
 function SaveState(tx: Tx, State: StateRow){
@@ -147,7 +150,11 @@ function LinksOf(tx: Tx, AccountId: string, Now: number): Linked[] {
         .where(and(gt(slayerlinks.endsAt, Now - KEEP_DAYS * 24 * HOUR_MS), or(eq(slayerlinks.senderId, AccountId), eq(slayerlinks.targetId, AccountId))))
         .orderBy(asc(slayerlinks.createdAt)).all().reverse();
 
-    return Rows.map((Link) => ({ Link, State: StateOf(tx, Link.linkId) }));
+    // One query for every state (the client polls every 3 s)
+    const States = Rows.length === 0 ? new Map<string, StateRow>() : new Map(tx.select().from(slayerlinkstate1147)
+        .where(inArray(slayerlinkstate1147.linkId, Rows.map((Link) => Link.linkId))).all().map((State) => [State.linkId, State]));
+
+    return Rows.map((Link) => ({ Link, State: States.get(Link.linkId) ?? EmptyState(Link.linkId) }));
 }
 
 function IsRunning(Link: LinkRow, Now: number){
@@ -463,9 +470,9 @@ function LinkEntry(Each: Linked, AccountId: string){
 function ReadLists(AccountId: string){
     const Now = Clock();
 
+    // No ExpireInvitesInTx here: PendingInvitesOf already leaves out expired invites, and the writes
+    // (invite, accept) mark them EXPIRED, so a poll writes nothing unless a prize pool must be drawn.
     return GetDb().transaction((tx) => {
-        ExpireInvitesInTx(tx, [AccountId], Now);
-
         const Shown = ShownLinksOf(tx, AccountId, Now);
 
         for(const Each of Shown){

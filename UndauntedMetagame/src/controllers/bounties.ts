@@ -21,14 +21,14 @@ const DEFAULT_DRAFT_DATA = {
 // 1.14.7 has three bounty components posting to the same route: the board (Bounty_*), daily challenges
 // (Challenge_Daily_*, draft_data_daily) and weekly season challenges (*_Challenge_Season_*, draft_data_weekly).
 // Their slot indexes are per component, and the weekly one posts a whole season whose slots repeat each week.
-const Is1147 = process.env.TARGET_GAME_VERSION === "1.14.7";
+const Is1147 = () => process.env.TARGET_GAME_VERSION === "1.14.7";
 const EXTRA_DRAFT_KEYS = ["draft_data_daily", "draft_data_weekly"] as const;
 
 // 1.14.7 board bounty (Bounty_*, not a daily/weekly challenge) the game server sent back as claimed. Its claim
 // posts the bounty with claimed: true instead of calling /bounty/delete; kept, it stayed in its slot (claimable
 // again for nothing) and the board could not draft into that slot. A claimed challenge is kept: its
 // claimed state is what stops the season or the day offering it again.
-const IsClaimedBoardBounty = (BountyId: string, Element: any) => Is1147 && !BountyId.includes("Challenge_") && Element?.claimed === true;
+const IsClaimedBoardBounty = (BountyId: string, Element: any) => Is1147() && !BountyId.includes("Challenge_") && Element?.claimed === true;
 
 function Board(tx: Tx, AccountId: string){
     const Bounties = tx.select().from(bounties).where(eq(bounties.accountId, AccountId)).orderBy(asc(bounties.slotIndex), asc(bounties.bountyId)).all().flatMap((Row) => {
@@ -50,7 +50,7 @@ function Board(tx: Tx, AccountId: string){
         draft_data: Draft != undefined ? JSON.parse(Draft.data) : DEFAULT_DRAFT_DATA
     };
 
-    if(Is1147){
+    if(Is1147()){
         for(const Key of EXTRA_DRAFT_KEYS){
             const Extra = tx.select().from(bountydraft).where(eq(bountydraft.accountId, `${AccountId}#${Key}`)).get();
             Reply[Key] = Extra != undefined ? JSON.parse(Extra.data) : DEFAULT_DRAFT_DATA;
@@ -110,9 +110,9 @@ export function SetBounties(AccountId: string, Body: unknown, Who: Caller): Real
             }
 
             // 1.14.7: only board bounties take each other's slot; challenges are removed through /bounty/delete
-            if(SlotIndex !== null && !(Is1147 && BountyId.includes("Challenge_"))){
+            if(SlotIndex !== null && !(Is1147() && BountyId.includes("Challenge_"))){
                 const Replaced = tx.delete(bounties).where(and(eq(bounties.accountId, AccountId), eq(bounties.slotIndex, SlotIndex), ne(bounties.bountyId, BountyId),
-                    ...(Is1147 ? [notLike(bounties.bountyId, "%Challenge%")] : []))).returning().all();
+                    ...(Is1147() ? [notLike(bounties.bountyId, "%Challenge%")] : []))).returning().all();
 
                 for(const Row of Replaced){
                     Notes.push(`${BountyId} took slot ${SlotIndex} from ${Row.bountyId}`);
@@ -135,7 +135,7 @@ export function SetBounties(AccountId: string, Body: unknown, Who: Caller): Real
             }
         }
 
-        if(Is1147 && IsPlainObject(Body)){
+        if(Is1147() && IsPlainObject(Body)){
             for(const Key of EXTRA_DRAFT_KEYS){
                 const Data = Body[Key];
                 if(IsPlainObject(Data)){

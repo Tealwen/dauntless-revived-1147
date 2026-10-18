@@ -8,7 +8,7 @@ import { GetSelectedHuntPass } from "../controllers/realprogression";
 import { GetBountyReply } from "../controllers/bounties";
 import { eq } from "drizzle-orm";
 import { GetDb } from "../db";
-import { playerjourney } from "../db/schema";
+import { playerjourney, trackedobjectives1147 } from "../db/schema";
 
 // The Dauntless 1.14.7 client (TARGET_GAME_VERSION=1.14.7). Sources for the shapes:
 // PORT-1.14.7/06-backend-1.14.7-contract.md (another 1.14.7 server's traffic, protocol facts only)
@@ -73,15 +73,22 @@ compat1147EarlyRouter.get("/bounty/:userId", HasUndauntedMetagameAuth, (req: any
 // badge) per week of the active Hunt Pass track's start_date..end_date, and builds them all each time the
 // quest menu opens. The generated tracks run from 2019 to 2099, so 4,175 headers and ~330,000 objects per
 // open: a 1.5 s freeze, and the objects pile up. The active pass gets the challenge season's 14 weeks.
+// The reply (~150 KB) only changes with the loaded config, the active pass or the season window: it is
+// serialized once per combination instead of on every call.
+let ConfigReply: { Config: unknown, Active: string, Start: string, Json: string } | undefined;
 compat1147EarlyRouter.get("/progression/config", HasUndauntedMetagameAuth, (req: any, res) => {
     const Config: any = GetProgressionConfigPayload();
     const Active = GetActiveHuntPass();
     const Season = ChallengeSeasonWindow();
-    const Paths = (Config?.payload?.paths ?? []).map((Path: any) => Path?.progression_id === Active
-        ? { ...Path, start_date: Season.Start, end_date: Season.End }
-        : Path);
+    let Reply = ConfigReply;
+    if(Reply === undefined || Reply.Config !== Config || Reply.Active !== Active || Reply.Start !== Season.Start){
+        const Paths = (Config?.payload?.paths ?? []).map((Path: any) => Path?.progression_id === Active
+            ? { ...Path, start_date: Season.Start, end_date: Season.End }
+            : Path);
+        Reply = ConfigReply = { Config, Active, Start: Season.Start, Json: JSON.stringify({ ...Config, payload: { ...Config.payload, paths: Paths } }) };
+    }
     logger.info(`Progression Config (1.14.7, ${Active} ${Season.Start}..${Season.End})`);
-    res.json({ ...Config, payload: { ...Config.payload, paths: Paths } });
+    res.type("application/json").send(Reply.Json);
 });
 
 // A player's own key: the account id, or account-season-faction. The game server reads and writes any.
@@ -137,18 +144,34 @@ compat1147EarlyRouter.get("/game_tuning/:blobId", (req: any, res, next) => {
 // /progression/... routes 1.14.7 adds next to the 1.4.4 /progression/:userId/:progressionId, which
 // would read them as an account id: tracked objectives (client), the Gauntlet level access and
 // Gauntlet progression with an empty season (game server).
-const TrackedObjectives = new Map<string, unknown>();
+// Tracked objectives are stored per account (table trackedobjectives1147), keyed by the account id only, as
+// an object of at most TRACKED_MAX_BYTES once serialized (a few quest and craftable ids in practice).
+const TRACKED_MAX_BYTES = 16 * 1024;
+const DEFAULT_TRACKED = { current_set: "quest_slayer_links", omitted_quests: [], tracked_craftables: [], tracked_quests: [] };
+function OwnsAccount(req: any, AccountId: string){
+    return req.AuthData?.IsGameserver === true || (typeof req.AuthData?.userId === "string" && req.AuthData.userId === AccountId);
+}
 compat1147EarlyRouter.get("/progression/tracked_objectives/:userId", HasUndauntedMetagameAuth, (req: any, res) => {
-    if(!OwnsKey(req, req.params.userId)) return Forbidden(res);
-    res.json(Wrapped(TrackedObjectives.get(req.params.userId)
-        ?? { current_set: "quest_slayer_links", omitted_quests: [], tracked_craftables: [], tracked_quests: [] }));
+    if(!OwnsAccount(req, req.params.userId)) return Forbidden(res);
+    const Row = GetDb().select().from(trackedobjectives1147).where(eq(trackedobjectives1147.accountId, req.params.userId)).get();
+    res.json(Wrapped(Row != undefined ? JSON.parse(Row.body) : DEFAULT_TRACKED));
 });
 compat1147EarlyRouter.post("/progression/tracked_objectives/:userId", HasUndauntedMetagameAuth, (req: any, res) => {
-    if(!OwnsKey(req, req.params.userId)) return Forbidden(res);
-    if(req.body && typeof req.body === "object") TrackedObjectives.set(req.params.userId, req.body);
+    if(!OwnsAccount(req, req.params.userId)) return Forbidden(res);
+    if(!req.body || typeof req.body !== "object" || Array.isArray(req.body)){
+        return res.status(400).json({ code: "400", message: "Tracked objectives must be an object" });
+    }
+    const Body = JSON.stringify(req.body);
+    if(Buffer.byteLength(Body) > TRACKED_MAX_BYTES){
+        return res.status(413).json({ code: "413", message: "Tracked objectives too large" });
+    }
+    const Now = new Date().toISOString();
+    GetDb().insert(trackedobjectives1147).values({ accountId: req.params.userId, body: Body, updatedDate: Now })
+        .onConflictDoUpdate({ target: trackedobjectives1147.accountId, set: { body: Body, updatedDate: Now } }).run();
     res.json(Wrapped(null));
 });
-compat1147EarlyRouter.get(/^\/progression\/level_access(\/.*)?$/, HasUndauntedMetagameAuth, (req: any, res) => {
+// A constant, so no auth: the client also asks while logging out, without a token (a 401 logged as an error)
+compat1147EarlyRouter.get(/^\/progression\/level_access(\/.*)?$/, (req: any, res) => {
     res.json(Wrapped(0));
 });
 compat1147EarlyRouter.get(/^\/progression\/\/[^/]+$/, HasUndauntedMetagameAuth, (req: any, res) => {
@@ -157,6 +180,7 @@ compat1147EarlyRouter.get(/^\/progression\/\/[^/]+$/, HasUndauntedMetagameAuth, 
 
 // ---- Mounted AFTER the 1.4.4 routers: routes 1.4.4 never asks for ----
 export const compat1147Router = Router();
+compat1147Router.use((req, res, next) => IsGame1147() ? next() : next("router"));
 
 // IsBannedEndpoint: a 404 fails the login ("LoginOperation Failed - NotFound"). Flat, field `isBanned`.
 compat1147Router.get("/isbanned", HasUndauntedMetagameAuth, (req: any, res) => {
@@ -189,8 +213,8 @@ compat1147Router.get(["/pjm", "/pjm/:key"], HasUndauntedMetagameAuth, (req: any,
 compat1147Router.get("/pjm/seasonal/:key", HasUndauntedMetagameAuth, (req: any, res) => {
     res.json(Wrapped(JourneyOf(`seasonal:${req.params.key}`)));
 });
-compat1147Router.post("/pjm/:key", HasUndauntedMetagameAuth, (req: any, res) => {
-    const Key = req.params.key;
+compat1147Router.post(["/pjm/:key", "/pjm/seasonal/:key"], HasUndauntedMetagameAuth, (req: any, res) => {
+    const Key = req.path.startsWith("/pjm/seasonal/") ? `seasonal:${req.params.key}` : req.params.key;
     // Only the game server saves journeys: it spends the unlock costs (PJM Unlock inventory transactions),
     // so a player writing their own would unlock nodes for free
     if(!req.AuthData?.IsGameserver) return Forbidden(res);

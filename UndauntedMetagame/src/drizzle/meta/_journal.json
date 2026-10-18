@@ -218,6 +218,13 @@
       "when": 1792400000000,
       "tag": "0030_slayer_links_1147",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "6",
+      "when": 1792500000000,
+      "tag": "0031_tracked_objectives_character_user",
+      "breakpoints": true
     }
   ]
 }

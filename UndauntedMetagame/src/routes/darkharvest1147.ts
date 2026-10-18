@@ -254,6 +254,10 @@ export function RedeemDarkHarvestPurchase(AccountId: string, Currency: string, T
         else{
             // Unlocks are not granted twice; consumables (repeatable offers) always are
             ToGrant = GrantsOf(Offer).filter((Item) => Offer.repeatable || !HeldIds.has(Item.catalogId));
+            // Everything was obtained since the token was issued: charge nothing for nothing
+            if(ToGrant.length === 0 && GrantsOf(Offer).length > 0){
+                throw new EventStoreError(409, "You already own everything this offer can grant");
+            }
         }
 
         const Stacked = ToGrant.filter((Item) => Item.kind === "stacked").map((Item) => ({ catalogId: Item.catalogId, quantity: Item.quantity }));

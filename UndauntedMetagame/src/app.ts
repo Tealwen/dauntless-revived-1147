@@ -40,7 +40,9 @@ app.use((req,res,next)=>{if(/^\/undaunted\/api\/ServerStatus\/?$/i.test(req.path
 // another proxy; a no-op with AUTH_MODE=APIKEY. See middleware/RequestOrigin.ts.
 app.use(RefuseProxiedInDevAuthMode);
 
-app.use(express.json({ limit: "50mb" }));
+// Bodies are parsed before any route checks auth. The largest the game sends are character saves and
+// progression events (about 50 KB); JSON_BODY_LIMIT raises the cap if a save ever needs it.
+app.use(express.json({ limit: process.env.JSON_BODY_LIMIT || "2mb" }));
 
 app.use(express.urlencoded({ extended: true }));
 
