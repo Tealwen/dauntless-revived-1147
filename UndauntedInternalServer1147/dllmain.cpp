@@ -31,12 +31,14 @@
 #include "Hooking.h"
 #include "HuntIdlePolicy.h"
 #include "HuntUnlock1147.h"
+#include "MiddlemanDustPrice1147.h"
 #include "NativeDiagnostics.h"
 #include "Networking.h"
 #include "NoPlatinumPrice1147.h"
 #include "SeasonalSchedule1147.h"
 #include "ServerFrameLimit.h"
 #include "Social1147.h"
+#include "SocialPollRate1147.h"
 #include "VendorTabs1147.h"
 #include "constants.h"
 
@@ -570,6 +572,10 @@ static void Init() {
         Hooking::Hook("FCommandLine::Get", Addr::CommandLineGet, Prologue::CommandLineGet, ClientCommandLineHook, &OrigCommandLine);
         // Client: press start, the F2 console, developer style and the UI fixes (the ability RPCs stay unresolved here).
         Hooking::Hook("UObject::ProcessEvent", Addr::ProcessEvent, Prologue::ProcessEvent, ProcessEventHook, &OrigProcessEvent);
+        // Middleman cells: their Aetherdust price (MiddlemanDustPrice1147.h)
+        MiddlemanDustPrice::Install();
+        // Party and Slayer link polls every 3 s (SocialPollRate1147.h)
+        SocialPollRate1147::Apply();
     }
 
     if (Hooking::Failures)
