@@ -25,6 +25,7 @@ import { hunts1147EarlyRouter, hunts1147Router } from "./routes/hunts1147.js";
 import { progression1147Router } from "./routes/progression1147.js";
 import { stores1147Router } from "./routes/stores1147.js";
 import { darkHarvest1147Router } from "./routes/darkharvest1147.js";
+import { fountain1147Router } from "./routes/fountain1147.js";
 import { DescribeOrigin, RefuseProxiedInDevAuthMode } from "./middleware/RequestOrigin.js";
 import { BodyLog, Redact } from "./middleware/BodyLog.js";
 import { backupRouter } from './routes/backup';
@@ -77,6 +78,7 @@ app.use("/", characterRouter);
 app.use("/", inventoryRouter);
 app.use("/", progression1147Router); // 1.14.7 Elite Hunt Pass offer (routes/progression1147.ts)
 app.use("/", darkHarvest1147Router); // 1.14.7 Dark Harvest event store (seasonal_event, rumour_store; routes/darkharvest1147.ts)
+app.use("/", fountain1147Router); // 1.14.7 Ramsgate fountain, one free daily core (fountain_daily_free_bundle, routes/fountain1147.ts)
 app.use("/", stores1147Router); // 1.14.7 Reward Cache (season_store, routes/stores1147.ts)
 app.use("/", storeRouter);
 app.use("/", guildRouter);

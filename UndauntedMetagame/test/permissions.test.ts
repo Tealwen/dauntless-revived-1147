@@ -253,6 +253,11 @@ const EXPECTED_ROUTES = [
     "GET /product/sku/:skuId [HasUndauntedMetagameAuth, PlayerTokenOnly]",
     "GET /token/:currency/:skuId [HasUndauntedMetagameAuth, PlayerTokenOnly]",
     "POST /notification/:currency [HasUndauntedMetagameAuth, PlayerTokenOnly]",
+    // 1.14.7 Ramsgate fountain (routes/fountain1147.ts), mounted before the Reward Cache
+    "GET /product/skus/public [HasUndauntedMetagameAuth, PlayerTokenOnly]",
+    "GET /product/sku/:skuId [HasUndauntedMetagameAuth, PlayerTokenOnly]",
+    "GET /token/:currency/:skuId [HasUndauntedMetagameAuth, PlayerTokenOnly]",
+    "POST /notification/:currency [HasUndauntedMetagameAuth, PlayerTokenOnly]",
     // 1.14.7 Reward Cache (routes/stores1147.ts), mounted before the store
     "GET /product/skus/public [HasUndauntedMetagameAuth, PlayerTokenOnly]",
     "GET /product/sku/:skuId [HasUndauntedMetagameAuth, PlayerTokenOnly]",
