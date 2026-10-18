@@ -39,6 +39,7 @@ export const PRESENCE_REFILL_MS = 2000;
 export const MAX_STATUS_LENGTH = 4096;
 export const ADMIN_LOCAL = "xmpp-admin";
 export const FRIEND_MESSAGE_TYPE = "com.epicgames.friends.core.apiobjects.Friend";
+export const FRIEND_REMOVAL_MESSAGE_TYPE = "com.epicgames.friends.core.apiobjects.FriendRemoval";
 const SHOW_VALUES = new Set(["away", "chat", "dnd", "xa"]);
 
 // What the client last broadcast: <show> (only the four values it writes) and <status>, as sent
@@ -176,13 +177,20 @@ export class FriendPresence {
     }
 
     // The friends-list push: {"type", "payload", "timestamp"} in the body of a plain message from xmpp-admin
-    private friendMessage(To: PresenceSession, Other: string, Direction: "INBOUND" | "OUTBOUND", CreatedAt: number): string {
+    private friendMessage(To: PresenceSession, Other: string, Direction: "INBOUND" | "OUTBOUND", CreatedAt: number, Status: "ACCEPTED" | "PENDING" = "ACCEPTED"): string {
         const Now = new Date(this.host.Clock()).toISOString();
         const Body = JSON.stringify({
             type: FRIEND_MESSAGE_TYPE,
-            payload: { accountId: Other, status: "ACCEPTED", direction: Direction, created: new Date(CreatedAt > 0 ? CreatedAt : this.host.Clock()).toISOString() },
+            payload: { accountId: Other, status: Status, direction: Direction, created: new Date(CreatedAt > 0 ? CreatedAt : this.host.Clock()).toISOString() },
             timestamp: Now
         });
+
+        return `<message xmlns="${NS.CLIENT}" from="${ADMIN_LOCAL}@${EscapeXml(To.Domain)}" to="${EscapeXml(FullJidOf(To))}"><body>${EscapeXml(Body)}</body></message>`;
+    }
+
+    // The friends-list push that takes an entry (friend or request) off the list
+    private removalMessage(To: PresenceSession, Other: string, Reason: "DELETED" | "REJECTED" | "ABORTED"): string {
+        const Body = JSON.stringify({ type: FRIEND_REMOVAL_MESSAGE_TYPE, payload: { accountId: Other, reason: Reason }, timestamp: new Date(this.host.Clock()).toISOString() });
 
         return `<message xmlns="${NS.CLIENT}" from="${ADMIN_LOCAL}@${EscapeXml(To.Domain)}" to="${EscapeXml(FullJidOf(To))}"><body>${EscapeXml(Body)}</body></message>`;
     }
@@ -339,8 +347,40 @@ export class FriendPresence {
         if(Event.Kind === "accepted"){
             this.accepted(Event.Requester, Event.Accepter, Event.CreatedAt);
         }
+        else if(Event.Kind === "requested"){
+            this.requested(Event.Requester, Event.Target, Event.CreatedAt);
+        }
+        else if(Event.Kind === "withdrawn"){
+            this.removed(Event.A, Event.B, Event.Reason);
+        }
         else{
+            this.removed(Event.A, Event.B, "DELETED");
             this.ended(Event.A, Event.B);
+        }
+    }
+
+    // A request sent: on both lists at once, as a pending entry
+    private requested(Requester: string, Target: string, CreatedAt: number): void {
+        if(SameAccount(Requester, Target) || this.access.IsBlockedEitherWay(Requester, Target)){
+            return;
+        }
+        for(const To of this.host.SessionsOf(Target).filter(IsOnline)){
+            this.deliver(ADMIN_LOCAL, To, this.friendMessage(To, Requester, "INBOUND", CreatedAt, "PENDING"));
+        }
+        for(const To of this.host.SessionsOf(Requester).filter(IsOnline)){
+            this.deliver(ADMIN_LOCAL, To, this.friendMessage(To, Target, "OUTBOUND", CreatedAt, "PENDING"));
+        }
+    }
+
+    // A friend or a request gone: off both lists at once
+    private removed(A: string, B: string, Reason: "DELETED" | "REJECTED" | "ABORTED"): void {
+        if(SameAccount(A, B)){
+            return;
+        }
+        for(const [Who, Other] of [[A, B], [B, A]]){
+            for(const To of this.host.SessionsOf(Who).filter(IsOnline)){
+                this.deliver(ADMIN_LOCAL, To, this.removalMessage(To, Other, Reason));
+            }
         }
     }
 

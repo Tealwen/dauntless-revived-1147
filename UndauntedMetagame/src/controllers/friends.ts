@@ -42,8 +42,12 @@ export function SetBlockHook(Hook: (Blocker: string, Blocked: string) => void){
 // These moments are the ones the presence service of Harmonic's fork reacted to
 // (github.com/Harmonicrain/Undaunted 895f7c7); none of its code is used.
 // Called after the change is stored; a listener that throws is logged and changes nothing here.
+// "requested" and "withdrawn" (a pending request sent, declined or withdrawn) let the chat server update both
+// friends lists at once (realtime/presence.ts); without them the 1.14.7 client saw a request only on its next refresh.
 export type FriendshipEvent =
     | { Kind: "accepted", Requester: string, Accepter: string, CreatedAt: number }
+    | { Kind: "requested", Requester: string, Target: string, CreatedAt: number }
+    | { Kind: "withdrawn", A: string, B: string, Reason: "REJECTED" | "ABORTED" }
     | { Kind: "ended", A: string, B: string, Why: "removed" | "blocked" };
 
 const FriendshipListeners = new Set<(Event: FriendshipEvent) => void>();
@@ -63,7 +67,7 @@ function NotifyFriendship(Event: FriendshipEvent){
             Listener(Event);
         }
         catch(error){
-            logger.warn(error, `friends: a listener failed on a friendship that ${Event.Kind === "accepted" ? "began" : "ended"}`);
+            logger.warn(error, `friends: a listener failed on a friendship event (${Event.Kind})`);
         }
     }
 }
@@ -206,6 +210,7 @@ export function SendOrAcceptFriendRequest(Me: string, Them: string): FriendResul
     }
 
     let RequestedAt = 0;
+    let SentAt = 0;
     const Result = GetDb().transaction((tx): FriendResult => {
         if(!AccountExists(tx, Them)){
             return { ok: false, Status: 404, Error: "not_found" };
@@ -254,6 +259,7 @@ export function SendOrAcceptFriendRequest(Me: string, Them: string): FriendResul
 
         tx.insert(friendships).values({ userLow: Low, userHigh: High, requesterId: Me, status: "PENDING", createdAt: Now, updatedAt: Now }).run();
         RecentRequests.set(Me, [...Recent, WindowNow]);
+        SentAt = Now;
         return { ok: true, Result: "requested" };
     });
 
@@ -262,6 +268,9 @@ export function SendOrAcceptFriendRequest(Me: string, Them: string): FriendResul
     if(Result.ok && Result.Result === "accepted"){
         NotifyFriendship({ Kind: "accepted", Requester: Them, Accepter: Me, CreatedAt: RequestedAt });
     }
+    else if(Result.ok && Result.Result === "requested"){
+        NotifyFriendship({ Kind: "requested", Requester: Me, Target: Them, CreatedAt: SentAt });
+    }
 
     return Result;
 }
@@ -269,7 +278,7 @@ export function SendOrAcceptFriendRequest(Me: string, Them: string): FriendResul
 // DELETE /friends/api/public/friends/:me/:them: unfriend, withdraw a request or decline one
 export function RemoveFriend(Me: string, Them: string): FriendResult {
     const { Removed, Cancelled } = GetDb().transaction((tx) => ({
-        Removed: tx.delete(friendships).where(PairCondition(Me, Them)).returning({ status: friendships.status }).all(),
+        Removed: tx.delete(friendships).where(PairCondition(Me, Them)).returning({ status: friendships.status, requesterId: friendships.requesterId }).all(),
         Cancelled: CancelSlayerLinkInvitesInTx(tx, Me, Them)
     }));
     const Result: FriendResult = { ok: true, Result: Removed.length > 0 ? "removed" : "not_friends" };
@@ -278,6 +287,10 @@ export function RemoveFriend(Me: string, Them: string): FriendResult {
 
     if(Removed.some((Row) => Row.status === "ACCEPTED")){
         NotifyFriendship({ Kind: "ended", A: Me, B: Them, Why: "removed" });
+    }
+    else if(Removed.length > 0){
+        // A pending request: withdrawn by the one who sent it, declined by the other
+        NotifyFriendship({ Kind: "withdrawn", A: Me, B: Them, Reason: Removed[0].requesterId === Me ? "ABORTED" : "REJECTED" });
     }
 
     return Result;

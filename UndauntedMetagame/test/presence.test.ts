@@ -282,10 +282,10 @@ describe("friends' online status (CHAT_PRESENCE=1)", () => {
         assert.equal((await Frames(Bob)).length, 1, "the friend hears it");
         assert.deepEqual(await Frames(Carl), [], "a stranger does not");
 
-        // A block ends the friendship: each side sees the other go once, then nothing more
+        // A block ends the friendship: each side gets the list removal and sees the other go once, then nothing more
         assert.equal(BlockPlayer(B, A).ok, true);
-        assert.deepEqual((await Frames(Bob)).map((Each) => [Each.From, Each.Type]), [[Jid(Alice), "unavailable"]]);
-        assert.deepEqual((await Frames(Alice)).map((Each) => [Each.From, Each.Type]), [[Jid(Bob), "unavailable"]]);
+        assert.deepEqual((await Frames(Bob)).map((Each) => [Each.From, Each.Type]), [[`xmpp-admin@${DOMAIN}`, undefined], [Jid(Alice), "unavailable"]]);
+        assert.deepEqual((await Frames(Alice)).map((Each) => [Each.From, Each.Type]), [[`xmpp-admin@${DOMAIN}`, undefined], [Jid(Bob), "unavailable"]]);
         Broadcast(Alice, HUNT);
         await Frames(Alice);
         assert.deepEqual(await Frames(Bob), [], "a blocked player hears no more");
@@ -311,13 +311,14 @@ describe("friends' online status (CHAT_PRESENCE=1)", () => {
         // An unfriend: the same
         GetDb().$client.prepare("delete from blocks").run();
         Befriend(A, C);
-        assert.deepEqual((await Frames(Carl)).map((Each) => [Each.Kind, Each.From]), [["message", `xmpp-admin@${DOMAIN}`], ["presence", Jid(Alice)]]);
+        // The pending request, the accepted entry, then the presence
+        assert.deepEqual((await Frames(Carl)).map((Each) => [Each.Kind, Each.From]), [["message", `xmpp-admin@${DOMAIN}`], ["message", `xmpp-admin@${DOMAIN}`], ["presence", Jid(Alice)]]);
         await Frames(Alice);
         Broadcast(Alice, CITY);
         await Frames(Alice);
         assert.equal((await Frames(Carl)).length, 1, "a new friend hears the next change");
         Unfriend(C, A);
-        assert.deepEqual((await Frames(Carl)).map((Each) => [Each.From, Each.Type]), [[Jid(Alice), "unavailable"]]);
+        assert.deepEqual((await Frames(Carl)).map((Each) => [Each.From, Each.Type]), [[`xmpp-admin@${DOMAIN}`, undefined], [Jid(Alice), "unavailable"]]);
         Broadcast(Alice, HUNT);
         await Frames(Alice);
         assert.deepEqual(await Frames(Carl), []);
@@ -332,7 +333,14 @@ describe("friends' online status (CHAT_PRESENCE=1)", () => {
         await Frames(Carl);
 
         assert.deepEqual(SendOrAcceptFriendRequest(C, A), { ok: true, Result: "requested" });
-        assert.deepEqual(await Frames(Alice), [], "a request alone pushes nothing");
+        // The request is on both lists at once, as a pending entry (no presence yet)
+        for(const [Me, Other, Direction] of [[Alice, Carl, "INBOUND"], [Carl, Alice, "OUTBOUND"]] as [WireClient, WireClient, string][]){
+            const Pending = await Frames(Me);
+            assert.equal(Pending.length, 1, JSON.stringify(Pending));
+            const Body = JSON.parse(Pending[0].Body!);
+            assert.equal(Body.type, FRIEND_MESSAGE_TYPE);
+            assert.deepEqual({ ...Body.payload, created: undefined }, { accountId: Other.Uid, status: "PENDING", direction: Direction, created: undefined });
+        }
 
         assert.deepEqual(SendOrAcceptFriendRequest(A, C), { ok: true, Result: "accepted" });
 
@@ -350,6 +358,32 @@ describe("friends' online status (CHAT_PRESENCE=1)", () => {
 
             assert.deepEqual([Seen_[1].Kind, Seen_[1].From, Seen_[1].Type], ["presence", Jid(Other), undefined], "then the new friend's presence");
         }
+    });
+
+    it("(e) a declined or withdrawn request leaves both lists at once (FriendRemoval)", async () => {
+        const Alice = await Online(A);
+        const Carl = await Online(C);
+        await Frames(Alice);
+        await Frames(Carl);
+        const Removal = async (Me: WireClient, Other: WireClient, Reason: string) => {
+            const Seen_ = await Frames(Me);
+            assert.equal(Seen_.length, 1, JSON.stringify(Seen_));
+            assert.deepEqual(JSON.parse(Seen_[0].Body!).payload, { accountId: Other.Uid, reason: Reason });
+        };
+
+        SendOrAcceptFriendRequest(C, A);
+        await Frames(Alice);
+        await Frames(Carl);
+        RemoveFriend(A, C); // Alice declines
+        await Removal(Alice, Carl, "REJECTED");
+        await Removal(Carl, Alice, "REJECTED");
+
+        SendOrAcceptFriendRequest(C, A);
+        await Frames(Alice);
+        await Frames(Carl);
+        RemoveFriend(C, A); // Carl withdraws it
+        await Removal(Alice, Carl, "ABORTED");
+        await Removal(Carl, Alice, "ABORTED");
     });
 
     it("(f) a change is relayed; the same presence again is not; a flood is held back and its latest goes out at the next tick", async () => {
