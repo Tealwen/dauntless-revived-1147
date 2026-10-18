@@ -10,11 +10,11 @@ const Offer = (tags: string[], items = 1, platinumPrice: number | null = 0): Sto
 
 describe("STORE_PRICING=platinum", () => {
     it("prices webstore offers by category, armour sets above single pieces", () => {
-        assert.equal(PlatinumPriceFor(Offer(["webstore", "skin_armour"], 4)), 1500);
-        assert.equal(PlatinumPriceFor(Offer(["webstore", "skin_armour"], 1)), 450);
-        assert.equal(PlatinumPriceFor(Offer(["webstore", "skin_weapon_cb"])), 800);
-        assert.equal(PlatinumPriceFor(Offer(["webstore", "social_emote", "personality_character"])), 300);
-        assert.equal(PlatinumPriceFor(Offer(["webstore"])), 300);
+        assert.equal(PlatinumPriceFor(Offer(["webstore", "skin_armour"], 4)), 300);
+        assert.equal(PlatinumPriceFor(Offer(["webstore", "skin_armour"], 1)), 90);
+        assert.equal(PlatinumPriceFor(Offer(["webstore", "skin_weapon_cb"])), 160);
+        assert.equal(PlatinumPriceFor(Offer(["webstore", "social_emote", "personality_character"])), 60);
+        assert.equal(PlatinumPriceFor(Offer(["webstore"])), 60);
     });
 
     it("keeps a catalogue price, and leaves supplies and other tags alone", () => {
