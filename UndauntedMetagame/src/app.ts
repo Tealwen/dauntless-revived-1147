@@ -17,6 +17,7 @@ import { trialsRouter } from "./routes/trials.js";
 import { matchmakingRouter } from "./routes/matchmaking.js";
 import { partyRouter } from "./routes/party.js";
 import { slayerLinksRouter } from "./routes/slayerlinks.js";
+import { slayerLinks1147Router } from "./routes/slayerlinks1147.js";
 import { progressionRouter } from "./routes/progression.js";
 import { loadoutRouter } from "./routes/loadout.js";
 import { undauntedApiRouter } from "./routes/undauntedapi.js";
@@ -86,6 +87,7 @@ app.use("/", tuningRouter);
 app.use("/", trialsRouter);
 app.use("/", matchmakingRouter);
 app.use("/", partyRouter);
+app.use("/", slayerLinks1147Router); // 1.14.7 Slayer Links: prize pool, rewards, 48 h invites (routes/slayerlinks1147.ts)
 app.use("/", slayerLinksRouter);
 app.use("/", progressionRouter);
 app.use("/", loadoutRouter);

@@ -485,6 +485,23 @@ export const slayerlinks = sqliteTable("slayerlinks", {
     index("slayerlinks_target").on(table.targetId)
 ]);
 
+// What a 1.14.7 link adds to its slayerlinks row (controllers/slayerlinks1147.ts, migration
+// 0030_slayer_links_1147): the prize pool both players share (JSON [{catalog_id, quantity,
+// received_for_level}], from the game server's PUT /slayerlink/links/rewards or drawn here), and for each
+// side when its rewards were handed to the game server (and which, JSON) and when it removed the link
+// from its slots. Times are epoch ms.
+export const slayerlinkstate1147 = sqliteTable("slayerlinkstate1147", {
+    linkId: text("linkId").notNull().primaryKey(),
+    prizePool: text("prizePool"),
+    poolSource: text("poolSource"),
+    senderClaimedAt: integer("senderClaimedAt"),
+    targetClaimedAt: integer("targetClaimedAt"),
+    senderRewards: text("senderRewards"),
+    targetRewards: text("targetRewards"),
+    senderRemovedAt: integer("senderRemovedAt"),
+    targetRemovedAt: integer("targetRemovedAt")
+});
+
 // One-time data jobs the metagame ran at startup (migrations may only add tables, so a build can be
 // rolled back); a job whose id is here is never run again
 export const onetimejobs = sqliteTable("onetimejobs", {

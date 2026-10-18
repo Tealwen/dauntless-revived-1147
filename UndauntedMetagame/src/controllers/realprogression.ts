@@ -43,6 +43,28 @@ export type SeedMode = "grandfather" | "fresh";
 const DEFAULT_CONFIRMED_DATE = "1970-01-01T00:00:00.000Z";
 const DEFAULT_GRANT_CAP = 5000;
 
+// Told of each track a grant added XP to, after it is stored (a retried grant adds none): the 1.14.7
+// Slayer Links charge on Hunt Pass XP (controllers/slayerlinks1147.ts)
+type GrantListener = (AccountId: string, ProgressionId: string, Amount: number) => void;
+const GrantListeners: GrantListener[] = [];
+
+export function AddProgressionGrantListener(Listener: GrantListener){
+    GrantListeners.push(Listener);
+}
+
+function TellGrantListeners(AccountId: string, Granted: [string, number][]){
+    for(const [ProgressionId, Amount] of Granted){
+        for(const Listener of GrantListeners){
+            try{
+                Listener(AccountId, ProgressionId, Amount);
+            }
+            catch(error){
+                logger.warn(`progression: a grant listener failed for ${ProgressionId} of ${AccountId}: ${(error as Error).message}`);
+            }
+        }
+    }
+}
+
 type TrackRow = typeof progresstracks.$inferSelect;
 type ObjectiveRow = typeof objectives.$inferSelect;
 
@@ -297,7 +319,8 @@ export function GrantProgression(AccountId: string, Body: unknown, Who: Caller):
     const Notes: string[] = [];
     const Parsed = ParseGrantBody(Body, Notes);
 
-    return GetDb().transaction((tx) => {
+    const Granted: [string, number][] = [];
+    const Result = GetDb().transaction((tx) => {
         if(!DoesAccountExist(tx, AccountId)){
             RecordProgressionEvent(tx, {AccountId, Caller: Who, Route, Body, Status: 404, Notes: [...Notes, "unknown account"]});
             logger.warn(`Refusing progression grant for unknown account ${AccountId}`);
@@ -339,6 +362,7 @@ export function GrantProgression(AccountId: string, Body: unknown, Who: Caller):
                 confirmedDate: Current?.confirmedDate ?? DEFAULT_CONFIRMED_DATE
             });
 
+            Granted.push([ProgressionId, Amount]);
             TrackReplies.push(ToTrackRecord(AccountId, ProgressionId, Written));
 
             const OldRank = EarnedFree(ProgressionId, OldProgress);
@@ -390,6 +414,10 @@ export function GrantProgression(AccountId: string, Body: unknown, Who: Caller):
 
         return {Status: 200, Body: Reply};
     });
+
+    TellGrantListeners(AccountId, Granted);
+
+    return Result;
 }
 
 // POST /progression/:uid/:track/:amount (game server; quest and tutorial rewards). No body.
@@ -398,7 +426,8 @@ export function GrantProgressionInTrack(AccountId: string, ProgressionId: string
     const Notes: string[] = [];
     const Amount = ParsePathInteger(AmountRaw, true);
 
-    return GetDb().transaction((tx) => {
+    const Granted: [string, number][] = [];
+    const Result = GetDb().transaction((tx) => {
         if(!DoesAccountExist(tx, AccountId)){
             RecordProgressionEvent(tx, {AccountId, Caller: Who, Route, Status: 404, Notes: [`track ${ProgressionId} amount ${AmountRaw}`, "unknown account"]});
             logger.warn(`Refusing progression grant for unknown account ${AccountId}`);
@@ -438,6 +467,8 @@ export function GrantProgressionInTrack(AccountId: string, ProgressionId: string
             confirmedDate: Current?.confirmedDate ?? DEFAULT_CONFIRMED_DATE
         });
 
+        Granted.push([ProgressionId, Clamped]);
+
         const Reply = {code: "OK", message: "OK", payload: ToTrackRecord(AccountId, ProgressionId, Written)};
 
         RecordProgressionEvent(tx, {AccountId, Caller: Who, Route, Status: 200, Reply, Notes: [`track ${ProgressionId} amount ${AmountRaw}`, ...Notes]});
@@ -446,6 +477,10 @@ export function GrantProgressionInTrack(AccountId: string, ProgressionId: string
 
         return {Status: 200, Body: Reply};
     });
+
+    TellGrantListeners(AccountId, Granted);
+
+    return Result;
 }
 
 // PROGRESSION_CONFIRM_ENTITLEMENTS=1 only: the permanent entitlements the config lists for the ranks a

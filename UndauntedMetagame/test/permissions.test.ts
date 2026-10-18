@@ -316,6 +316,17 @@ const EXPECTED_ROUTES = [
     "PUT /party/member/promote/:memberId [HasUndauntedMetagameAuth, PlayerTokenOnly]",
     "DELETE /party/leader/:leaderId [HasUndauntedMetagameAuth, PlayerTokenOnly]",
     "POST /party/status [HasUndauntedMetagameAuth, PlayerTokenOnly]",
+    // 1.14.7 Slayer Links (off unless TARGET_GAME_VERSION=1.14.7): the client's routes act as the token's
+    // account; the prize pool, rewards and removal also come from the game server (its key)
+    "GET /slayerlink/status_good [HasUndauntedMetagameAuth, PlayerTokenOnly]",
+    "GET /slayerlink/invites [HasUndauntedMetagameAuth, PlayerTokenOnly]",
+    "GET /slayerlink/links [HasUndauntedMetagameAuth, PlayerTokenOnly]",
+    "PUT /slayerlink/invite [HasUndauntedMetagameAuth, PlayerTokenOnly]",
+    "POST /slayerlink/invite [HasUndauntedMetagameAuth, PlayerTokenOnly]",
+    "POST /slayerlink/availability [HasUndauntedMetagameAuth, PlayerTokenOnly]",
+    "PUT /slayerlink/links/rewards [HasUndauntedMetagameAuth, PlayerOrGameServer]",
+    "GET /slayerlink/links/rewards/:accountId/:slot [HasUndauntedMetagameAuth, PlayerOrGameServer]",
+    "DELETE /slayerlink/links [HasUndauntedMetagameAuth, PlayerOrGameServer]",
     // Slayer Links: the token's own account acts; SLAYER_LINKS=0 puts the 404s back
     "GET /slayerlink/status_good [SlayerLinksOn, HasUndauntedMetagameAuth, PlayerTokenOnly]",
     "GET /slayerlink/invites [SlayerLinksOn, HasUndauntedMetagameAuth, PlayerTokenOnly]",
