@@ -24,7 +24,9 @@ import RewardTables from "../vendor/slayer_link_rewards_1147.json";
 //   Linked_Slayer_Slot_<slot> track when the linked partner is in the player's party. The client reads the
 //   link's level from that progression track (UArchonLinkedSlayers::UpdateSlotProgression, exe 0x1C8BEA0);
 //   nothing in the exe grants it, so the backend did. The tracks are in the progression config
-//   (vendor/progression-1147/Linked_Slayer_Slot_N.json): 4 levels.
+//   (vendor/progression-1147/Linked_Slayer_Slot_N.json): 4 levels. SLAYER_LINK_XP_DIVISOR (default 1) slows
+//   it: the track gets the XP divided by it, the remainder carried to the player's next grant (in memory: a
+//   restart drops less than one point per slot).
 // - Prize pool: the game server draws 12 prizes from linked_slayer_rewards when a slot is activated and
 //   sends them in PUT /slayerlink/links/rewards; each has received_for_level 1..4 (the level that wins it)
 //   or -1 (shown, not won). The first pool a link gets is kept and both players share it. A link with no
@@ -252,13 +254,28 @@ function LevelCount(){
     return Math.max(0, (GetProgressionPath(TrackIdFor(1))?.requirements?.length ?? 1) - 1);
 }
 
+// Hunt Pass XP per link point (SLAYER_LINK_XP_DIVISOR, a positive whole number; default 1)
+export function GetLinkXpDivisor(){
+    const Divisor = Number(process.env.SLAYER_LINK_XP_DIVISOR);
+
+    return Number.isInteger(Divisor) && Divisor > 0 ? Divisor : 1;
+}
+
+// The XP below one point of each (account, slot), kept for the next grant
+const Carried = new Map<string, number>();
+
+// Tests only
+export function ClearSlayerLinkCarryForTests(){
+    Carried.clear();
+}
+
 function IsHuntPassTrack(ProgressionId: string){
     return ProgressionId === GetActiveHuntPass() || /^season\d+[a-z]?$/.test(ProgressionId) || ProgressionId.startsWith("eventpass_");
 }
 
-// After the game server granted a player Hunt Pass XP (routes/progression.ts): the same amount on the
+// After the game server granted a player Hunt Pass XP (routes/progression.ts): that amount (divided by GetLinkXpDivisor) on the
 // track of each running link whose partner is in the player's party. Returns what it added, for the tests.
-export function AddLinkProgressForHuntPassXp(AccountId: string, ProgressionId: string, AmountRaw: unknown): { Slot: number, Partner: string, Progress: number }[] {
+export function AddLinkProgressForHuntPassXp(AccountId: string, ProgressionId: string, AmountRaw: unknown): { Slot: number, Partner: string, Progress: number, Added: number }[] {
     const Amount = typeof AmountRaw === "number" ? AmountRaw : typeof AmountRaw === "string" && /^\d{1,10}$/.test(AmountRaw) ? Number(AmountRaw) : NaN;
 
     if(!IsHuntPassTrack(ProgressionId) || !Number.isSafeInteger(Amount) || Amount <= 0){
@@ -271,10 +288,11 @@ export function AddLinkProgressForHuntPassXp(AccountId: string, ProgressionId: s
         return [];
     }
 
-    const Added = Math.min(Amount, GetGrantCap());
+    const Granted = Math.min(Amount, GetGrantCap());
+    const Divisor = GetLinkXpDivisor();
     const Now = Clock();
     const Done = GetDb().transaction((tx) => {
-        const Out: { Slot: number, Partner: string, Progress: number }[] = [];
+        const Out: { Slot: number, Partner: string, Progress: number, Added: number }[] = [];
 
         for(const Each of LinksOf(tx, AccountId, Now)){
             const Partner = OtherOf(Each.Link, AccountId);
@@ -284,17 +302,26 @@ export function AddLinkProgressForHuntPassXp(AccountId: string, ProgressionId: s
             }
 
             const Slot = SlotFor(Each.Link, AccountId);
+            const Key = `${Each.Link.linkId}:${AccountId}`;
+            const Pending = (Carried.get(Key) ?? 0) + Granted;
+            const Added = Math.floor(Pending / Divisor);
+
+            Carried.set(Key, Pending % Divisor);
+            if(Added === 0){
+                continue;
+            }
+
             const Progress = Math.min(TrackProgress(tx, AccountId, Slot) + Added, INT32_MAX);
 
             SetTrackProgress(tx, AccountId, Slot, Progress);
-            Out.push({ Slot, Partner, Progress });
+            Out.push({ Slot, Partner, Progress, Added });
         }
 
         return Out;
     });
 
     for(const Each of Done){
-        logger.info(`slayerlink: ${AccountId} earned ${Added} Hunt Pass XP with ${Each.Partner}: ${TrackIdFor(Each.Slot)} -> ${Each.Progress} (level ${GetDb().transaction((tx) => LevelOf(tx, AccountId, Each.Slot))})`);
+        logger.info(`slayerlink: ${AccountId} earned ${Granted} Hunt Pass XP with ${Each.Partner}${Divisor > 1 ? ` (+${Each.Added} link point(s), divisor ${Divisor})` : ""}: ${TrackIdFor(Each.Slot)} -> ${Each.Progress} (level ${GetDb().transaction((tx) => LevelOf(tx, AccountId, Each.Slot))})`);
         Notify(AccountId, "progress", { account_id: Each.Partner, slot: Each.Slot, progress: Each.Progress });
     }
 

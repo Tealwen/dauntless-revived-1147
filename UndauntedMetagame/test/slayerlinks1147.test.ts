@@ -9,7 +9,7 @@ import { GetDb } from "../src/db";
 import { users } from "../src/db/schema";
 import { AcceptPartyInvite, InviteToParty, LeaveParty, PollParty } from "../src/controllers/party";
 import {
-    CLAIM_GRACE_MS, DrawPrizePool, INVITE_EXPIRY_HOURS, LINK_DURATION_HOURS, POOL_WAIT_MS, SetSlayerLink1147ClockForTests, SetSlayerLink1147RandomForTests
+    CLAIM_GRACE_MS, ClearSlayerLinkCarryForTests, DrawPrizePool, INVITE_EXPIRY_HOURS, LINK_DURATION_HOURS, POOL_WAIT_MS, SetSlayerLink1147ClockForTests, SetSlayerLink1147RandomForTests
 } from "../src/controllers/slayerlinks1147";
 
 // Slayer Links with the 1.14.7 client (routes/slayerlinks1147.ts): the client's invites and polls, the game
@@ -33,6 +33,7 @@ after(async () => {
 afterEach(() => {
     SetSlayerLink1147ClockForTests();
     SetSlayerLink1147RandomForTests();
+    ClearSlayerLinkCarryForTests();
 });
 
 const With1147 = <T>(Body: () => Promise<T>) => WithEnv({
@@ -176,6 +177,22 @@ describe("Slayer Links (1.14.7)", () => {
 
         LeaveParty(B);
     }));
+
+    it("SLAYER_LINK_XP_DIVISOR slows the link and carries the remainder to the next grant", () => WithEnv({ SLAYER_LINK_XP_DIVISOR: "7" }, () => With1147(async () => {
+        const A = Player("Max"), B = Player("Ned");
+        await Linked(A, B, 1, 1);
+        await Party(A, B);
+
+        await HuntPassXp(A, 5);
+        assert.equal((await LinkTrack(A, 1)).progress, 0, "5 XP: under one point");
+        await HuntPassXp(A, 25);
+        assert.equal((await LinkTrack(A, 1)).progress, 4, "30 XP: 4 points, 2 carried");
+        await HuntPassXp(A, 12);
+        assert.equal((await LinkTrack(A, 1)).progress, 6, "42 XP: 6 points");
+        assert.equal((await LinkTrack(B, 1)).progress, 0, "the partner's own track is apart");
+
+        LeaveParty(B);
+    })));
 
     it("after the week the game server gets the prizes of the level reached, once; the slot frees", () => With1147(async () => {
         const A = Player("Kim"), B = Player("Lee");
