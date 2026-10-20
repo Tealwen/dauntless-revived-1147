@@ -122,7 +122,7 @@ against one bucket. `burst` is the bucket size and `per minute` is the refill ra
 
 | Bucket | Requests | burst, per minute | Why |
 |---|---|---|---|
-| general | everything not below | 300, 180 | at least 4 times every measured peak: 300 in 1 s (vs 120), 330 in 10 s (vs 212), 480 in 60 s (vs 392), 2,100 in 10 min (vs 1,424). That leaves room for a few players behind one home connection |
+| general | everything not below | 1500, 1200 | 1.14.7: one player is about 190 a minute (the client polls the party and the Slayer Links every 3 s), so 300, 180 (4 times the 1.4.4 peaks) refused requests even for one player and about 800 a minute for three behind one home address, hunt requests among them (18 October 2026). 1500, 1200 fits about six players per address. A reinstall keeps `GATEWAY_RATE_*`. |
 | content | `/content/*` | 600, 600 | a whole 410-file download without waiting |
 | register | `POST /undaunted/api/Register` | 5, 0.2 (one per 5 min) | 4 times the observed rate; typos and taken names included |
 | token | `POST /account/api/oauth/token` | 10, 1 | 8 in 60 s and 16 in 10 min are 4 times the observed peaks |
