@@ -69,6 +69,7 @@ type LogEntry = Omit<typeof inventorylog.$inferInsert, "time" | "userId" | "char
 const DAILY_CHALLENGE_DRAFT_TOKEN = "TOKEN_DAILY_CHALLENGE_DRAFT";
 const BOUNTY_DRAFT_TOKEN = "TOKEN_BOUNTY_DRAFT";
 const PATROL_BONUS_TOKEN = "TOKEN_DAILY_PATROL_BONUS";
+const PATROL_BONUS_PURCHASED_TOKEN = "TOKEN_DAILY_PATROL_BONUS_PURCHASED";
 
 function MakeEmptyInventoryRow(CharacterId: string): typeof inventory.$inferInsert {
     return {
@@ -887,11 +888,13 @@ export async function GetInventoryForUserIdAndCharacterId(UserId: string, Charac
             // already at or above it is left as it is (bought or saved keys are never taken away).
             // - Bounty board tokens: 1.14.7 never grants TOKEN_BOUNTY_DRAFT (retail got them from the Hunt Pass),
             //   so the board could never draft.
-            // - Patrol keys (TOKEN_DAILY_PATROL_BONUS, the map's free patrol boosts; the bought ones are
-            //   TOKEN_DAILY_PATROL_BONUS_PURCHASED, untouched): the 1.14.7 game server never sends the 1.4.4
-            //   PERIODIC_REWARD top-up, so spent keys never came back.
+            // - Patrol keys (TOKEN_DAILY_PATROL_BONUS, the map's free patrol boosts): the 1.14.7 game server never
+            //   sends the 1.4.4 PERIODIC_REWARD top-up, so spent keys never came back.
+            // - Patrol keys the game actually spends (TOKEN_DAILY_PATROL_BONUS_PURCHASED): a patrol chest takes one
+            //   of these, never the free one (inventorylog: only "patrol_chest" removes of _PURCHASED, the free
+            //   stack stays full), and the client counts them. They are refilled too, so a player has 10 a day.
             const ResetDay = new Date(Date.now() - 17 * 3600 * 1000).toISOString().slice(0, 10);
-            for(const [CatalogId, Amount, JobPrefix] of [[BOUNTY_DRAFT_TOKEN, BOUNTY_TOKENS_DAILY, "bounty_tokens"], [PATROL_BONUS_TOKEN, PATROL_BONUS_DAILY, "patrol_keys"]] as const){
+            for(const [CatalogId, Amount, JobPrefix] of [[BOUNTY_DRAFT_TOKEN, BOUNTY_TOKENS_DAILY, "bounty_tokens"], [PATROL_BONUS_TOKEN, PATROL_BONUS_DAILY, "patrol_keys"], [PATROL_BONUS_PURCHASED_TOKEN, PATROL_BONUS_DAILY, "patrol_keys_spent"]] as const){
                 const JobId = `${JobPrefix}_${CharacterId}_${ResetDay}`;
                 if(await GetDb().query.onetimejobs.findFirst({where: eq(onetimejobs.jobId, JobId)}) != undefined) continue;
                 const Stack = StackedItems.find((Item: any) => Item?.catalogId === CatalogId);
