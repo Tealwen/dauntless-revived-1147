@@ -12,6 +12,7 @@ import { MakePlayer, StackQuantity } from "./helpers";
 after(() => RemoveTestDb(() => GetDb().$client.close()));
 
 const KEY = "TOKEN_DAILY_PATROL_BONUS";
+const SPENT = "TOKEN_DAILY_PATROL_BONUS_PURCHASED";
 
 function SetStacks(CharacterId: string, Stacks: Record<string, number>){
     const Value = JSON.stringify(Object.entries(Stacks).map(([catalogId, quantity]) => ({ catalogId, quantity })));
@@ -21,7 +22,10 @@ function SetStacks(CharacterId: string, Stacks: Record<string, number>){
 
 // The next daily reset: today's refill job forgotten
 function NextDay(CharacterId: string){
-    GetDb().delete(onetimejobs).where(eq(onetimejobs.jobId, `patrol_keys_${CharacterId}_${new Date(Date.now() - 17 * 3600 * 1000).toISOString().slice(0, 10)}`)).run();
+    const Day = new Date(Date.now() - 17 * 3600 * 1000).toISOString().slice(0, 10);
+    for(const Prefix of ["patrol_keys", "patrol_keys_spent"]){
+        GetDb().delete(onetimejobs).where(eq(onetimejobs.jobId, `${Prefix}_${CharacterId}_${Day}`)).run();
+    }
 }
 
 // controllers/inventory.ts on 1.14.7: patrol keys come back to 10 at each daily reset, never past 10
@@ -47,10 +51,24 @@ describe("1.14.7 daily patrol keys", () => {
 
     it("a player holding more than 10 keeps them all and gets none", async () => {
         const { UserId, CharacterId } = await MakePlayer();
-        SetStacks(CharacterId, { [KEY]: 14, TOKEN_DAILY_PATROL_BONUS_PURCHASED: 2 });
+        SetStacks(CharacterId, { [KEY]: 14, [SPENT]: 13 });
         await GetInventoryForUserIdAndCharacterId(UserId, CharacterId);
         assert.equal(StackQuantity(CharacterId, KEY), 14);
-        assert.equal(StackQuantity(CharacterId, "TOKEN_DAILY_PATROL_BONUS_PURCHASED"), 2);
+        assert.equal(StackQuantity(CharacterId, SPENT), 13);
+    });
+
+    it("the keys a patrol chest spends (_PURCHASED) come back to 10 at the next reset too", async () => {
+        const { UserId, CharacterId } = await MakePlayer();
+        await GetInventoryForUserIdAndCharacterId(UserId, CharacterId);
+        assert.equal(StackQuantity(CharacterId, SPENT), 10, "a new character");
+        SetStacks(CharacterId, { [KEY]: 10, [SPENT]: 4 });
+
+        await GetInventoryForUserIdAndCharacterId(UserId, CharacterId);
+        assert.equal(StackQuantity(CharacterId, SPENT), 4, "same day: no second refill");
+
+        NextDay(CharacterId);
+        await GetInventoryForUserIdAndCharacterId(UserId, CharacterId);
+        assert.equal(StackQuantity(CharacterId, SPENT), 10);
     });
 });
 
