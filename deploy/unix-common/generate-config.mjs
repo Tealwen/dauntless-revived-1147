@@ -146,6 +146,7 @@ const metagame = {
     STORE_PRICING: oldMeta.STORE_PRICING || "platinum",
     // Hunt loot Rams multiplier (controllers/inventory.ts, 1 to 5, default 1.5)
     ...(oldMeta.RAMS_LOOT_MULTIPLIER ? { RAMS_LOOT_MULTIPLIER: oldMeta.RAMS_LOOT_MULTIPLIER } : {}),
+    ...(oldMeta.STORE_LANGUAGE ? { STORE_LANGUAGE: oldMeta.STORE_LANGUAGE } : {}),
     ...(oldMeta.CHALLENGE_SEASON_START ? { CHALLENGE_SEASON_START: oldMeta.CHALLENGE_SEASON_START } : {}),
     // Seasonal events kept running (routes/tuning.ts), e.g. EVENT_DARKHARVEST,DarkHarvest for Halloween
     ...(oldMeta.SEASONAL_EVENTS ? { SEASONAL_EVENTS: oldMeta.SEASONAL_EVENTS } : {}),
