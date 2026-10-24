@@ -15539,6 +15539,1344 @@
           "EventID": "None",
           "PlayerJourneyMapNodes": []
         }
+      },
+      "CR19_PlayerHunt_Escalation_Glitter_Easy": {
+        "HuntName": {
+          "CultureInvariantString": "Radiant Escalation {MinEscalationLevel}-{MaxEscalationLevel}"
+        },
+        "HuntDescription": {
+          "text": "Escalation Unused Description"
+        },
+        "Region": {
+          "DataTable": {
+            "ObjectName": "DataTable'hunt_regions'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/hunt_regions.0"
+          },
+          "RowName": "ZONE_ESCALATION_RADIANT"
+        },
+        "MatchmakerHuntIDs": [
+          {
+            "DataTable": {
+              "ObjectName": "DataTable'matchmaker_hunts_table'",
+              "ObjectPath": "Archon/Content/Gameplay/hunts/matchmaker_hunts_table.0"
+            },
+            "RowName": "CR19_MatchmakerHunt_Escalation_Glitter_Easy"
+          }
+        ],
+        "MatchmakingType": "EMatchmakingType::Reserved",
+        "MatchmakingGameType": "EMatchmakingGameType::Escalation",
+        "MatchmakerHuntsByTag": [],
+        "HuntTags": [
+          "Hunt.Escalation.Radiant.Easy"
+        ],
+        "EscalationModeSpecification": {
+          "DataTable": {
+            "ObjectName": "DataTable'escalation_mode_specs'",
+            "ObjectPath": "Archon/Content/Gameplay/escalation_mode_specs.0"
+          },
+          "RowName": "Glitter_Easy"
+        },
+        "EscalationPatrolInitialChallengeLevel": 0,
+        "EscalationPatrolMaxChallengeLevel": 0,
+        "RecommendedEscalationLevel": 0,
+        "bHasPortals": false,
+        "bHasGlitterEvent": false,
+        "bHasPhaelanxEvent": false,
+        "HuntSuccessReward": "None",
+        "HuntSuccessConditionalRewards": [],
+        "FirstCompletionSuccessReward": "None",
+        "TargetedHuntSuccessReward": "None",
+        "HuntSuccessProgress": [],
+        "FirstCompletionSuccessProgress": [],
+        "ConditionalBoostedRewards": [],
+        "UI_RewardLimitedByItems": [],
+        "UI_RewardLimitItemCooldownName": "",
+        "HuntFailureReward": "None",
+        "TargetedHuntFailureReward": "None",
+        "HuntFailureProgress": [],
+        "MinWeaponSkillLevel": 5,
+        "RecomendedWeaponSkillLevel": 10,
+        "HuntDangerModerate": 0,
+        "HuntDangerHigh": 0,
+        "HuntDangerExtreme": 0,
+        "HuntDifficulty": 0,
+        "HuntComplexity": 0,
+        "IsVisibleWhileLocked": false,
+        "Unlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AnyRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": {
+            "ObjectName": "DataTable'escalation_season_6_radiant_bpff_C'",
+            "ObjectPath": "Archon/Content/gamemodes/escalation/escalation_season_6_radiant_bpff.0"
+          },
+          "EventID": "None",
+          "PlayerJourneyMapNodes": [
+            {
+              "DataTable": {
+                "ObjectName": "DataTable'player_journey_table'",
+                "ObjectPath": "Archon/Content/Gameplay/PlayerJourney/player_journey_table.0"
+              },
+              "RowName": "Escalation.Easy.Radiant"
+            }
+          ]
+        },
+        "AltUnlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": []
+        }
+      },
+      "CR19_PlayerHunt_Escalation_Glitter_Hard": {
+        "HuntName": {
+          "CultureInvariantString": "Radiant Escalation {MinEscalationLevel}-{MaxEscalationLevel}"
+        },
+        "HuntDescription": {
+          "text": "Escalation Unused Description"
+        },
+        "Region": {
+          "DataTable": {
+            "ObjectName": "DataTable'hunt_regions'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/hunt_regions.0"
+          },
+          "RowName": "ZONE_ESCALATION_RADIANT"
+        },
+        "MatchmakerHuntIDs": [
+          {
+            "DataTable": {
+              "ObjectName": "DataTable'matchmaker_hunts_table'",
+              "ObjectPath": "Archon/Content/Gameplay/hunts/matchmaker_hunts_table.0"
+            },
+            "RowName": "CR19_MatchmakerHunt_Escalation_Glitter_Hard"
+          }
+        ],
+        "MatchmakingType": "EMatchmakingType::Reserved",
+        "MatchmakingGameType": "EMatchmakingGameType::Escalation",
+        "MatchmakerHuntsByTag": [],
+        "HuntTags": [
+          "Hunt.Escalation.Radiant.Hard"
+        ],
+        "EscalationModeSpecification": {
+          "DataTable": {
+            "ObjectName": "DataTable'escalation_mode_specs'",
+            "ObjectPath": "Archon/Content/Gameplay/escalation_mode_specs.0"
+          },
+          "RowName": "Glitter_Hard"
+        },
+        "EscalationPatrolInitialChallengeLevel": 0,
+        "EscalationPatrolMaxChallengeLevel": 0,
+        "RecommendedEscalationLevel": 0,
+        "bHasPortals": false,
+        "bHasGlitterEvent": false,
+        "bHasPhaelanxEvent": false,
+        "HuntSuccessReward": "None",
+        "HuntSuccessConditionalRewards": [],
+        "FirstCompletionSuccessReward": "None",
+        "TargetedHuntSuccessReward": "None",
+        "HuntSuccessProgress": [],
+        "FirstCompletionSuccessProgress": [],
+        "ConditionalBoostedRewards": [],
+        "UI_RewardLimitedByItems": [],
+        "UI_RewardLimitItemCooldownName": "",
+        "HuntFailureReward": "None",
+        "TargetedHuntFailureReward": "None",
+        "HuntFailureProgress": [],
+        "MinWeaponSkillLevel": 14,
+        "RecomendedWeaponSkillLevel": 18,
+        "HuntDangerModerate": 0,
+        "HuntDangerHigh": 0,
+        "HuntDangerExtreme": 0,
+        "HuntDifficulty": 0,
+        "HuntComplexity": 0,
+        "IsVisibleWhileLocked": false,
+        "Unlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AnyRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": {
+            "ObjectName": "DataTable'escalation_season_6_radiant_bpff_C'",
+            "ObjectPath": "Archon/Content/gamemodes/escalation/escalation_season_6_radiant_bpff.0"
+          },
+          "EventID": "None",
+          "PlayerJourneyMapNodes": [
+            {
+              "DataTable": {
+                "ObjectName": "DataTable'player_journey_table'",
+                "ObjectPath": "Archon/Content/Gameplay/PlayerJourney/player_journey_table.0"
+              },
+              "RowName": "Escalation.Hard.Radiant"
+            }
+          ]
+        },
+        "AltUnlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": []
+        }
+      },
+      "CR19_PlayerHunt_Escalation_Glitter_Heroic": {
+        "HuntName": {
+          "CultureInvariantString": "Radiant Escalation {MinEscalationLevel}-{MaxEscalationLevel}"
+        },
+        "HuntDescription": {
+          "text": "Escalation Unused Description"
+        },
+        "Region": {
+          "DataTable": {
+            "ObjectName": "DataTable'hunt_regions'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/hunt_regions.0"
+          },
+          "RowName": "ZONE_ESCALATION_RADIANT"
+        },
+        "MatchmakerHuntIDs": [
+          {
+            "DataTable": {
+              "ObjectName": "DataTable'matchmaker_hunts_table'",
+              "ObjectPath": "Archon/Content/Gameplay/hunts/matchmaker_hunts_table.0"
+            },
+            "RowName": "CR19_MatchmakerHunt_Escalation_Glitter_heroic"
+          }
+        ],
+        "MatchmakingType": "EMatchmakingType::Reserved",
+        "MatchmakingGameType": "EMatchmakingGameType::Escalation",
+        "MatchmakerHuntsByTag": [],
+        "HuntTags": [
+          "Hunt.Escalation.Heroic.Radiant"
+        ],
+        "EscalationModeSpecification": {
+          "DataTable": {
+            "ObjectName": "DataTable'escalation_mode_specs'",
+            "ObjectPath": "Archon/Content/Gameplay/escalation_mode_specs.0"
+          },
+          "RowName": "Glitter_Heroic"
+        },
+        "EscalationPatrolInitialChallengeLevel": 0,
+        "EscalationPatrolMaxChallengeLevel": 0,
+        "RecommendedEscalationLevel": 20,
+        "bHasPortals": false,
+        "bHasGlitterEvent": false,
+        "bHasPhaelanxEvent": false,
+        "HuntSuccessReward": "None",
+        "HuntSuccessConditionalRewards": [],
+        "FirstCompletionSuccessReward": "None",
+        "TargetedHuntSuccessReward": "None",
+        "HuntSuccessProgress": [],
+        "FirstCompletionSuccessProgress": [],
+        "ConditionalBoostedRewards": [],
+        "UI_RewardLimitedByItems": [],
+        "UI_RewardLimitItemCooldownName": "",
+        "HuntFailureReward": "None",
+        "TargetedHuntFailureReward": "None",
+        "HuntFailureProgress": [],
+        "MinWeaponSkillLevel": 18,
+        "RecomendedWeaponSkillLevel": 20,
+        "HuntDangerModerate": 0,
+        "HuntDangerHigh": 0,
+        "HuntDangerExtreme": 0,
+        "HuntDifficulty": 0,
+        "HuntComplexity": 0,
+        "IsVisibleWhileLocked": false,
+        "Unlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": {
+            "ObjectName": "DataTable'escalation_season_6_radiant_bpff_C'",
+            "ObjectPath": "Archon/Content/gamemodes/escalation/escalation_season_6_radiant_bpff.0"
+          },
+          "EventID": "None",
+          "PlayerJourneyMapNodes": [
+            {
+              "DataTable": {
+                "ObjectName": "DataTable'player_journey_table'",
+                "ObjectPath": "Archon/Content/Gameplay/PlayerJourney/player_journey_table.0"
+              },
+              "RowName": "Escalation_Heroic_Unlock"
+            }
+          ]
+        },
+        "AltUnlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": []
+        }
+      },
+      "CR19_PlayerHunt_Escalation_Patrol_Easy": {
+        "HuntName": {
+          "table": "UI",
+          "key": "Escalation.Patrol.Title"
+        },
+        "HuntDescription": {
+          "table": "UI",
+          "key": "Escalation.Patrol.Description"
+        },
+        "Region": {
+          "DataTable": {
+            "ObjectName": "DataTable'hunt_regions'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/hunt_regions.0"
+          },
+          "RowName": "ZONE_ESCALATION"
+        },
+        "MatchmakerHuntIDs": [
+          {
+            "DataTable": {
+              "ObjectName": "DataTable'matchmaker_hunts_table'",
+              "ObjectPath": "Archon/Content/Gameplay/hunts/matchmaker_hunts_table.0"
+            },
+            "RowName": "CR19_MatchmakerHunt_Escalation_Thunderbird_Easy"
+          },
+          {
+            "DataTable": {
+              "ObjectName": "DataTable'matchmaker_hunts_table'",
+              "ObjectPath": "Archon/Content/Gameplay/hunts/matchmaker_hunts_table.0"
+            },
+            "RowName": "CR19_MatchmakerHunt_Escalation_Armstrong_Easy"
+          },
+          {
+            "DataTable": {
+              "ObjectName": "DataTable'matchmaker_hunts_table'",
+              "ObjectPath": "Archon/Content/Gameplay/hunts/matchmaker_hunts_table.0"
+            },
+            "RowName": "CR19_MatchmakerHunt_Escalation_Funguy_Easy"
+          },
+          {
+            "DataTable": {
+              "ObjectName": "DataTable'matchmaker_hunts_table'",
+              "ObjectPath": "Archon/Content/Gameplay/hunts/matchmaker_hunts_table.0"
+            },
+            "RowName": "CR19_MatchmakerHunt_Escalation_Randall_Easy"
+          },
+          {
+            "DataTable": {
+              "ObjectName": "DataTable'matchmaker_hunts_table'",
+              "ObjectPath": "Archon/Content/Gameplay/hunts/matchmaker_hunts_table.0"
+            },
+            "RowName": "CR19_MatchmakerHunt_Escalation_Mint_Easy"
+          },
+          {
+            "DataTable": {
+              "ObjectName": "DataTable'matchmaker_hunts_table'",
+              "ObjectPath": "Archon/Content/Gameplay/hunts/matchmaker_hunts_table.0"
+            },
+            "RowName": "CR19_MatchmakerHunt_Escalation_Glitter_Easy"
+          }
+        ],
+        "MatchmakingType": "EMatchmakingType::Reserved",
+        "MatchmakingGameType": "EMatchmakingGameType::Escalation",
+        "MatchmakerHuntsByTag": [],
+        "HuntTags": [
+          "Hunt.Escalation.Patrol.Easy.Blaze",
+          "Hunt.Escalation.Patrol.Easy.Frost",
+          "Hunt.Escalation.Patrol.Easy.Radiant",
+          "Hunt.Escalation.Patrol.Easy.Shock",
+          "Hunt.Escalation.Patrol.Easy.Terra",
+          "Hunt.Escalation.Patrol.Easy.Umbral"
+        ],
+        "EscalationModeSpecification": {
+          "DataTable": {
+            "ObjectName": "DataTable'escalation_mode_specs'",
+            "ObjectPath": "Archon/Content/Gameplay/escalation_mode_specs.0"
+          },
+          "RowName": "None"
+        },
+        "EscalationPatrolInitialChallengeLevel": 1,
+        "EscalationPatrolMaxChallengeLevel": 13,
+        "RecommendedEscalationLevel": 0,
+        "bHasPortals": false,
+        "bHasGlitterEvent": false,
+        "bHasPhaelanxEvent": false,
+        "HuntSuccessReward": "None",
+        "HuntSuccessConditionalRewards": [],
+        "FirstCompletionSuccessReward": "None",
+        "TargetedHuntSuccessReward": "None",
+        "HuntSuccessProgress": [],
+        "FirstCompletionSuccessProgress": [],
+        "ConditionalBoostedRewards": [],
+        "UI_RewardLimitedByItems": [],
+        "UI_RewardLimitItemCooldownName": "",
+        "HuntFailureReward": "None",
+        "TargetedHuntFailureReward": "None",
+        "HuntFailureProgress": [],
+        "MinWeaponSkillLevel": 5,
+        "RecomendedWeaponSkillLevel": 10,
+        "HuntDangerModerate": 0,
+        "HuntDangerHigh": 0,
+        "HuntDangerExtreme": 0,
+        "HuntDifficulty": 0,
+        "HuntComplexity": 0,
+        "IsVisibleWhileLocked": false,
+        "Unlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": {
+            "ObjectName": "Class'EscalationPatrolsFeature'",
+            "ObjectPath": "/Script/Archon"
+          },
+          "EventID": "None",
+          "PlayerJourneyMapNodes": [
+            {
+              "DataTable": {
+                "ObjectName": "DataTable'player_journey_table'",
+                "ObjectPath": "Archon/Content/Gameplay/PlayerJourney/player_journey_table.0"
+              },
+              "RowName": "Escalation.Easy.Unlock"
+            }
+          ]
+        },
+        "AltUnlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": []
+        }
+      },
+      "CR19_PlayerHunt_Escalation_Patrol_Hard": {
+        "HuntName": {
+          "table": "UI",
+          "key": "Escalation.Patrol.Title"
+        },
+        "HuntDescription": {
+          "table": "UI",
+          "key": "Escalation.Patrol.Description"
+        },
+        "Region": {
+          "DataTable": {
+            "ObjectName": "DataTable'hunt_regions'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/hunt_regions.0"
+          },
+          "RowName": "ZONE_ESCALATION"
+        },
+        "MatchmakerHuntIDs": [
+          {
+            "DataTable": {
+              "ObjectName": "DataTable'matchmaker_hunts_table'",
+              "ObjectPath": "Archon/Content/Gameplay/hunts/matchmaker_hunts_table.0"
+            },
+            "RowName": "CR19_MatchmakerHunt_Escalation_Thunderbird_Hard"
+          },
+          {
+            "DataTable": {
+              "ObjectName": "DataTable'matchmaker_hunts_table'",
+              "ObjectPath": "Archon/Content/Gameplay/hunts/matchmaker_hunts_table.0"
+            },
+            "RowName": "CR19_MatchmakerHunt_Escalation_Armstrong_Hard"
+          },
+          {
+            "DataTable": {
+              "ObjectName": "DataTable'matchmaker_hunts_table'",
+              "ObjectPath": "Archon/Content/Gameplay/hunts/matchmaker_hunts_table.0"
+            },
+            "RowName": "CR19_MatchmakerHunt_Escalation_Funguy_Hard"
+          },
+          {
+            "DataTable": {
+              "ObjectName": "DataTable'matchmaker_hunts_table'",
+              "ObjectPath": "Archon/Content/Gameplay/hunts/matchmaker_hunts_table.0"
+            },
+            "RowName": "CR19_MatchmakerHunt_Escalation_Randall_Hard"
+          },
+          {
+            "DataTable": {
+              "ObjectName": "DataTable'matchmaker_hunts_table'",
+              "ObjectPath": "Archon/Content/Gameplay/hunts/matchmaker_hunts_table.0"
+            },
+            "RowName": "CR19_MatchmakerHunt_Escalation_Mint_Hard"
+          },
+          {
+            "DataTable": {
+              "ObjectName": "DataTable'matchmaker_hunts_table'",
+              "ObjectPath": "Archon/Content/Gameplay/hunts/matchmaker_hunts_table.0"
+            },
+            "RowName": "CR19_MatchmakerHunt_Escalation_Glitter_Hard"
+          }
+        ],
+        "MatchmakingType": "EMatchmakingType::Reserved",
+        "MatchmakingGameType": "EMatchmakingGameType::Escalation",
+        "MatchmakerHuntsByTag": [],
+        "HuntTags": [
+          "Hunt.Escalation.Patrol.Hard.Blaze",
+          "Hunt.Escalation.Patrol.Hard.Frost",
+          "Hunt.Escalation.Patrol.Hard.Terra",
+          "Hunt.Escalation.Patrol.Hard.Umbral",
+          "Hunt.Escalation.Patrol.Hard.Shock",
+          "Hunt.Escalation.Patrol.Hard.Radiant"
+        ],
+        "EscalationModeSpecification": {
+          "DataTable": {
+            "ObjectName": "DataTable'escalation_mode_specs'",
+            "ObjectPath": "Archon/Content/Gameplay/escalation_mode_specs.0"
+          },
+          "RowName": "None"
+        },
+        "EscalationPatrolInitialChallengeLevel": 10,
+        "EscalationPatrolMaxChallengeLevel": 50,
+        "RecommendedEscalationLevel": 0,
+        "bHasPortals": false,
+        "bHasGlitterEvent": false,
+        "bHasPhaelanxEvent": false,
+        "HuntSuccessReward": "None",
+        "HuntSuccessConditionalRewards": [],
+        "FirstCompletionSuccessReward": "None",
+        "TargetedHuntSuccessReward": "None",
+        "HuntSuccessProgress": [],
+        "FirstCompletionSuccessProgress": [],
+        "ConditionalBoostedRewards": [],
+        "UI_RewardLimitedByItems": [],
+        "UI_RewardLimitItemCooldownName": "",
+        "HuntFailureReward": "None",
+        "TargetedHuntFailureReward": "None",
+        "HuntFailureProgress": [],
+        "MinWeaponSkillLevel": 14,
+        "RecomendedWeaponSkillLevel": 18,
+        "HuntDangerModerate": 0,
+        "HuntDangerHigh": 0,
+        "HuntDangerExtreme": 0,
+        "HuntDifficulty": 0,
+        "HuntComplexity": 0,
+        "IsVisibleWhileLocked": false,
+        "Unlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": {
+            "ObjectName": "Class'EscalationPatrolsFeature'",
+            "ObjectPath": "/Script/Archon"
+          },
+          "EventID": "None",
+          "PlayerJourneyMapNodes": [
+            {
+              "DataTable": {
+                "ObjectName": "DataTable'player_journey_table'",
+                "ObjectPath": "Archon/Content/Gameplay/PlayerJourney/player_journey_table.0"
+              },
+              "RowName": "Escalation.Hard.Unlock"
+            }
+          ]
+        },
+        "AltUnlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": []
+        }
+      },
+      "CR19_PlayerHunt_Gauntlet": {
+        "HuntName": {
+          "CultureInvariantString": "Gauntlet"
+        },
+        "HuntDescription": {
+          "text": "Gauntlet Unused Description"
+        },
+        "Region": {
+          "DataTable": {
+            "ObjectName": "DataTable'hunt_regions'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/hunt_regions.0"
+          },
+          "RowName": "ZONE_GAUNTLET"
+        },
+        "MatchmakerHuntIDs": [
+          {
+            "DataTable": {
+              "ObjectName": "DataTable'matchmaker_hunts_table'",
+              "ObjectPath": "Archon/Content/Gameplay/hunts/matchmaker_hunts_table.0"
+            },
+            "RowName": "CR19_MatchmakerHunt_Gauntlet"
+          }
+        ],
+        "MatchmakingType": "EMatchmakingType::Reserved",
+        "MatchmakingGameType": "EMatchmakingGameType::Gauntlet",
+        "MatchmakerHuntsByTag": [],
+        "HuntTags": [
+          "Hunt.Gauntlet"
+        ],
+        "EscalationModeSpecification": {
+          "DataTable": null,
+          "RowName": "None"
+        },
+        "EscalationPatrolInitialChallengeLevel": 0,
+        "EscalationPatrolMaxChallengeLevel": 0,
+        "RecommendedEscalationLevel": 0,
+        "bHasPortals": false,
+        "bHasGlitterEvent": false,
+        "bHasPhaelanxEvent": false,
+        "HuntSuccessReward": "None",
+        "HuntSuccessConditionalRewards": [],
+        "FirstCompletionSuccessReward": "None",
+        "TargetedHuntSuccessReward": "None",
+        "HuntSuccessProgress": [],
+        "FirstCompletionSuccessProgress": [],
+        "ConditionalBoostedRewards": [],
+        "UI_RewardLimitedByItems": [],
+        "UI_RewardLimitItemCooldownName": "",
+        "HuntFailureReward": "None",
+        "TargetedHuntFailureReward": "None",
+        "HuntFailureProgress": [],
+        "MinWeaponSkillLevel": 0,
+        "RecomendedWeaponSkillLevel": 0,
+        "HuntDangerModerate": 0,
+        "HuntDangerHigh": 0,
+        "HuntDangerExtreme": 0,
+        "HuntDifficulty": 0,
+        "HuntComplexity": 0,
+        "IsVisibleWhileLocked": false,
+        "Unlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": []
+        },
+        "AltUnlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": []
+        }
+      },
+      "PlayerHunt_StoryMission_Linnea_01": {
+        "HuntName": {
+          "table": "Dialog_player_hunts_table",
+          "key": "Linnea_Story_Mission_01|Display Name"
+        },
+        "HuntDescription": {
+          "table": "Dialog_player_hunts_table",
+          "key": "Linnea_Story_Mission_01|Description"
+        },
+        "Region": {
+          "DataTable": {
+            "ObjectName": "DataTable'hunt_regions'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/hunt_regions.0"
+          },
+          "RowName": "ZONE_L"
+        },
+        "MatchmakerHuntIDs": [
+          {
+            "DataTable": {
+              "ObjectName": "DataTable'matchmaker_hunts_table'",
+              "ObjectPath": "Archon/Content/Gameplay/hunts/matchmaker_hunts_table.0"
+            },
+            "RowName": "MatchmakerHunt_StoryMission_Linnea_01"
+          }
+        ],
+        "MatchmakingType": "EMatchmakingType::Reserved",
+        "MatchmakingGameType": "EMatchmakingGameType::Mission",
+        "MatchmakerHuntsByTag": [],
+        "HuntTags": [
+          "Hunt.Mission"
+        ],
+        "EscalationModeSpecification": {
+          "DataTable": null,
+          "RowName": "None"
+        },
+        "EscalationPatrolInitialChallengeLevel": 0,
+        "EscalationPatrolMaxChallengeLevel": 0,
+        "RecommendedEscalationLevel": 0,
+        "bHasPortals": false,
+        "bHasGlitterEvent": false,
+        "bHasPhaelanxEvent": false,
+        "HuntSuccessReward": "None",
+        "HuntSuccessConditionalRewards": [],
+        "FirstCompletionSuccessReward": "None",
+        "TargetedHuntSuccessReward": "None",
+        "HuntSuccessProgress": [],
+        "FirstCompletionSuccessProgress": [],
+        "ConditionalBoostedRewards": [],
+        "UI_RewardLimitedByItems": [],
+        "UI_RewardLimitItemCooldownName": "",
+        "HuntFailureReward": "None",
+        "TargetedHuntFailureReward": "None",
+        "HuntFailureProgress": [],
+        "MinWeaponSkillLevel": 0,
+        "RecomendedWeaponSkillLevel": 0,
+        "HuntDangerModerate": 0,
+        "HuntDangerHigh": 0,
+        "HuntDangerExtreme": 0,
+        "HuntDifficulty": 0,
+        "HuntComplexity": 0,
+        "IsVisibleWhileLocked": false,
+        "Unlock": {
+          "Quests": [
+            {
+              "QuestID": "Linnea_Story_Mission_01",
+              "QuestStatusArray": [
+                "EQuestStatus::Accepted",
+                "EQuestStatus::Redeemable",
+                "EQuestStatus::Redeemed"
+              ]
+            }
+          ],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AnyRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": []
+        },
+        "AltUnlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": []
+        }
+      },
+      "PlayerHunt_Event_Anniversary_01": {
+        "HuntName": {
+          "table": "Dialog_EVENT_ANNIVERSARY_2022",
+          "key": "Mission|Name"
+        },
+        "HuntDescription": {
+          "table": "Dialog_EVENT_ANNIVERSARY_2022",
+          "key": "MIssion|Description"
+        },
+        "Region": {
+          "DataTable": {
+            "ObjectName": "DataTable'hunt_regions'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/hunt_regions.0"
+          },
+          "RowName": "ZONE_EVENTS_ANNIVERSARY"
+        },
+        "MatchmakerHuntIDs": [
+          {
+            "DataTable": {
+              "ObjectName": "DataTable'matchmaker_hunts_table'",
+              "ObjectPath": "Archon/Content/Gameplay/hunts/matchmaker_hunts_table.0"
+            },
+            "RowName": "MatchmakerHunt_Event_Anniversary_01"
+          }
+        ],
+        "MatchmakingType": "EMatchmakingType::Reserved",
+        "MatchmakingGameType": "EMatchmakingGameType::Mission",
+        "MatchmakerHuntsByTag": [],
+        "HuntTags": [
+          "Hunt.Event.Anniversary"
+        ],
+        "EscalationModeSpecification": {
+          "DataTable": null,
+          "RowName": "None"
+        },
+        "EscalationPatrolInitialChallengeLevel": 0,
+        "EscalationPatrolMaxChallengeLevel": 0,
+        "RecommendedEscalationLevel": 0,
+        "bHasPortals": false,
+        "bHasGlitterEvent": false,
+        "bHasPhaelanxEvent": false,
+        "HuntSuccessReward": "None",
+        "HuntSuccessConditionalRewards": [],
+        "FirstCompletionSuccessReward": "None",
+        "TargetedHuntSuccessReward": "None",
+        "HuntSuccessProgress": [],
+        "FirstCompletionSuccessProgress": [],
+        "ConditionalBoostedRewards": [],
+        "UI_RewardLimitedByItems": [],
+        "UI_RewardLimitItemCooldownName": "",
+        "HuntFailureReward": "None",
+        "TargetedHuntFailureReward": "None",
+        "HuntFailureProgress": [],
+        "MinWeaponSkillLevel": 0,
+        "RecomendedWeaponSkillLevel": 0,
+        "HuntDangerModerate": 0,
+        "HuntDangerHigh": 0,
+        "HuntDangerExtreme": 0,
+        "HuntDifficulty": 0,
+        "HuntComplexity": 0,
+        "IsVisibleWhileLocked": false,
+        "Unlock": {
+          "Quests": [
+            {
+              "QuestID": "PHX_ANNIVERSARY_2023_02",
+              "QuestStatusArray": [
+                "EQuestStatus::Redeemed"
+              ]
+            }
+          ],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "Event_Anniversary_Evergreen",
+          "PlayerJourneyMapNodes": []
+        },
+        "AltUnlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": []
+        }
+      },
+      "PlayerHunt_Event_Anniversary_02": {
+        "HuntName": {
+          "table": "Dialog_EVENT_ANNIVERSARY_2022",
+          "key": "Mission|Name2"
+        },
+        "HuntDescription": {
+          "table": "Dialog_EVENT_ANNIVERSARY_2022",
+          "key": "Mission|Description2"
+        },
+        "Region": {
+          "DataTable": {
+            "ObjectName": "DataTable'hunt_regions'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/hunt_regions.0"
+          },
+          "RowName": "ZONE_EVENTS_ANNIVERSARY"
+        },
+        "MatchmakerHuntIDs": [
+          {
+            "DataTable": {
+              "ObjectName": "DataTable'matchmaker_hunts_table'",
+              "ObjectPath": "Archon/Content/Gameplay/hunts/matchmaker_hunts_table.0"
+            },
+            "RowName": "MatchmakerHunt_Event_Anniversary_02"
+          }
+        ],
+        "MatchmakingType": "EMatchmakingType::Reserved",
+        "MatchmakingGameType": "EMatchmakingGameType::Mission",
+        "MatchmakerHuntsByTag": [],
+        "HuntTags": [
+          "Hunt.Event.Anniversary"
+        ],
+        "EscalationModeSpecification": {
+          "DataTable": null,
+          "RowName": "None"
+        },
+        "EscalationPatrolInitialChallengeLevel": 0,
+        "EscalationPatrolMaxChallengeLevel": 0,
+        "RecommendedEscalationLevel": 0,
+        "bHasPortals": false,
+        "bHasGlitterEvent": false,
+        "bHasPhaelanxEvent": false,
+        "HuntSuccessReward": "None",
+        "HuntSuccessConditionalRewards": [],
+        "FirstCompletionSuccessReward": "None",
+        "TargetedHuntSuccessReward": "None",
+        "HuntSuccessProgress": [],
+        "FirstCompletionSuccessProgress": [],
+        "ConditionalBoostedRewards": [],
+        "UI_RewardLimitedByItems": [],
+        "UI_RewardLimitItemCooldownName": "",
+        "HuntFailureReward": "None",
+        "TargetedHuntFailureReward": "None",
+        "HuntFailureProgress": [],
+        "MinWeaponSkillLevel": 0,
+        "RecomendedWeaponSkillLevel": 0,
+        "HuntDangerModerate": 0,
+        "HuntDangerHigh": 0,
+        "HuntDangerExtreme": 0,
+        "HuntDifficulty": 0,
+        "HuntComplexity": 0,
+        "IsVisibleWhileLocked": false,
+        "Unlock": {
+          "Quests": [
+            {
+              "QuestID": "PHX_ANNIVERSARY_2023_03",
+              "QuestStatusArray": [
+                "EQuestStatus::Redeemed"
+              ]
+            }
+          ],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "Event_Anniversary_Evergreen",
+          "PlayerJourneyMapNodes": []
+        },
+        "AltUnlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": []
+        }
+      },
+      "PlayerHunt_Event_Ramsgiving_01": {
+        "HuntName": {
+          "table": "Dialog_EVENT_RAMSGIVING",
+          "key": "RamsgivingMission|Name"
+        },
+        "HuntDescription": {
+          "table": "Dialog_EVENT_RAMSGIVING",
+          "key": "RamsgivingMission|Description"
+        },
+        "Region": {
+          "DataTable": {
+            "ObjectName": "DataTable'hunt_regions'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/hunt_regions.0"
+          },
+          "RowName": "ZONE_EVENTS_RAMSGIVING"
+        },
+        "MatchmakerHuntIDs": [
+          {
+            "DataTable": {
+              "ObjectName": "DataTable'matchmaker_hunts_table'",
+              "ObjectPath": "Archon/Content/Gameplay/hunts/matchmaker_hunts_table.0"
+            },
+            "RowName": "MatchmakerHunt_Event_Ramsgiving_01"
+          }
+        ],
+        "MatchmakingType": "EMatchmakingType::Reserved",
+        "MatchmakingGameType": "EMatchmakingGameType::Mission",
+        "MatchmakerHuntsByTag": [],
+        "HuntTags": [
+          "Hunt.Event.Ramsgiving"
+        ],
+        "EscalationModeSpecification": {
+          "DataTable": null,
+          "RowName": "None"
+        },
+        "EscalationPatrolInitialChallengeLevel": 0,
+        "EscalationPatrolMaxChallengeLevel": 0,
+        "RecommendedEscalationLevel": 0,
+        "bHasPortals": false,
+        "bHasGlitterEvent": false,
+        "bHasPhaelanxEvent": false,
+        "HuntSuccessReward": "BUNDLE_EVENT_RAMSGIVING_KING",
+        "HuntSuccessConditionalRewards": [],
+        "FirstCompletionSuccessReward": "None",
+        "TargetedHuntSuccessReward": "None",
+        "HuntSuccessProgress": [],
+        "FirstCompletionSuccessProgress": [],
+        "ConditionalBoostedRewards": [],
+        "UI_RewardLimitedByItems": [],
+        "UI_RewardLimitItemCooldownName": "",
+        "HuntFailureReward": "None",
+        "TargetedHuntFailureReward": "None",
+        "HuntFailureProgress": [],
+        "MinWeaponSkillLevel": 0,
+        "RecomendedWeaponSkillLevel": 10,
+        "HuntDangerModerate": 0,
+        "HuntDangerHigh": 0,
+        "HuntDangerExtreme": 0,
+        "HuntDifficulty": 0,
+        "HuntComplexity": 0,
+        "IsVisibleWhileLocked": false,
+        "Unlock": {
+          "Quests": [
+            {
+              "QuestID": "EVENT_RAMSGIVING_EVERGREEN_035",
+              "QuestStatusArray": [
+                "EQuestStatus::Redeemed"
+              ]
+            }
+          ],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "EVENT_RAMSGIVING",
+          "PlayerJourneyMapNodes": []
+        },
+        "AltUnlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": []
+        }
+      },
+      "PlayerHunt_Event_Ramsgiving_02": {
+        "HuntName": {
+          "table": "Dialog_EVENT_RAMSGIVING",
+          "key": "RamsgivingMission|Name|2"
+        },
+        "HuntDescription": {
+          "table": "Dialog_EVENT_RAMSGIVING",
+          "key": "RamsgivingMission|Description|2"
+        },
+        "Region": {
+          "DataTable": {
+            "ObjectName": "DataTable'hunt_regions'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/hunt_regions.0"
+          },
+          "RowName": "ZONE_EVENTS_RAMSGIVING"
+        },
+        "MatchmakerHuntIDs": [
+          {
+            "DataTable": {
+              "ObjectName": "DataTable'matchmaker_hunts_table'",
+              "ObjectPath": "Archon/Content/Gameplay/hunts/matchmaker_hunts_table.0"
+            },
+            "RowName": "MatchmakerHunt_Event_Ramsgiving_02"
+          }
+        ],
+        "MatchmakingType": "EMatchmakingType::Reserved",
+        "MatchmakingGameType": "EMatchmakingGameType::Mission",
+        "MatchmakerHuntsByTag": [],
+        "HuntTags": [
+          "Hunt.Event.Ramsgiving.Hard"
+        ],
+        "EscalationModeSpecification": {
+          "DataTable": null,
+          "RowName": "None"
+        },
+        "EscalationPatrolInitialChallengeLevel": 0,
+        "EscalationPatrolMaxChallengeLevel": 0,
+        "RecommendedEscalationLevel": 0,
+        "bHasPortals": false,
+        "bHasGlitterEvent": false,
+        "bHasPhaelanxEvent": false,
+        "HuntSuccessReward": "BUNDLE_EVENT_RAMSGIVING_KING_2",
+        "HuntSuccessConditionalRewards": [],
+        "FirstCompletionSuccessReward": "None",
+        "TargetedHuntSuccessReward": "None",
+        "HuntSuccessProgress": [],
+        "FirstCompletionSuccessProgress": [],
+        "ConditionalBoostedRewards": [],
+        "UI_RewardLimitedByItems": [],
+        "UI_RewardLimitItemCooldownName": "",
+        "HuntFailureReward": "None",
+        "TargetedHuntFailureReward": "None",
+        "HuntFailureProgress": [],
+        "MinWeaponSkillLevel": 0,
+        "RecomendedWeaponSkillLevel": 18,
+        "HuntDangerModerate": 0,
+        "HuntDangerHigh": 0,
+        "HuntDangerExtreme": 0,
+        "HuntDifficulty": 0,
+        "HuntComplexity": 0,
+        "IsVisibleWhileLocked": false,
+        "Unlock": {
+          "Quests": [
+            {
+              "QuestID": "EVENT_RAMSGIVING_EVERGREEN_04",
+              "QuestStatusArray": [
+                "EQuestStatus::Redeemed"
+              ]
+            }
+          ],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "EVENT_RAMSGIVING",
+          "PlayerJourneyMapNodes": []
+        },
+        "AltUnlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": []
+        }
+      },
+      "ShatteredIsles_Experiment2_F": {
+        "HuntName": {
+          "text": "Sandrian's Stone"
+        },
+        "HuntDescription": {
+          "text": "A parched wasteland full of precious stones, valuable herbs, and a dangerous host of blaze and terra behemoths feeding on the local aether. Watch your step that you don't fall through a crack, and make sure to bring extra water to quench your thirst. You might encounter a Charrogg here for the first time. Beware its lava expulsions and painful fire spouts.\r\n\r\nIsland Events: Embermania"
+        },
+        "Region": {
+          "DataTable": {
+            "ObjectName": "DataTable'hunt_regions'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/hunt_regions.0"
+          },
+          "RowName": "ZONE_00"
+        },
+        "MatchmakerHuntIDs": [
+          {
+            "DataTable": {
+              "ObjectName": "DataTable'matchmaker_hunts_table'",
+              "ObjectPath": "Archon/Content/Gameplay/hunts/matchmaker_hunts_table.0"
+            },
+            "RowName": "Adventure_IslandF"
+          }
+        ],
+        "MatchmakingType": "EMatchmakingType::Open",
+        "MatchmakingGameType": "EMatchmakingGameType::HuntingGround",
+        "MatchmakerHuntsByTag": [],
+        "HuntTags": [
+          "Hunt.Experimental.ShatteredIsles.E2_M"
+        ],
+        "EscalationModeSpecification": {
+          "DataTable": null,
+          "RowName": "None"
+        },
+        "EscalationPatrolInitialChallengeLevel": 0,
+        "EscalationPatrolMaxChallengeLevel": 0,
+        "RecommendedEscalationLevel": 0,
+        "bHasPortals": false,
+        "bHasGlitterEvent": false,
+        "bHasPhaelanxEvent": false,
+        "HuntSuccessReward": "None",
+        "HuntSuccessConditionalRewards": [],
+        "FirstCompletionSuccessReward": "None",
+        "TargetedHuntSuccessReward": "None",
+        "HuntSuccessProgress": [],
+        "FirstCompletionSuccessProgress": [],
+        "ConditionalBoostedRewards": [],
+        "UI_RewardLimitedByItems": [],
+        "UI_RewardLimitItemCooldownName": "",
+        "HuntFailureReward": "None",
+        "TargetedHuntFailureReward": "None",
+        "HuntFailureProgress": [],
+        "MinWeaponSkillLevel": 0,
+        "RecomendedWeaponSkillLevel": 0,
+        "HuntDangerModerate": 0,
+        "HuntDangerHigh": 0,
+        "HuntDangerExtreme": 0,
+        "HuntDifficulty": 0,
+        "HuntComplexity": 0,
+        "IsVisibleWhileLocked": false,
+        "Unlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": [
+            {
+              "DataTable": {
+                "ObjectName": "DataTable'player_journey_table'",
+                "ObjectPath": "Archon/Content/Gameplay/PlayerJourney/player_journey_table.0"
+              },
+              "RowName": "AirshipUpgrades_Islands_H"
+            }
+          ]
+        },
+        "AltUnlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": []
+        }
+      },
+      "ShatteredIsles_Experiment2_G": {
+        "HuntName": {
+          "text": "Aulric's Refuge"
+        },
+        "HuntDescription": {
+          "text": "A lush cliff-dotted landscape teeming with plant life you can use to craft tonics. Many Shrikes have been encountered here, often the first for most Slayers. You'll also find various shock and frost behemoths wandering the area. Don't forget that you can use aether propulsion vents and your glider to get a shrike's eye view of the terrain to assist your hunting.\r\n\r\nIsland Events: Coldsnap"
+        },
+        "Region": {
+          "DataTable": {
+            "ObjectName": "DataTable'hunt_regions'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/hunt_regions.0"
+          },
+          "RowName": "ZONE_00"
+        },
+        "MatchmakerHuntIDs": [
+          {
+            "DataTable": {
+              "ObjectName": "DataTable'matchmaker_hunts_table'",
+              "ObjectPath": "Archon/Content/Gameplay/hunts/matchmaker_hunts_table.0"
+            },
+            "RowName": "Adventure_IslandG"
+          }
+        ],
+        "MatchmakingType": "EMatchmakingType::Open",
+        "MatchmakingGameType": "EMatchmakingGameType::HuntingGround",
+        "MatchmakerHuntsByTag": [],
+        "HuntTags": [
+          "Hunt.Experimental.ShatteredIsles.E2_P"
+        ],
+        "EscalationModeSpecification": {
+          "DataTable": null,
+          "RowName": "None"
+        },
+        "EscalationPatrolInitialChallengeLevel": 0,
+        "EscalationPatrolMaxChallengeLevel": 0,
+        "RecommendedEscalationLevel": 0,
+        "bHasPortals": false,
+        "bHasGlitterEvent": false,
+        "bHasPhaelanxEvent": false,
+        "HuntSuccessReward": "None",
+        "HuntSuccessConditionalRewards": [],
+        "FirstCompletionSuccessReward": "None",
+        "TargetedHuntSuccessReward": "None",
+        "HuntSuccessProgress": [],
+        "FirstCompletionSuccessProgress": [],
+        "ConditionalBoostedRewards": [],
+        "UI_RewardLimitedByItems": [],
+        "UI_RewardLimitItemCooldownName": "",
+        "HuntFailureReward": "None",
+        "TargetedHuntFailureReward": "None",
+        "HuntFailureProgress": [],
+        "MinWeaponSkillLevel": 0,
+        "RecomendedWeaponSkillLevel": 0,
+        "HuntDangerModerate": 0,
+        "HuntDangerHigh": 0,
+        "HuntDangerExtreme": 0,
+        "HuntDifficulty": 0,
+        "HuntComplexity": 0,
+        "IsVisibleWhileLocked": false,
+        "Unlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": {
+            "ObjectName": "Class'ExplorationIslandsFeature'",
+            "ObjectPath": "/Script/Archon"
+          },
+          "EventID": "None",
+          "PlayerJourneyMapNodes": [
+            {
+              "DataTable": {
+                "ObjectName": "DataTable'player_journey_table'",
+                "ObjectPath": "Archon/Content/Gameplay/PlayerJourney/player_journey_table.0"
+              },
+              "RowName": "AirshipUpgrades_Islands_H"
+            }
+          ]
+        },
+        "AltUnlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": []
+        }
       }
     }
   }

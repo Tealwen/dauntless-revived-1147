@@ -25665,6 +25665,997 @@
           },
           "RowName": "Island_U(19-20)"
         }
+      },
+      "CR19_MatchmakerHunt_Escalation_Glitter_Easy": {
+        "Region": {
+          "DataTable": {
+            "ObjectName": "DataTable'hunt_regions'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/hunt_regions.0"
+          },
+          "RowName": "ZONE_ESCALATION_RADIANT"
+        },
+        "HuntTags": [
+          "Hunt.Escalation.Radiant.Easy"
+        ],
+        "HuntThreatLevel": 0,
+        "GameModeOverride": "",
+        "DangerPerSecOverride": 0,
+        "SpecificBehemoth": {
+          "BehemothName": "",
+          "BehemothAsset": {
+            "AssetPathName": "None",
+            "SubPathString": ""
+          },
+          "PowerOverride": 0,
+          "Weighting": 0
+        },
+        "AdditionalBehemoths": [],
+        "AdditionalSpecificBehemoths": [],
+        "MapMetaData": {
+          "DataTable": {
+            "ObjectName": "DataTable'map_metadata_table'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/map_metadata_table.0"
+          },
+          "RowName": "Escalation_Island_06"
+        },
+        "MapList": [
+          {
+            "MapName": "escalation_island_00",
+            "MapAssetName": "/Game/Maps/islands/escalation/escalation_island_radiant_00.escalation_island_radiant_00",
+            "MapAsset": {
+              "AssetPathName": "/Game/Maps/islands/escalation/escalation_island_radiant_00.escalation_island_radiant_00",
+              "SubPathString": ""
+            },
+            "Biome": "EHuntBiome::Moss",
+            "Weighting": 1,
+            "AtmosphereList": null,
+            "SpecificAtmosphere": {
+              "AtmosphereName": "radiant",
+              "AtmosphereAsset": {
+                "AssetPathName": "/Game/World/atmospheres/blueprints/atmospheres/production/atmospheres_night_01_radiant_bp.atmospheres_night_01_radiant_bp_C",
+                "SubPathString": ""
+              },
+              "Weighting": 1
+            },
+            "GatherableDistributions": [
+              {
+                "GatherableDataRow": {
+                  "DataTable": {
+                    "ObjectName": "DataTable'gatherable_distribution_table'",
+                    "ObjectPath": "Archon/Content/Gameplay/hunts/gatherable_distribution_table.0"
+                  },
+                  "RowName": "ESCALATION_ISLAND_00"
+                },
+                "Weight": 1
+              }
+            ]
+          }
+        ],
+        "SpecificModifier": null,
+        "Modifiers": [],
+        "GatherableTier": "EGatherableTier::Tier0",
+        "MaxPlayers": 4,
+        "Unlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": {
+            "ObjectName": "DataTable'escalation_season_6_radiant_bpff_C'",
+            "ObjectPath": "Archon/Content/gamemodes/escalation/escalation_season_6_radiant_bpff.0"
+          },
+          "EventID": "None",
+          "PlayerJourneyMapNodes": [
+            {
+              "DataTable": {
+                "ObjectName": "DataTable'player_journey_table'",
+                "ObjectPath": "Archon/Content/Gameplay/PlayerJourney/player_journey_table.0"
+              },
+              "RowName": "Escalation.Easy.Radiant"
+            }
+          ]
+        },
+        "AltUnlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": []
+        },
+        "bIsGeneratedEncounter": true,
+        "GameModeSpecificData": {
+          "DataTable": {
+            "ObjectName": "DataTable'exploration_island_spec_table'",
+            "ObjectPath": "Archon/Content/gamemodes/exploration/data_tables/exploration_island_spec_table.0"
+          },
+          "RowName": "None"
+        }
+      },
+      "CR19_MatchmakerHunt_Escalation_Glitter_Hard": {
+        "Region": {
+          "DataTable": {
+            "ObjectName": "DataTable'hunt_regions'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/hunt_regions.0"
+          },
+          "RowName": "ZONE_ESCALATION_RADIANT"
+        },
+        "HuntTags": [
+          "Hunt.Escalation.Radiant.Hard"
+        ],
+        "HuntThreatLevel": 0,
+        "GameModeOverride": "",
+        "DangerPerSecOverride": 0,
+        "SpecificBehemoth": {
+          "BehemothName": "",
+          "BehemothAsset": {
+            "AssetPathName": "None",
+            "SubPathString": ""
+          },
+          "PowerOverride": 0,
+          "Weighting": 0
+        },
+        "AdditionalBehemoths": [],
+        "AdditionalSpecificBehemoths": [],
+        "MapMetaData": {
+          "DataTable": {
+            "ObjectName": "DataTable'map_metadata_table'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/map_metadata_table.0"
+          },
+          "RowName": "Escalation_Island_06"
+        },
+        "MapList": [
+          {
+            "MapName": "escalation_island_00",
+            "MapAssetName": "/Game/Maps/islands/escalation/escalation_island_radiant_00.escalation_island_radiant_00",
+            "MapAsset": {
+              "AssetPathName": "/Game/Maps/islands/escalation/escalation_island_radiant_00.escalation_island_radiant_00",
+              "SubPathString": ""
+            },
+            "Biome": "EHuntBiome::Moss",
+            "Weighting": 1,
+            "AtmosphereList": null,
+            "SpecificAtmosphere": {
+              "AtmosphereName": "radiant",
+              "AtmosphereAsset": {
+                "AssetPathName": "/Game/World/atmospheres/blueprints/atmospheres/production/atmospheres_night_01_radiant_bp.atmospheres_night_01_radiant_bp_C",
+                "SubPathString": ""
+              },
+              "Weighting": 1
+            },
+            "GatherableDistributions": [
+              {
+                "GatherableDataRow": {
+                  "DataTable": {
+                    "ObjectName": "DataTable'gatherable_distribution_table'",
+                    "ObjectPath": "Archon/Content/Gameplay/hunts/gatherable_distribution_table.0"
+                  },
+                  "RowName": "ESCALATION_ISLAND_00"
+                },
+                "Weight": 1
+              }
+            ]
+          }
+        ],
+        "SpecificModifier": null,
+        "Modifiers": [],
+        "GatherableTier": "EGatherableTier::Tier0",
+        "MaxPlayers": 4,
+        "Unlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": {
+            "ObjectName": "DataTable'escalation_season_6_radiant_bpff_C'",
+            "ObjectPath": "Archon/Content/gamemodes/escalation/escalation_season_6_radiant_bpff.0"
+          },
+          "EventID": "None",
+          "PlayerJourneyMapNodes": [
+            {
+              "DataTable": {
+                "ObjectName": "DataTable'player_journey_table'",
+                "ObjectPath": "Archon/Content/Gameplay/PlayerJourney/player_journey_table.0"
+              },
+              "RowName": "Escalation.Hard.Radiant"
+            }
+          ]
+        },
+        "AltUnlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": []
+        },
+        "bIsGeneratedEncounter": true,
+        "GameModeSpecificData": {
+          "DataTable": {
+            "ObjectName": "DataTable'exploration_island_spec_table'",
+            "ObjectPath": "Archon/Content/gamemodes/exploration/data_tables/exploration_island_spec_table.0"
+          },
+          "RowName": "None"
+        }
+      },
+      "CR19_MatchmakerHunt_Escalation_Glitter_heroic": {
+        "Region": {
+          "DataTable": {
+            "ObjectName": "DataTable'hunt_regions'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/hunt_regions.0"
+          },
+          "RowName": "ZONE_ESCALATION_RADIANT"
+        },
+        "HuntTags": [
+          "Hunt.Escalation.Radiant.Heroic"
+        ],
+        "HuntThreatLevel": 0,
+        "GameModeOverride": "",
+        "DangerPerSecOverride": 0,
+        "SpecificBehemoth": {
+          "BehemothName": "",
+          "BehemothAsset": {
+            "AssetPathName": "None",
+            "SubPathString": ""
+          },
+          "PowerOverride": 0,
+          "Weighting": 0
+        },
+        "AdditionalBehemoths": [],
+        "AdditionalSpecificBehemoths": [],
+        "MapMetaData": {
+          "DataTable": {
+            "ObjectName": "DataTable'map_metadata_table'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/map_metadata_table.0"
+          },
+          "RowName": "Escalation_Island_06"
+        },
+        "MapList": [
+          {
+            "MapName": "escalation_island_00",
+            "MapAssetName": "/Game/Maps/islands/escalation/escalation_island_radiant_00.escalation_island_radiant_00",
+            "MapAsset": {
+              "AssetPathName": "/Game/Maps/islands/escalation/escalation_island_radiant_00.escalation_island_radiant_00",
+              "SubPathString": ""
+            },
+            "Biome": "EHuntBiome::Moss",
+            "Weighting": 1,
+            "AtmosphereList": null,
+            "SpecificAtmosphere": {
+              "AtmosphereName": "radiant",
+              "AtmosphereAsset": {
+                "AssetPathName": "/Game/World/atmospheres/blueprints/atmospheres/production/atmospheres_night_01_radiant_bp.atmospheres_night_01_radiant_bp_C",
+                "SubPathString": ""
+              },
+              "Weighting": 1
+            },
+            "GatherableDistributions": [
+              {
+                "GatherableDataRow": {
+                  "DataTable": {
+                    "ObjectName": "DataTable'gatherable_distribution_table'",
+                    "ObjectPath": "Archon/Content/Gameplay/hunts/gatherable_distribution_table.0"
+                  },
+                  "RowName": "ESCALATION_ISLAND_00"
+                },
+                "Weight": 1
+              }
+            ]
+          }
+        ],
+        "SpecificModifier": null,
+        "Modifiers": [],
+        "GatherableTier": "EGatherableTier::Tier0",
+        "MaxPlayers": 4,
+        "Unlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": {
+            "ObjectName": "DataTable'escalation_season_6_radiant_bpff_C'",
+            "ObjectPath": "Archon/Content/gamemodes/escalation/escalation_season_6_radiant_bpff.0"
+          },
+          "EventID": "None",
+          "PlayerJourneyMapNodes": [
+            {
+              "DataTable": {
+                "ObjectName": "DataTable'player_journey_table'",
+                "ObjectPath": "Archon/Content/Gameplay/PlayerJourney/player_journey_table.0"
+              },
+              "RowName": "Escalation_Heroic_Unlock"
+            }
+          ]
+        },
+        "AltUnlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": []
+        },
+        "bIsGeneratedEncounter": true,
+        "GameModeSpecificData": {
+          "DataTable": {
+            "ObjectName": "DataTable'exploration_island_spec_table'",
+            "ObjectPath": "Archon/Content/gamemodes/exploration/data_tables/exploration_island_spec_table.0"
+          },
+          "RowName": "None"
+        }
+      },
+      "CR19_MatchmakerHunt_Gauntlet": {
+        "Region": {
+          "DataTable": {
+            "ObjectName": "DataTable'hunt_regions'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/hunt_regions.0"
+          },
+          "RowName": "ZONE_GAUNTLET"
+        },
+        "HuntTags": [
+          "Hunt.Gauntlet"
+        ],
+        "HuntThreatLevel": 0,
+        "GameModeOverride": "/Game/Blueprints/GameMode/BPGM_ArchonGauntlet.BPGM_ArchonGauntlet_C",
+        "DangerPerSecOverride": 0,
+        "SpecificBehemoth": {
+          "BehemothName": "",
+          "BehemothAsset": {
+            "AssetPathName": "None",
+            "SubPathString": ""
+          },
+          "PowerOverride": 0,
+          "Weighting": 0
+        },
+        "AdditionalBehemoths": [],
+        "AdditionalSpecificBehemoths": [],
+        "MapMetaData": {
+          "DataTable": {
+            "ObjectName": "DataTable'map_metadata_table'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/map_metadata_table.0"
+          },
+          "RowName": "Gauntlet_Map"
+        },
+        "MapList": [
+          {
+            "MapName": "adventure_destroyed_ramsgate_00",
+            "MapAssetName": "/Game/Maps/islands/adventure/Destroyed_Ramsgate/adventure_destroyed_ramsgate_00.adventure_destroyed_ramsgate_00",
+            "MapAsset": {
+              "AssetPathName": "/Game/Maps/islands/adventure/Destroyed_Ramsgate/adventure_destroyed_ramsgate_00.adventure_destroyed_ramsgate_00",
+              "SubPathString": ""
+            },
+            "Biome": "EHuntBiome::Moss",
+            "Weighting": 1,
+            "AtmosphereList": null,
+            "SpecificAtmosphere": {
+              "AtmosphereName": "radiant",
+              "AtmosphereAsset": {
+                "AssetPathName": "/Game/World/atmospheres/blueprints/atmospheres/production/atmospheres_storm_01_bp.atmospheres_storm_01_bp_C",
+                "SubPathString": ""
+              },
+              "Weighting": 1
+            },
+            "GatherableDistributions": [
+              {
+                "GatherableDataRow": {
+                  "DataTable": {
+                    "ObjectName": "DataTable'gatherable_distribution_table'",
+                    "ObjectPath": "Archon/Content/Gameplay/hunts/gatherable_distribution_table.0"
+                  },
+                  "RowName": "ESCALATION_ISLAND_00"
+                },
+                "Weight": 1
+              }
+            ]
+          }
+        ],
+        "SpecificModifier": null,
+        "Modifiers": [],
+        "GatherableTier": "EGatherableTier::Tier0",
+        "MaxPlayers": 4,
+        "Unlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": [
+            {
+              "DataTable": {
+                "ObjectName": "DataTable'player_journey_table'",
+                "ObjectPath": "Archon/Content/Gameplay/PlayerJourney/player_journey_table.0"
+              },
+              "RowName": "Gauntlet_Unlock"
+            }
+          ]
+        },
+        "AltUnlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": []
+        },
+        "bIsGeneratedEncounter": true,
+        "GameModeSpecificData": {
+          "DataTable": null,
+          "RowName": "None"
+        }
+      },
+      "MatchmakerHunt_StoryMission_Linnea_01": {
+        "Region": {
+          "DataTable": {
+            "ObjectName": "DataTable'hunt_regions'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/hunt_regions.0"
+          },
+          "RowName": "ZONE_L"
+        },
+        "HuntTags": [],
+        "HuntThreatLevel": 11,
+        "GameModeOverride": "/Game/Blueprints/GameMode/BPGM_ArchonStoryMissions.BPGM_ArchonStoryMissions_C",
+        "DangerPerSecOverride": 0,
+        "SpecificBehemoth": {
+          "BehemothName": "snowflake_alpha_oneeye",
+          "BehemothAsset": {
+            "AssetPathName": "None",
+            "SubPathString": ""
+          },
+          "PowerOverride": 325,
+          "Weighting": 0
+        },
+        "AdditionalBehemoths": [],
+        "AdditionalSpecificBehemoths": [],
+        "MapMetaData": {
+          "DataTable": {
+            "ObjectName": "DataTable'map_metadata_table'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/map_metadata_table.0"
+          },
+          "RowName": "Campaign_Island_01"
+        },
+        "MapList": [
+          {
+            "MapName": "coldrunner-key",
+            "MapAssetName": "/Game/Maps/islands/adventure/Snow_Vega/adventure_snow_vega.adventure_snow_vega",
+            "MapAsset": {
+              "AssetPathName": "/Game/Maps/islands/adventure/Snow_Vega/adventure_snow_vega.adventure_snow_vega",
+              "SubPathString": ""
+            },
+            "Biome": "EHuntBiome::Ice",
+            "Weighting": 1,
+            "AtmosphereList": null,
+            "SpecificAtmosphere": {
+              "AtmosphereName": "frost",
+              "AtmosphereAsset": {
+                "AssetPathName": "/Game/World/atmospheres/blueprints/atmospheres/production/atmospheres_frost_00_bp.atmospheres_frost_00_bp_C",
+                "SubPathString": ""
+              },
+              "Weighting": 1
+            },
+            "GatherableDistributions": [
+              {
+                "GatherableDataRow": {
+                  "DataTable": {
+                    "ObjectName": "DataTable'gatherable_distribution_table'",
+                    "ObjectPath": "Archon/Content/Gameplay/hunts/gatherable_distribution_table.0"
+                  },
+                  "RowName": "None"
+                },
+                "Weight": 1
+              }
+            ]
+          }
+        ],
+        "SpecificModifier": null,
+        "Modifiers": [],
+        "GatherableTier": "EGatherableTier::Tier0",
+        "MaxPlayers": 4,
+        "Unlock": {
+          "Quests": [
+            {
+              "QuestID": "Linnea_Story_Mission_01",
+              "QuestStatusArray": [
+                "EQuestStatus::Accepted",
+                "EQuestStatus::Redeemable",
+                "EQuestStatus::Redeemed"
+              ]
+            }
+          ],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AnyRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": []
+        },
+        "AltUnlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": []
+        },
+        "bIsGeneratedEncounter": false,
+        "GameModeSpecificData": {
+          "DataTable": {
+            "ObjectName": "DataTable'story_missions_spec_table'",
+            "ObjectPath": "Archon/Content/gamemodes/exploration/data_tables/story_missions_spec_table.0"
+          },
+          "RowName": "MISSION_LINNEA_01"
+        }
+      },
+      "MatchmakerHunt_Event_Anniversary_01": {
+        "Region": {
+          "DataTable": {
+            "ObjectName": "DataTable'hunt_regions'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/hunt_regions.0"
+          },
+          "RowName": "ZONE_EVENTS_ANNIVERSARY"
+        },
+        "HuntTags": [],
+        "HuntThreatLevel": 11,
+        "GameModeOverride": "/Game/Blueprints/GameMode/BPGM_ArchonStoryMissions.BPGM_ArchonStoryMissions_C",
+        "DangerPerSecOverride": 0,
+        "SpecificBehemoth": {
+          "BehemothName": "bugbear_crowbear",
+          "BehemothAsset": {
+            "AssetPathName": "None",
+            "SubPathString": ""
+          },
+          "PowerOverride": 425,
+          "Weighting": 0
+        },
+        "AdditionalBehemoths": [],
+        "AdditionalSpecificBehemoths": [],
+        "MapMetaData": {
+          "DataTable": {
+            "ObjectName": "DataTable'map_metadata_table'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/map_metadata_table.0"
+          },
+          "RowName": "Campaign_Island_01"
+        },
+        "MapList": [
+          {
+            "MapName": "adventure_moss_triforce",
+            "MapAssetName": "/Game/Maps/islands/adventure/Moss_Triforce/adventure_moss_triforce.adventure_moss_triforce",
+            "MapAsset": {
+              "AssetPathName": "/Game/Maps/islands/adventure/Moss_Triforce/adventure_moss_triforce.adventure_moss_triforce",
+              "SubPathString": ""
+            },
+            "Biome": "EHuntBiome::Moss",
+            "Weighting": 1,
+            "AtmosphereList": null,
+            "SpecificAtmosphere": {
+              "AtmosphereName": "day",
+              "AtmosphereAsset": {
+                "AssetPathName": "/Game/World/atmospheres/blueprints/atmospheres/production/atmospheres_day_00_bp.atmospheres_day_00_bp_C",
+                "SubPathString": ""
+              },
+              "Weighting": 100
+            },
+            "GatherableDistributions": [
+              {
+                "GatherableDataRow": {
+                  "DataTable": null,
+                  "RowName": "None"
+                },
+                "Weight": 1
+              }
+            ]
+          }
+        ],
+        "SpecificModifier": null,
+        "Modifiers": [],
+        "GatherableTier": "EGatherableTier::Tier0",
+        "MaxPlayers": 4,
+        "Unlock": {
+          "Quests": [
+            {
+              "QuestID": "PHX_ANNIVERSARY_2023_02",
+              "QuestStatusArray": [
+                "EQuestStatus::Redeemed"
+              ]
+            }
+          ],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "Event_Anniversary_Evergreen",
+          "PlayerJourneyMapNodes": []
+        },
+        "AltUnlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": []
+        },
+        "bIsGeneratedEncounter": true,
+        "GameModeSpecificData": {
+          "DataTable": {
+            "ObjectName": "DataTable'story_missions_spec_table'",
+            "ObjectPath": "Archon/Content/gamemodes/exploration/data_tables/story_missions_spec_table.0"
+          },
+          "RowName": "ANNIVERSARY_01"
+        }
+      },
+      "MatchmakerHunt_Event_Anniversary_02": {
+        "Region": {
+          "DataTable": {
+            "ObjectName": "DataTable'hunt_regions'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/hunt_regions.0"
+          },
+          "RowName": "ZONE_EVENTS_ANNIVERSARY"
+        },
+        "HuntTags": [],
+        "HuntThreatLevel": 19,
+        "GameModeOverride": "/Game/Blueprints/GameMode/BPGM_ArchonStoryMissions.BPGM_ArchonStoryMissions_C",
+        "DangerPerSecOverride": 0,
+        "SpecificBehemoth": {
+          "BehemothName": "bugbear_crowbear",
+          "BehemothAsset": {
+            "AssetPathName": "None",
+            "SubPathString": ""
+          },
+          "PowerOverride": 700,
+          "Weighting": 0
+        },
+        "AdditionalBehemoths": [],
+        "AdditionalSpecificBehemoths": [],
+        "MapMetaData": {
+          "DataTable": {
+            "ObjectName": "DataTable'map_metadata_table'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/map_metadata_table.0"
+          },
+          "RowName": "Campaign_Island_01"
+        },
+        "MapList": [
+          {
+            "MapName": "adventure_moss_triforce",
+            "MapAssetName": "/Game/Maps/islands/adventure/Moss_Triforce/adventure_moss_triforce.adventure_moss_triforce",
+            "MapAsset": {
+              "AssetPathName": "/Game/Maps/islands/adventure/Moss_Triforce/adventure_moss_triforce.adventure_moss_triforce",
+              "SubPathString": ""
+            },
+            "Biome": "EHuntBiome::Moss",
+            "Weighting": 1,
+            "AtmosphereList": null,
+            "SpecificAtmosphere": {
+              "AtmosphereName": "sunset",
+              "AtmosphereAsset": {
+                "AssetPathName": "/Game/World/atmospheres/blueprints/atmospheres/experimental/atmospheres_sunset_00_bp.atmospheres_sunset_00_bp_C",
+                "SubPathString": ""
+              },
+              "Weighting": 100
+            },
+            "GatherableDistributions": [
+              {
+                "GatherableDataRow": {
+                  "DataTable": null,
+                  "RowName": "None"
+                },
+                "Weight": 1
+              }
+            ]
+          }
+        ],
+        "SpecificModifier": null,
+        "Modifiers": [],
+        "GatherableTier": "EGatherableTier::Tier0",
+        "MaxPlayers": 4,
+        "Unlock": {
+          "Quests": [
+            {
+              "QuestID": "PHX_ANNIVERSARY_2023_03",
+              "QuestStatusArray": [
+                "EQuestStatus::Redeemed"
+              ]
+            }
+          ],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "Event_Anniversary_Evergreen",
+          "PlayerJourneyMapNodes": []
+        },
+        "AltUnlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": []
+        },
+        "bIsGeneratedEncounter": true,
+        "GameModeSpecificData": {
+          "DataTable": {
+            "ObjectName": "DataTable'story_missions_spec_table'",
+            "ObjectPath": "Archon/Content/gamemodes/exploration/data_tables/story_missions_spec_table.0"
+          },
+          "RowName": "ANNIVERSARY_02"
+        }
+      },
+      "MatchmakerHunt_Event_Ramsgiving_01": {
+        "Region": {
+          "DataTable": {
+            "ObjectName": "DataTable'hunt_regions'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/hunt_regions.0"
+          },
+          "RowName": "ZONE_EVENTS_RAMSGIVING"
+        },
+        "HuntTags": [],
+        "HuntThreatLevel": 11,
+        "GameModeOverride": "/Game/Blueprints/GameMode/BPGM_ArchonStoryMissions.BPGM_ArchonStoryMissions_C",
+        "DangerPerSecOverride": 0,
+        "SpecificBehemoth": {
+          "BehemothName": "king_gruk",
+          "BehemothAsset": {
+            "AssetPathName": "None",
+            "SubPathString": ""
+          },
+          "PowerOverride": 425,
+          "Weighting": 0
+        },
+        "AdditionalBehemoths": [],
+        "AdditionalSpecificBehemoths": [],
+        "MapMetaData": {
+          "DataTable": {
+            "ObjectName": "DataTable'map_metadata_table'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/map_metadata_table.0"
+          },
+          "RowName": "Campaign_Island_01"
+        },
+        "MapList": [
+          {
+            "MapName": "dia_moss_triforce_ramsgiving",
+            "MapAssetName": "/Game/Maps/islands/1705/dia_moss_triforce_ramsgiving.dia_moss_triforce_ramsgiving",
+            "MapAsset": {
+              "AssetPathName": "/Game/Maps/islands/1705/dia_moss_triforce_ramsgiving.dia_moss_triforce_ramsgiving",
+              "SubPathString": ""
+            },
+            "Biome": "EHuntBiome::Moss",
+            "Weighting": 1,
+            "AtmosphereList": null,
+            "SpecificAtmosphere": {
+              "AtmosphereName": "dawn",
+              "AtmosphereAsset": {
+                "AssetPathName": "/Game/World/atmospheres/blueprints/atmospheres/production/atmospheres_dawn_00_bp.atmospheres_dawn_00_bp_C",
+                "SubPathString": ""
+              },
+              "Weighting": 100
+            },
+            "GatherableDistributions": [
+              {
+                "GatherableDataRow": {
+                  "DataTable": null,
+                  "RowName": "None"
+                },
+                "Weight": 1
+              }
+            ]
+          }
+        ],
+        "SpecificModifier": null,
+        "Modifiers": [],
+        "GatherableTier": "EGatherableTier::Tier0",
+        "MaxPlayers": 4,
+        "Unlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "EVENT_RAMSGIVING",
+          "PlayerJourneyMapNodes": [
+            {
+              "DataTable": {
+                "ObjectName": "DataTable'player_journey_table'",
+                "ObjectPath": "Archon/Content/Gameplay/PlayerJourney/player_journey_table.0"
+              },
+              "RowName": "Slayer_07"
+            }
+          ]
+        },
+        "AltUnlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": []
+        },
+        "bIsGeneratedEncounter": true,
+        "GameModeSpecificData": {
+          "DataTable": {
+            "ObjectName": "DataTable'story_missions_spec_table'",
+            "ObjectPath": "Archon/Content/gamemodes/exploration/data_tables/story_missions_spec_table.0"
+          },
+          "RowName": "RAMSGIVING_01"
+        }
+      },
+      "MatchmakerHunt_Event_Ramsgiving_02": {
+        "Region": {
+          "DataTable": {
+            "ObjectName": "DataTable'hunt_regions'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/hunt_regions.0"
+          },
+          "RowName": "ZONE_EVENTS_RAMSGIVING"
+        },
+        "HuntTags": [],
+        "HuntThreatLevel": 18,
+        "GameModeOverride": "/Game/Blueprints/GameMode/BPGM_ArchonStoryMissions.BPGM_ArchonStoryMissions_C",
+        "DangerPerSecOverride": 0,
+        "SpecificBehemoth": {
+          "BehemothName": "king_gruk",
+          "BehemothAsset": {
+            "AssetPathName": "None",
+            "SubPathString": ""
+          },
+          "PowerOverride": 425,
+          "Weighting": 0
+        },
+        "AdditionalBehemoths": [],
+        "AdditionalSpecificBehemoths": [],
+        "MapMetaData": {
+          "DataTable": {
+            "ObjectName": "DataTable'map_metadata_table'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/map_metadata_table.0"
+          },
+          "RowName": "Campaign_Island_01"
+        },
+        "MapList": [
+          {
+            "MapName": "dia_moss_triforce_ramsgiving",
+            "MapAssetName": "/Game/Maps/islands/1705/dia_moss_triforce_ramsgiving.dia_moss_triforce_ramsgiving",
+            "MapAsset": {
+              "AssetPathName": "/Game/Maps/islands/1705/dia_moss_triforce_ramsgiving.dia_moss_triforce_ramsgiving",
+              "SubPathString": ""
+            },
+            "Biome": "EHuntBiome::Moss",
+            "Weighting": 1,
+            "AtmosphereList": null,
+            "SpecificAtmosphere": {
+              "AtmosphereName": "dawn",
+              "AtmosphereAsset": {
+                "AssetPathName": "/Game/World/atmospheres/blueprints/atmospheres/production/atmospheres_dawn_00_bp.atmospheres_dawn_00_bp_C",
+                "SubPathString": ""
+              },
+              "Weighting": 100
+            },
+            "GatherableDistributions": [
+              {
+                "GatherableDataRow": {
+                  "DataTable": null,
+                  "RowName": "None"
+                },
+                "Weight": 1
+              }
+            ]
+          }
+        ],
+        "SpecificModifier": null,
+        "Modifiers": [],
+        "GatherableTier": "EGatherableTier::Tier0",
+        "MaxPlayers": 4,
+        "Unlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "EVENT_RAMSGIVING",
+          "PlayerJourneyMapNodes": [
+            {
+              "DataTable": {
+                "ObjectName": "DataTable'player_journey_table'",
+                "ObjectPath": "Archon/Content/Gameplay/PlayerJourney/player_journey_table.0"
+              },
+              "RowName": "Slayer_07"
+            }
+          ]
+        },
+        "AltUnlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": []
+        },
+        "bIsGeneratedEncounter": true,
+        "GameModeSpecificData": {
+          "DataTable": {
+            "ObjectName": "DataTable'story_missions_spec_table'",
+            "ObjectPath": "Archon/Content/gamemodes/exploration/data_tables/story_missions_spec_table.0"
+          },
+          "RowName": "RAMSGIVING_02"
+        }
       }
     }
   }
