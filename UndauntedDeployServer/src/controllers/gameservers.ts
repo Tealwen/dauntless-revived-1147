@@ -443,8 +443,8 @@ export async function StartupGameserverWithArgs(GameArgs: string){
     };
 }
 
-// The hunt tables (vendor/*.json) come from the 1.4.4 client: a 1.14.7 hunt missing from them (Escalation
-// Glitter and Patrol, Gauntlet, Anniversary, Ramsgiving, Linnea's story mission) is named in the error instead of
+// The hunt tables (vendor/*.json) come from the 1.4.4 client plus the 1.14.7 hunts it lacks (PORT-1.14.7/tools/
+// gen-island-hunts-1147.js): a hunt missing from them (the ~DNT~ test maps) is named in the error instead of
 // a TypeError on an undefined row.
 function GetMatchmakerHuntIdFromPlayerHuntId(PlayerHuntId: string){
     const Row = (PlayerHuntTable[0].Rows as any)[PlayerHuntId];
