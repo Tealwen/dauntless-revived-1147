@@ -15239,6 +15239,306 @@
           "EventID": "None",
           "PlayerJourneyMapNodes": []
         }
+      },
+      "ShatteredIsles_IslandS": {
+        "HuntName": {
+          "table": "player_hunts_table",
+          "key": "ShatteredIsles_IslandS|Hunt Name"
+        },
+        "HuntDescription": {
+          "table": "player_hunts_table",
+          "key": "ShatteredIsles_IslandS|Hunt Description"
+        },
+        "Region": {
+          "DataTable": {
+            "ObjectName": "DataTable'hunt_regions'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/hunt_regions.0"
+          },
+          "RowName": "ZONE_S"
+        },
+        "MatchmakerHuntIDs": [
+          {
+            "DataTable": {
+              "ObjectName": "DataTable'matchmaker_hunts_table'",
+              "ObjectPath": "Archon/Content/Gameplay/hunts/matchmaker_hunts_table.0"
+            },
+            "RowName": "Adventure_IslandS"
+          }
+        ],
+        "MatchmakingType": "EMatchmakingType::Open",
+        "MatchmakingGameType": "EMatchmakingGameType::HuntingGround",
+        "MatchmakerHuntsByTag": [],
+        "HuntTags": [
+          "Hunt.ShatteredIsles.IslandS",
+          "PublicTestRealm.Enabled"
+        ],
+        "EscalationModeSpecification": {
+          "DataTable": null,
+          "RowName": "None"
+        },
+        "EscalationPatrolInitialChallengeLevel": 0,
+        "EscalationPatrolMaxChallengeLevel": 0,
+        "RecommendedEscalationLevel": 0,
+        "bHasPortals": false,
+        "bHasGlitterEvent": true,
+        "bHasPhaelanxEvent": false,
+        "HuntSuccessReward": "None",
+        "HuntSuccessConditionalRewards": [],
+        "FirstCompletionSuccessReward": "None",
+        "TargetedHuntSuccessReward": "None",
+        "HuntSuccessProgress": [],
+        "FirstCompletionSuccessProgress": [],
+        "ConditionalBoostedRewards": [],
+        "UI_RewardLimitedByItems": [],
+        "UI_RewardLimitItemCooldownName": "",
+        "HuntFailureReward": "None",
+        "TargetedHuntFailureReward": "None",
+        "HuntFailureProgress": [],
+        "MinWeaponSkillLevel": 14,
+        "RecomendedWeaponSkillLevel": 18,
+        "HuntDangerModerate": 0,
+        "HuntDangerHigh": 0,
+        "HuntDangerExtreme": 0,
+        "HuntDifficulty": 0,
+        "HuntComplexity": 0,
+        "IsVisibleWhileLocked": false,
+        "Unlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": {
+            "ObjectName": "Class'ExplorationIslandsFeature'",
+            "ObjectPath": "/Script/Archon"
+          },
+          "EventID": "None",
+          "PlayerJourneyMapNodes": [
+            {
+              "DataTable": {
+                "ObjectName": "DataTable'player_journey_table'",
+                "ObjectPath": "Archon/Content/Gameplay/PlayerJourney/player_journey_table.0"
+              },
+              "RowName": "AirshipUpgrades_Islands_S"
+            }
+          ]
+        },
+        "AltUnlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": []
+        }
+      },
+      "ShatteredIsles_IslandT": {
+        "HuntName": {
+          "table": "player_hunts_table",
+          "key": "ShatteredIsles_IslandT|Hunt Name"
+        },
+        "HuntDescription": {
+          "table": "player_hunts_table",
+          "key": "ShatteredIsles_IslandT|Description"
+        },
+        "Region": {
+          "DataTable": {
+            "ObjectName": "DataTable'hunt_regions'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/hunt_regions.0"
+          },
+          "RowName": "ZONE_T"
+        },
+        "MatchmakerHuntIDs": [
+          {
+            "DataTable": {
+              "ObjectName": "DataTable'matchmaker_hunts_table'",
+              "ObjectPath": "Archon/Content/Gameplay/hunts/matchmaker_hunts_table.0"
+            },
+            "RowName": "Adventure_IslandT"
+          }
+        ],
+        "MatchmakingType": "EMatchmakingType::Open",
+        "MatchmakingGameType": "EMatchmakingGameType::HuntingGround",
+        "MatchmakerHuntsByTag": [],
+        "HuntTags": [
+          "Hunt.ShatteredIsles.IslandT"
+        ],
+        "EscalationModeSpecification": {
+          "DataTable": null,
+          "RowName": "None"
+        },
+        "EscalationPatrolInitialChallengeLevel": 0,
+        "EscalationPatrolMaxChallengeLevel": 0,
+        "RecommendedEscalationLevel": 0,
+        "bHasPortals": false,
+        "bHasGlitterEvent": false,
+        "bHasPhaelanxEvent": false,
+        "HuntSuccessReward": "None",
+        "HuntSuccessConditionalRewards": [],
+        "FirstCompletionSuccessReward": "None",
+        "TargetedHuntSuccessReward": "None",
+        "HuntSuccessProgress": [],
+        "FirstCompletionSuccessProgress": [],
+        "ConditionalBoostedRewards": [],
+        "UI_RewardLimitedByItems": [],
+        "UI_RewardLimitItemCooldownName": "",
+        "HuntFailureReward": "None",
+        "TargetedHuntFailureReward": "None",
+        "HuntFailureProgress": [],
+        "MinWeaponSkillLevel": 7,
+        "RecomendedWeaponSkillLevel": 11,
+        "HuntDangerModerate": 0,
+        "HuntDangerHigh": 0,
+        "HuntDangerExtreme": 0,
+        "HuntDifficulty": 0,
+        "HuntComplexity": 0,
+        "IsVisibleWhileLocked": false,
+        "Unlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": {
+            "ObjectName": "Class'ExplorationIslandsFeature'",
+            "ObjectPath": "/Script/Archon"
+          },
+          "EventID": "None",
+          "PlayerJourneyMapNodes": [
+            {
+              "DataTable": {
+                "ObjectName": "DataTable'player_journey_table'",
+                "ObjectPath": "Archon/Content/Gameplay/PlayerJourney/player_journey_table.0"
+              },
+              "RowName": "AirshipUpgrades_Islands_T"
+            }
+          ]
+        },
+        "AltUnlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": []
+        }
+      },
+      "ShatteredIsles_IslandU": {
+        "HuntName": {
+          "table": "player_hunts_table",
+          "key": "ShatteredIsles_IslandU|Hunt Name"
+        },
+        "HuntDescription": {
+          "table": "player_hunts_table",
+          "key": "ShatteredIsles_IslandU|Description"
+        },
+        "Region": {
+          "DataTable": {
+            "ObjectName": "DataTable'hunt_regions'",
+            "ObjectPath": "Archon/Content/Gameplay/hunts/hunt_regions.0"
+          },
+          "RowName": "ZONE_U"
+        },
+        "MatchmakerHuntIDs": [
+          {
+            "DataTable": {
+              "ObjectName": "DataTable'matchmaker_hunts_table'",
+              "ObjectPath": "Archon/Content/Gameplay/hunts/matchmaker_hunts_table.0"
+            },
+            "RowName": "Adventure_IslandU"
+          }
+        ],
+        "MatchmakingType": "EMatchmakingType::Open",
+        "MatchmakingGameType": "EMatchmakingGameType::HuntingGround",
+        "MatchmakerHuntsByTag": [],
+        "HuntTags": [
+          "Hunt.ShatteredIsles.IslandU",
+          "Hunt.ShatteredIsles.AdventureIsland",
+          "Hunt.OstianPowered"
+        ],
+        "EscalationModeSpecification": {
+          "DataTable": null,
+          "RowName": "None"
+        },
+        "EscalationPatrolInitialChallengeLevel": 0,
+        "EscalationPatrolMaxChallengeLevel": 0,
+        "RecommendedEscalationLevel": 0,
+        "bHasPortals": false,
+        "bHasGlitterEvent": false,
+        "bHasPhaelanxEvent": true,
+        "HuntSuccessReward": "None",
+        "HuntSuccessConditionalRewards": [],
+        "FirstCompletionSuccessReward": "None",
+        "TargetedHuntSuccessReward": "None",
+        "HuntSuccessProgress": [],
+        "FirstCompletionSuccessProgress": [],
+        "ConditionalBoostedRewards": [],
+        "UI_RewardLimitedByItems": [],
+        "UI_RewardLimitItemCooldownName": "",
+        "HuntFailureReward": "None",
+        "TargetedHuntFailureReward": "None",
+        "HuntFailureProgress": [],
+        "MinWeaponSkillLevel": 18,
+        "RecomendedWeaponSkillLevel": 19,
+        "HuntDangerModerate": 0,
+        "HuntDangerHigh": 0,
+        "HuntDangerExtreme": 0,
+        "HuntDifficulty": 0,
+        "HuntComplexity": 0,
+        "IsVisibleWhileLocked": false,
+        "Unlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": {
+            "ObjectName": "Class'ExplorationIslandsFeature'",
+            "ObjectPath": "/Script/Archon"
+          },
+          "EventID": "None",
+          "PlayerJourneyMapNodes": [
+            {
+              "DataTable": {
+                "ObjectName": "DataTable'player_journey_table'",
+                "ObjectPath": "Archon/Content/Gameplay/PlayerJourney/player_journey_table.0"
+              },
+              "RowName": "AirshipUpgrades_Islands_U"
+            }
+          ]
+        },
+        "AltUnlock": {
+          "Quests": [],
+          "QuestRequirementCondition": "EQuestRequirementCondition::AllRequired",
+          "ItemID": "None",
+          "ItemQuantity": 1,
+          "HideItemID": "None",
+          "RequiredRanks": [],
+          "MinimumUnlocked": 0,
+          "MaximumUnlocked": 0,
+          "FeatureFlag": null,
+          "EventID": "None",
+          "PlayerJourneyMapNodes": []
+        }
       }
     }
   }

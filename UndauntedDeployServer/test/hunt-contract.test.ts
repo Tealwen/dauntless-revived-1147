@@ -30,6 +30,18 @@ test('every enabled catalog hunt supplies a map, matchmaker hunt and the complet
     assert.ok(checked > 100, `only ${checked} catalog hunts checked`);
 });
 
+// The islands added after 1.4.4 (rows from the 1.14.7 tables, PORT-1.14.7/tools/gen-island-hunts-1147.js)
+test('The Paradox Breaks, island T and The Blazeworks start on their 1.14.7 maps', async () => {
+    for (const [hunt, map] of [['ShatteredIsles_IslandS', 'Radiant_Valley/adventure_radiant_valley'],
+        ['ShatteredIsles_IslandT', 'Radiant_Cave/adventure_radiant_cave'], ['ShatteredIsles_IslandU', 'Tundra_Jamima/adventure_tundra_jamima']]) {
+        ResetGameserversForTests();
+        await Startup();
+        await StartupGameserverWithHuntIdAndPlayers(hunt, ['UID-a']);
+        assert.ok(args[2].startsWith(`/Game/Maps/islands/adventure/${map}?game=/Game/Blueprints/GameMode/BPGM_ArchonExploration`), args[2]);
+        assert.equal(args[4], `Adventure_Island${hunt.slice(-1)}`);
+    }
+});
+
 test('concurrent Training requests share a world with catalog rules and no fixed player roster', async () => {
     ResetGameserversForTests();
     const replies = await Promise.all(Array.from({length: 12}, () => GetTrainingDojoConnectionDetails()));
